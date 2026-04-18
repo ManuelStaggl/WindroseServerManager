@@ -2,9 +2,9 @@
 
 **Dedicated Server Manager für [Windrose](https://store.steampowered.com/app/3041230/Windrose/)** — eine native Windows-Desktop-App (Avalonia / .NET 9), die SteamCMD, Server-Steuerung, Konfiguration, Backups, Firewall-Regeln und Update-Checks in einer schlanken UI bündelt.
 
-**Status: Beta · v0.9.0**
+**Status: Beta · v0.9.5**
 
-![Version](https://img.shields.io/badge/version-0.9.0-orange)
+![Version](https://img.shields.io/badge/version-0.9.5-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
 

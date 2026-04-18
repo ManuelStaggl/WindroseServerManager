@@ -8,11 +8,16 @@ using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
 
-public sealed class NavItem
+public sealed class NavItem : ObservableObject
 {
-    public string Title { get; init; } = string.Empty;
+    public string TitleKey { get; init; } = string.Empty;
     public string Icon { get; init; } = string.Empty;
     public Type VmType { get; init; } = typeof(ViewModelBase);
+
+    public string Title => Loc.Get(TitleKey);
+
+    /// <summary>Called after language change to re-raise the Title binding.</summary>
+    public void RefreshTitle() => OnPropertyChanged(nameof(Title));
 }
 
 public partial class MainWindowViewModel : ViewModelBase
@@ -41,6 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IToastService toasts,
         IAppSettingsService settings,
         IAppUpdateService appUpdate,
+        ILocalizationService localization,
         RestartScheduler restartScheduler,
         ILogger<MainWindowViewModel> logger)
     {
@@ -54,15 +60,24 @@ public partial class MainWindowViewModel : ViewModelBase
 
         NavItems = new ObservableCollection<NavItem>
         {
-            new() { Title = "Dashboard", Icon = "\uE80F", VmType = typeof(DashboardViewModel) },
-            new() { Title = "Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
-            new() { Title = "Log & Automatisierung", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
-            new() { Title = "Konfiguration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
-            new() { Title = "Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },
+            new() { TitleKey = "Nav.Dashboard", Icon = "\uE80F", VmType = typeof(DashboardViewModel) },
+            new() { TitleKey = "Nav.Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
+            new() { TitleKey = "Nav.ServerControl", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
+            new() { TitleKey = "Nav.Configuration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
+            new() { TitleKey = "Nav.Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },
         };
         FooterItems = new ObservableCollection<NavItem>
         {
-            new() { Title = "Einstellungen", Icon = "\uE713", VmType = typeof(SettingsViewModel) },
+            new() { TitleKey = "Nav.Settings", Icon = "\uE713", VmType = typeof(SettingsViewModel) },
+        };
+
+        localization.LanguageChanged += () =>
+        {
+            foreach (var n in NavItems) n.RefreshTitle();
+            foreach (var n in FooterItems) n.RefreshTitle();
+            UpdateBannerMessage = _pendingLatestVersion is null
+                ? string.Empty
+                : Loc.Format("Update.Banner.AvailableFormat", _pendingLatestVersion);
         };
 
         var hasInstall = !string.IsNullOrWhiteSpace(settings.Current.ServerInstallDir)
@@ -110,7 +125,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (evt.Trigger == WindroseServerManager.Core.Services.RestartTrigger.ScheduledWarning)
                 Toasts.Warning(evt.Reason);
             else
-                Toasts.Info($"Auto-Restart: {evt.Reason}");
+                Toasts.Info(Loc.Format("Toast.AutoRestartPrefix", evt.Reason));
         });
     }
 
@@ -134,7 +149,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             _pendingLatestVersion = result.LatestVersion;
             _pendingReleaseUrl = result.ReleaseUrl ?? result.DownloadUrl;
-            UpdateBannerMessage = $"Update verfügbar: v{result.LatestVersion}";
+            UpdateBannerMessage = Loc.Format("Update.Banner.AvailableFormat", result.LatestVersion);
             IsUpdateBannerVisible = true;
         });
     }
@@ -151,7 +166,7 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Konnte Release-URL nicht öffnen: {Url}", url);
-            Toasts.Error("Release-Seite konnte nicht geöffnet werden.");
+            Toasts.Error(Loc.Get("Toast.ReleasePageFailed"));
         }
     }
 

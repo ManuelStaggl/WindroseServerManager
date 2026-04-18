@@ -2,9 +2,37 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using WindroseServerManager.App.Services;
 using WindroseServerManager.Core.Models;
 
 namespace WindroseServerManager.App.ViewModels;
+
+public sealed class ServerStatusToLocalizedTextConverter : IValueConverter
+{
+    public static readonly ServerStatusToLocalizedTextConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is ServerStatus s ? Loc.Get($"ServerStatus.{s}") : string.Empty;
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class WorldPresetTypeToLocalizedTextConverter : IValueConverter
+{
+    public static readonly WorldPresetTypeToLocalizedTextConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is WorldPresetType p ? Loc.Get($"WorldPreset.{p}") : string.Empty;
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class CombatDifficultyToLocalizedTextConverter : IValueConverter
+{
+    public static readonly CombatDifficultyToLocalizedTextConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is CombatDifficultyOption d ? Loc.Get($"Combat.{d}") : string.Empty;
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
 
 public sealed class ServerStatusToBrushConverter : IValueConverter
 {
@@ -38,7 +66,7 @@ public sealed class BoolToInstalledConverter : IValueConverter
 {
     public static readonly BoolToInstalledConverter Instance = new();
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is bool b && b ? "Installiert" : "Nicht installiert";
+        => value is bool b && b ? Loc.Get("Status.Installed") : Loc.Get("Status.NotInstalled");
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }
@@ -138,12 +166,12 @@ public sealed class ServerEventToTitleConverter : IValueConverter
         if (value is not ServerEvent e) return string.Empty;
         var typeLabel = e.Type switch
         {
-            ServerEventType.Started => "Gestartet",
-            ServerEventType.Stopped => "Gestoppt",
-            ServerEventType.Crashed => "Crash",
-            ServerEventType.ScheduledRestart => "Geplanter Restart",
-            ServerEventType.AutoRestartHighRam => "Auto-Restart (RAM)",
-            ServerEventType.AutoRestartMaxUptime => "Auto-Restart (Uptime)",
+            ServerEventType.Started => Loc.Get("Event.Started"),
+            ServerEventType.Stopped => Loc.Get("Event.Stopped"),
+            ServerEventType.Crashed => Loc.Get("Event.Crashed"),
+            ServerEventType.ScheduledRestart => Loc.Get("Event.ScheduledRestart"),
+            ServerEventType.AutoRestartHighRam => Loc.Get("Event.AutoRestartRam"),
+            ServerEventType.AutoRestartMaxUptime => Loc.Get("Event.AutoRestartUptime"),
             _ => e.Type.ToString(),
         };
         var ts = e.TimestampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", culture);
@@ -164,8 +192,8 @@ public sealed class ServerEventToDetailConverter : IValueConverter
         if (e.SessionDuration is { } d && d.TotalSeconds > 0)
         {
             var durStr = d.TotalHours >= 1
-                ? $"Session-Dauer: {(int)d.TotalHours}h {d.Minutes}m"
-                : $"Session-Dauer: {d.Minutes}m {d.Seconds}s";
+                ? Loc.Format("Event.SessionDurationHm", (int)d.TotalHours, d.Minutes)
+                : Loc.Format("Event.SessionDurationMs", d.Minutes, d.Seconds);
             parts.Add(durStr);
         }
         return string.Join(" · ", parts);

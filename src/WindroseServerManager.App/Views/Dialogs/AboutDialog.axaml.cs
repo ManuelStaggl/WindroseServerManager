@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using WindroseServerManager.App.Services;
 
 namespace WindroseServerManager.App.Views.Dialogs;
 
@@ -15,7 +16,7 @@ public partial class AboutDialog : Window
 
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
         if (this.FindControl<TextBlock>("VersionText") is { } text)
-            text.Text = $"Version {version}";
+            text.Text = Loc.Format("Settings.About.VersionFormat", version);
     }
 
     private void InitializeComponent()

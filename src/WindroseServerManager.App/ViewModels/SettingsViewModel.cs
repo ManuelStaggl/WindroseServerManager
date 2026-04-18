@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -7,6 +8,12 @@ using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
 
+public sealed class LanguageOption
+{
+    public required string Key { get; init; }        // "auto" | "de" | "en"
+    public required string DisplayName { get; init; }
+}
+
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly IAppSettingsService _settings;
@@ -14,6 +21,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly IFirewallService _firewall;
     private readonly IAutoStartService _autoStart;
     private readonly IAppUpdateService _appUpdate;
+    private readonly ILocalizationService _localization;
 
     [ObservableProperty] private bool _autoRestartOnCrash;
     [ObservableProperty] private int _gracefulShutdownSeconds;
@@ -39,6 +47,11 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private bool _isUpdateCheckBusy;
     [ObservableProperty] private string? _updateCheckStatus;
 
+    // Language
+    public ObservableCollection<LanguageOption> LanguageOptions { get; } = new();
+    [ObservableProperty] private LanguageOption? _selectedLanguageOption;
+    private bool _suppressLanguageWrite;
+
     private bool _suppressAutoStartWrite;
 
     public SettingsViewModel(
@@ -46,13 +59,15 @@ public partial class SettingsViewModel : ViewModelBase
         IToastService toasts,
         IFirewallService firewall,
         IAutoStartService autoStart,
-        IAppUpdateService appUpdate)
+        IAppUpdateService appUpdate,
+        ILocalizationService localization)
     {
         _settings = settings;
         _toasts = toasts;
         _firewall = firewall;
         _autoStart = autoStart;
         _appUpdate = appUpdate;
+        _localization = localization;
 
         var c = settings.Current;
         _autoRestartOnCrash = c.AutoRestartOnCrash;
@@ -68,8 +83,49 @@ public partial class SettingsViewModel : ViewModelBase
         _autoStartEnabled = _autoStart.IsEnabled();
         _suppressAutoStartWrite = false;
 
+        RebuildLanguageOptions();
+        _localization.LanguageChanged += OnLanguageChanged;
+
         _settings.Changed += OnSettingsChanged;
         _ = CheckFirewallCoreAsync(showToast: false);
+    }
+
+    public string AppVersionDisplay =>
+        Loc.Format("Settings.About.VersionFormat",
+            Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0");
+
+    private void OnLanguageChanged()
+    {
+        RebuildLanguageOptions();
+        OnPropertyChanged(nameof(AppVersionDisplay));
+    }
+
+    private void RebuildLanguageOptions()
+    {
+        _suppressLanguageWrite = true;
+        try
+        {
+            LanguageOptions.Clear();
+            LanguageOptions.Add(new LanguageOption { Key = "auto", DisplayName = Loc.Get("Settings.Language.Auto") });
+            LanguageOptions.Add(new LanguageOption { Key = "de",   DisplayName = Loc.Get("Settings.Language.German") });
+            LanguageOptions.Add(new LanguageOption { Key = "en",   DisplayName = Loc.Get("Settings.Language.English") });
+
+            var current = _localization.CurrentSetting;
+            SelectedLanguageOption = LanguageOptions.FirstOrDefault(o => o.Key == current) ?? LanguageOptions[0];
+        }
+        finally
+        {
+            _suppressLanguageWrite = false;
+        }
+    }
+
+    partial void OnSelectedLanguageOptionChanged(LanguageOption? value)
+    {
+        if (_suppressLanguageWrite || value is null) return;
+        if (string.Equals(value.Key, _localization.CurrentSetting, StringComparison.OrdinalIgnoreCase)) return;
+
+        _localization.SetLanguage(value.Key);
+        _ = _settings.UpdateAsync(s => s.Language = value.Key);
     }
 
     [RelayCommand]
@@ -81,7 +137,7 @@ public partial class SettingsViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(binary))
         {
             IsFirewallRuleInstalled = false;
-            if (showToast) _toasts.Warning("Server-Binary nicht gefunden. Bitte zuerst installieren.");
+            if (showToast) _toasts.Warning(Loc.Get("Toast.FirewallBinaryMissing"));
             return;
         }
         try
@@ -90,13 +146,13 @@ public partial class SettingsViewModel : ViewModelBase
             IsFirewallRuleInstalled = await _firewall.IsRuleInstalledAsync(binary);
             if (showToast)
             {
-                if (IsFirewallRuleInstalled) _toasts.Success("Firewall-Regel ist aktiv.");
-                else _toasts.Info("Keine Firewall-Regel vorhanden.");
+                if (IsFirewallRuleInstalled) _toasts.Success(Loc.Get("Toast.FirewallRuleActive"));
+                else _toasts.Info(Loc.Get("Toast.FirewallNoRule"));
             }
         }
         catch (Exception ex)
         {
-            if (showToast) _toasts.Error($"Status-Prüfung fehlgeschlagen: {ErrorMessageHelper.FriendlyMessage(ex)}");
+            if (showToast) _toasts.Error(Loc.Format("Toast.FirewallCheckFailedFormat", ErrorMessageHelper.FriendlyMessage(ex)));
         }
         finally
         {
@@ -110,13 +166,13 @@ public partial class SettingsViewModel : ViewModelBase
         var binary = ResolveServerBinary();
         if (string.IsNullOrWhiteSpace(binary))
         {
-            _toasts.Warning("Server-Binary nicht gefunden. Bitte zuerst installieren.");
+            _toasts.Warning(Loc.Get("Toast.FirewallBinaryMissing"));
             return;
         }
 
         if (!FirewallService.IsCurrentProcessElevated())
         {
-            _toasts.Warning("App mit Admin-Rechten neu starten nötig.");
+            _toasts.Warning(Loc.Get("Toast.FirewallAdminNeeded"));
             return;
         }
 
@@ -127,14 +183,14 @@ public partial class SettingsViewModel : ViewModelBase
             if (IsFirewallRuleInstalled)
             {
                 ok = await _firewall.RemoveRuleAsync(binary);
-                if (ok) _toasts.Success("Firewall-Regel entfernt.");
-                else _toasts.Error("Firewall-Regel konnte nicht entfernt werden.");
+                if (ok) _toasts.Success(Loc.Get("Toast.FirewallRuleRemoved"));
+                else _toasts.Error(Loc.Get("Toast.FirewallRuleNotRemoved"));
             }
             else
             {
                 ok = await _firewall.InstallRuleAsync(binary);
-                if (ok) _toasts.Success("Firewall-Regel hinzugefügt.");
-                else _toasts.Error("Firewall-Regel konnte nicht hinzugefügt werden.");
+                if (ok) _toasts.Success(Loc.Get("Toast.FirewallRuleAdded"));
+                else _toasts.Error(Loc.Get("Toast.FirewallRuleNotAdded"));
             }
             await CheckFirewallCoreAsync(showToast: false);
         }
@@ -164,21 +220,21 @@ public partial class SettingsViewModel : ViewModelBase
                     ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(exe))
                 {
-                    _toasts.Warning("Pfad zur App konnte nicht ermittelt werden.");
+                    _toasts.Warning(Loc.Get("Toast.AppPathUnknown"));
                     return;
                 }
                 _autoStart.Enable(exe);
-                _toasts.Success("Autostart aktiviert.");
+                _toasts.Success(Loc.Get("Toast.AutoStartOn"));
             }
             else
             {
                 _autoStart.Disable();
-                _toasts.Info("Autostart deaktiviert.");
+                _toasts.Info(Loc.Get("Toast.AutoStartOff"));
             }
         }
         catch (Exception ex)
         {
-            _toasts.Error($"Autostart-Fehler: {ErrorMessageHelper.FriendlyMessage(ex)}");
+            _toasts.Error(Loc.Format("Toast.AutoStartErrorFormat", ErrorMessageHelper.FriendlyMessage(ex)));
         }
     }
 
@@ -196,8 +252,8 @@ public partial class SettingsViewModel : ViewModelBase
             s.SteamAppId = string.IsNullOrWhiteSpace(SteamAppId) ? "4129620" : SteamAppId.Trim();
             s.SteamLogin = SteamLogin?.Trim() ?? string.Empty;
         });
-        StatusMessage = "Einstellungen gespeichert.";
-        _toasts.Success("Einstellungen gespeichert.");
+        StatusMessage = Loc.Get("Toast.SettingsSaved");
+        _toasts.Success(Loc.Get("Toast.SettingsSaved"));
     }
 
     public string AppVersion =>
@@ -210,7 +266,7 @@ public partial class SettingsViewModel : ViewModelBase
         try
         {
             IsUpdateCheckBusy = true;
-            UpdateCheckStatus = "Prüfe auf Updates…";
+            UpdateCheckStatus = Loc.Get("Toast.UpdateChecking");
             var result = await _appUpdate.CheckAsync();
             UpdateCheckStatus = result.Message;
             if (result.HasUpdate) _toasts.Info(result.Message);
@@ -218,7 +274,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            UpdateCheckStatus = "Update-Check fehlgeschlagen.";
+            UpdateCheckStatus = Loc.Get("Toast.UpdateCheckFailed");
             _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex));
         }
         finally

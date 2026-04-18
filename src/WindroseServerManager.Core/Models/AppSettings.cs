@@ -2,7 +2,8 @@ namespace WindroseServerManager.Core.Models;
 
 public sealed class AppSettings
 {
-    public string Language { get; set; } = "de";
+    /// <summary>UI-Sprache: "auto" (Windows-Sprache) | "de" | "en".</summary>
+    public string Language { get; set; } = "auto";
 
     // Server paths
     public string ServerInstallDir { get; set; } = string.Empty;

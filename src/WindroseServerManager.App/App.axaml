@@ -25,15 +25,15 @@
 
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico" ToolTipText="Windrose Server Manager">
+            <TrayIcon Icon="/Assets/avalonia-logo.ico" ToolTipText="{DynamicResource Tray.ToolTip}">
                 <TrayIcon.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Öffnen" Click="OnTrayShowMainWindow"/>
+                        <NativeMenuItem Header="{DynamicResource Tray.Open}" Click="OnTrayShowMainWindow"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Server starten" Click="OnTrayStartServer"/>
-                        <NativeMenuItem Header="Server stoppen" Click="OnTrayStopServer"/>
+                        <NativeMenuItem Header="{DynamicResource Tray.StartServer}" Click="OnTrayStartServer"/>
+                        <NativeMenuItem Header="{DynamicResource Tray.StopServer}" Click="OnTrayStopServer"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Beenden" Click="OnTrayQuit"/>
+                        <NativeMenuItem Header="{DynamicResource Tray.Quit}" Click="OnTrayQuit"/>
                     </NativeMenu>
                 </TrayIcon.Menu>
             </TrayIcon>

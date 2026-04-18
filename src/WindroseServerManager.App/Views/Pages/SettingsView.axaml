@@ -8,26 +8,44 @@
     </UserControl.KeyBindings>
     <ScrollViewer>
         <StackPanel>
-            <TextBlock Classes="page-title" Text="Einstellungen" />
-            <TextBlock Classes="caption" Text="App-Konfiguration" Margin="0,4,0,20" />
+            <TextBlock Classes="page-title" Text="{DynamicResource Settings.Title}" />
+            <TextBlock Classes="caption" Text="{DynamicResource Settings.Subtitle}" Margin="0,4,0,20" />
+
+            <!-- ==================== SPRACHE / LANGUAGE ==================== -->
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Language.Title}" />
+                    <ComboBox ItemsSource="{Binding LanguageOptions}"
+                              SelectedItem="{Binding SelectedLanguageOption}"
+                              HorizontalAlignment="Left" MinWidth="220">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.Language.Hint}" />
+                </StackPanel>
+            </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Server-Start (Launch-Args)" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.LaunchArgs.Title}" />
 
-                    <CheckBox Content="Console-Log aktivieren (-log)" IsChecked="{Binding LogEnabled}" />
+                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.ConsoleLog}" IsChecked="{Binding LogEnabled}" />
 
                     <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Zusätzliche Launch-Args (optional)" />
-                        <TextBox Text="{Binding ExtraLaunchArgs}" PlaceholderText="z.B. -NOSEAMLESSTRAVEL" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.Extra}" />
+                        <TextBox Text="{Binding ExtraLaunchArgs}" Watermark="{DynamicResource Settings.LaunchArgs.Extra.Placeholder}" />
                         <TextBlock Classes="caption" TextWrapping="Wrap"
-                                   Text="Windrose nutzt automatische NAT-Punch-Through. Feste Ports sind nicht vorgesehen — das Feld ist nur für ungedockte Zukunfts-Args." />
+                                   Text="{DynamicResource Settings.LaunchArgs.Hint}" />
                     </StackPanel>
 
-                    <CheckBox Content="Automatischer Neustart bei Crash" IsChecked="{Binding AutoRestartOnCrash}" />
+                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.AutoRestartOnCrash}" IsChecked="{Binding AutoRestartOnCrash}" />
 
                     <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Graceful-Shutdown (Sekunden)" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.GracefulShutdown}" />
                         <NumericUpDown Value="{Binding GracefulShutdownSeconds}" Minimum="5" Maximum="600" FormatString="0" />
                     </StackPanel>
                 </StackPanel>
@@ -35,31 +53,31 @@
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Steam &amp; SteamCMD" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Steam.Title}" />
                     <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Steam App-ID" />
-                        <TextBox Text="{Binding SteamAppId}" PlaceholderText="4129620" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.AppId}" />
+                        <TextBox Text="{Binding SteamAppId}" Watermark="4129620" />
                     </StackPanel>
                     <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Steam Login (leer = anonymous)" />
-                        <TextBox Text="{Binding SteamLogin}" PlaceholderText="anonymous" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.Login}" />
+                        <TextBox Text="{Binding SteamLogin}" Watermark="anonymous" />
                     </StackPanel>
                     <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="Normalerweise nicht nötig. Ändern nur für Beta-Branches oder alternative Steam-Konten." />
+                               Text="{DynamicResource Settings.Steam.Hint}" />
                 </StackPanel>
             </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="Netzwerk &amp; Ports" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Network.Title}" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="Windrose-Ports: UDP 7777 (Game) + 7778 (Query). NAT-Punch-through bevorzugt. Firewall-Ausnahme für WindroseServer.exe empfohlen. Externe Hoster müssen beide Ports öffnen." />
+                               Text="{DynamicResource Settings.Network.Hint}" />
                 </StackPanel>
             </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Windows Firewall" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Firewall.Title}" />
                     <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                         <Panel Width="12" Height="12">
                             <Ellipse Width="12" Height="12"
@@ -69,49 +87,49 @@
                                      Fill="{DynamicResource BrandTextMutedBrush}"
                                      IsVisible="{Binding !IsFirewallRuleInstalled}" />
                         </Panel>
-                        <TextBlock Classes="body" Text="Firewall-Regel: installiert"
+                        <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.Installed}"
                                    IsVisible="{Binding IsFirewallRuleInstalled}" />
-                        <TextBlock Classes="body" Text="Firewall-Regel: nicht installiert"
+                        <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.NotInstalled}"
                                    IsVisible="{Binding !IsFirewallRuleInstalled}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Classes="primary" Content="Regel hinzufügen"
+                        <Button Classes="primary" Content="{DynamicResource Settings.Firewall.Add}"
                                 Command="{Binding ToggleFirewallCommand}"
                                 IsVisible="{Binding !IsFirewallRuleInstalled}"
                                 IsEnabled="{Binding !IsFirewallBusy}" />
-                        <Button Content="Regel entfernen"
+                        <Button Content="{DynamicResource Settings.Firewall.Remove}"
                                 Command="{Binding ToggleFirewallCommand}"
                                 IsVisible="{Binding IsFirewallRuleInstalled}"
                                 IsEnabled="{Binding !IsFirewallBusy}" />
-                        <Button Content="Status prüfen" Command="{Binding CheckFirewallCommand}"
+                        <Button Content="{DynamicResource Settings.Firewall.Check}" Command="{Binding CheckFirewallCommand}"
                                 IsEnabled="{Binding !IsFirewallBusy}" />
                     </StackPanel>
                     <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="Erfordert Admin-Rechte. Bei UAC-Prompt zustimmen." />
+                               Text="{DynamicResource Settings.Firewall.Hint}" />
                 </StackPanel>
             </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="Autostart" />
-                    <CheckBox Content="Windrose Server Manager beim Windows-Start ausführen"
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.AutoStart.Title}" />
+                    <CheckBox Content="{DynamicResource Settings.AutoStart.Label}"
                               IsChecked="{Binding AutoStartEnabled}" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="Trägt einen Eintrag in HKCU\Software\Microsoft\Windows\CurrentVersion\Run ein." />
+                               Text="{DynamicResource Settings.AutoStart.Hint}" />
                 </StackPanel>
             </Border>
 
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Classes="primary" Content="Speichern" Command="{Binding SaveCommand}" />
+                <Button Classes="primary" Content="{DynamicResource Action.Save}" Command="{Binding SaveCommand}" />
             </StackPanel>
 
             <Border Classes="card" Margin="0,16,0,0">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="App-Updates" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.AppUpdate.Title}" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="Prüft auf GitHub nach einer neueren Version des Windrose Server Managers. Automatisch alle 6 Stunden." />
+                               Text="{DynamicResource Settings.AppUpdate.Hint}" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Content="Jetzt auf Update prüfen"
+                        <Button Content="{DynamicResource Settings.AppUpdate.CheckNow}"
                                 Command="{Binding CheckAppUpdateCommand}"
                                 IsEnabled="{Binding !IsUpdateCheckBusy}" />
                         <TextBlock Text="{Binding UpdateCheckStatus}"
@@ -124,10 +142,10 @@
 
             <Border Classes="card" Margin="0,16,0,0">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="Über" />
-                    <TextBlock Classes="body" Text="{Binding AppVersion, StringFormat='Version {0}'}" />
-                    <TextBlock Classes="caption" Text="MIT Lizenz · © 2026 Manuel Staggl" />
-                    <Button Content="Über Windrose Server Manager" Command="{Binding ShowAboutCommand}"
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.About.Title}" />
+                    <TextBlock Classes="body" Text="{Binding AppVersionDisplay}" />
+                    <TextBlock Classes="caption" Text="{DynamicResource Settings.About.License}" />
+                    <Button Content="{DynamicResource Settings.About.Show}" Command="{Binding ShowAboutCommand}"
                             HorizontalAlignment="Left" Margin="0,8,0,0" />
                 </StackPanel>
             </Border>

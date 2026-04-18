@@ -32,6 +32,9 @@ public partial class App : Application
         var settings = Services.GetRequiredService<IAppSettingsService>();
         settings.LoadAsync().GetAwaiter().GetResult();
 
+        var localization = Services.GetRequiredService<ILocalizationService>();
+        localization.Initialize(settings.Current.Language);
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var main = Services.GetRequiredService<MainWindowViewModel>();
@@ -67,6 +70,7 @@ public partial class App : Application
         s.AddHttpClient();
 
         s.AddSingleton<IAppSettingsService, AppSettingsService>();
+        s.AddSingleton<ILocalizationService, LocalizationService>();
         s.AddSingleton<ISteamCmdService, SteamCmdService>();
         s.AddSingleton<IServerInstallService, ServerInstallService>();
         s.AddSingleton<IServerProcessService, ServerProcessService>();

@@ -1,0 +1,378 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- App -->
+    <sys:String x:Key="App.Title">Windrose Server Manager</sys:String>
+    <sys:String x:Key="App.Subtitle">Server Manager</sys:String>
+
+    <!-- Tray -->
+    <sys:String x:Key="Tray.ToolTip">Windrose Server Manager</sys:String>
+    <sys:String x:Key="Tray.Open">Open</sys:String>
+    <sys:String x:Key="Tray.StartServer">Start server</sys:String>
+    <sys:String x:Key="Tray.StopServer">Stop server</sys:String>
+    <sys:String x:Key="Tray.Quit">Quit</sys:String>
+
+    <!-- Window Controls -->
+    <sys:String x:Key="Window.Minimize">Minimize</sys:String>
+    <sys:String x:Key="Window.Maximize">Maximize</sys:String>
+    <sys:String x:Key="Window.Close">Close</sys:String>
+
+    <!-- Navigation -->
+    <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
+    <sys:String x:Key="Nav.Installation">Installation</sys:String>
+    <sys:String x:Key="Nav.ServerControl">Log &amp; Automation</sys:String>
+    <sys:String x:Key="Nav.Configuration">Configuration</sys:String>
+    <sys:String x:Key="Nav.Backups">Backups</sys:String>
+    <sys:String x:Key="Nav.Settings">Settings</sys:String>
+
+    <!-- Actions -->
+    <sys:String x:Key="Action.Save">Save</sys:String>
+    <sys:String x:Key="Action.Cancel">Cancel</sys:String>
+    <sys:String x:Key="Action.Delete">Delete</sys:String>
+    <sys:String x:Key="Action.Browse">Browse</sys:String>
+    <sys:String x:Key="Action.Change">Change...</sys:String>
+    <sys:String x:Key="Action.Close">Close</sys:String>
+    <sys:String x:Key="Action.Confirm">Confirm</sys:String>
+    <sys:String x:Key="Action.Copy">Copy</sys:String>
+    <sys:String x:Key="Action.Restart">Restart</sys:String>
+    <sys:String x:Key="Action.Start">Start</sys:String>
+    <sys:String x:Key="Action.Stop">Stop</sys:String>
+    <sys:String x:Key="Action.ForceKill">Force-Kill</sys:String>
+    <sys:String x:Key="Action.Refresh">Refresh</sys:String>
+    <sys:String x:Key="Action.Recheck">Re-check</sys:String>
+    <sys:String x:Key="Action.OpenInExplorer">Open in Explorer</sys:String>
+    <sys:String x:Key="Action.Download">Download</sys:String>
+    <sys:String x:Key="Action.Later">Later</sys:String>
+
+    <!-- Common -->
+    <sys:String x:Key="Common.EmDash">—</sys:String>
+
+    <!-- Dialogs -->
+    <sys:String x:Key="Dialog.Confirm.Title">Confirm</sys:String>
+
+    <!-- Dashboard -->
+    <sys:String x:Key="Dashboard.Title">Dashboard</sys:String>
+    <sys:String x:Key="Dashboard.Subtitle">Server and system overview</sys:String>
+    <sys:String x:Key="Dashboard.Crash.Title">App crashed last time</sys:String>
+    <sys:String x:Key="Dashboard.Crash.LogFormat">Log file: {0}</sys:String>
+    <sys:String x:Key="Dashboard.Crash.CopyPath">Copy path</sys:String>
+    <sys:String x:Key="Dashboard.Crash.OpenLog">Open log</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Title">Welcome to Windrose Server Manager</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Intro">Follow these steps to set up your server:</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step1.Title">Installation</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step1.Desc">Install server via SteamCMD</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step2.Title">Server control</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step2.Desc">Start the server once</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step3.Title">Configuration</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.Step3.Desc">Adjust world &amp; invite code</sys:String>
+    <sys:String x:Key="Dashboard.Welcome.InstallNow">Install now</sys:String>
+    <sys:String x:Key="Dashboard.NoServerName">No server name set</sys:String>
+    <sys:String x:Key="Dashboard.InviteCode">Invite code</sys:String>
+    <sys:String x:Key="Dashboard.ServerStatus">Server status</sys:String>
+    <sys:String x:Key="Dashboard.Uptime">Uptime</sys:String>
+    <sys:String x:Key="Dashboard.OpenServerDir">Open server folder</sys:String>
+    <sys:String x:Key="Dashboard.OpenServerDescription">Open ServerDescription.json</sys:String>
+    <sys:String x:Key="Dashboard.Installation">Installation</sys:String>
+    <sys:String x:Key="Dashboard.BuildFormat">Build: {0}</sys:String>
+    <sys:String x:Key="Dashboard.ServerProcess">Server process</sys:String>
+    <sys:String x:Key="Dashboard.CpuFormat">CPU: {0}</sys:String>
+    <sys:String x:Key="Dashboard.RamFormat">RAM: {0}</sys:String>
+    <sys:String x:Key="Dashboard.Host">Host</sys:String>
+    <sys:String x:Key="Dashboard.HostCpuFormat">CPU: {0:0.0}%</sys:String>
+    <sys:String x:Key="Dashboard.HostRamFormat">RAM: {0}</sys:String>
+    <sys:String x:Key="Dashboard.DiskFormat">Disk: {0}</sys:String>
+    <sys:String x:Key="Dashboard.ActiveWorld">Active world</sys:String>
+    <sys:String x:Key="Dashboard.NoActiveWorld">No world configured yet.</sys:String>
+    <sys:String x:Key="Dashboard.GoToConfiguration">Go to configuration</sys:String>
+
+    <!-- Installation -->
+    <sys:String x:Key="Installation.Title">Installation</sys:String>
+    <sys:String x:Key="Installation.Subtitle">Windrose Dedicated Server via SteamCMD (App ID 4129620)</sys:String>
+    <sys:String x:Key="Installation.InstallDir">Install folder</sys:String>
+    <sys:String x:Key="Installation.InstallDir.Placeholder">e.g. G:\Windrose Server</sys:String>
+    <sys:String x:Key="Installation.PathHint">Path must not end in spaces or special characters. Recommended: a dedicated partition (e.g. G:\Windrose Server).</sys:String>
+    <sys:String x:Key="Installation.InstallOrUpdate">Install / Update</sys:String>
+    <sys:String x:Key="Installation.Status">Status</sys:String>
+    <sys:String x:Key="Installation.NotCheckedYet">Not checked yet</sys:String>
+    <sys:String x:Key="Installation.BuildIdFormat">Build ID: {0}</sys:String>
+    <sys:String x:Key="Installation.BinaryFormat">Binary: {0}</sys:String>
+    <sys:String x:Key="Installation.BinaryPlaceholder">Binary: —</sys:String>
+    <sys:String x:Key="Installation.LastUpdatedFormat">Last updated: {0:yyyy-MM-dd HH:mm}</sys:String>
+    <sys:String x:Key="Installation.UpdateStatusPlaceholder">Update status: not checked yet</sys:String>
+    <sys:String x:Key="Installation.CheckUpdate">Check for update</sys:String>
+    <sys:String x:Key="Installation.Log">Log</sys:String>
+    <sys:String x:Key="Installation.PickFolder.Title">Pick install folder</sys:String>
+    <sys:String x:Key="Installation.Complete">Installation complete.</sys:String>
+    <sys:String x:Key="Installation.Cancelled">Cancelled.</sys:String>
+
+    <!-- Status (shared — Installed/Not installed) -->
+    <sys:String x:Key="Status.Installed">Installed</sys:String>
+    <sys:String x:Key="Status.NotInstalled">Not installed</sys:String>
+
+    <!-- Configuration -->
+    <sys:String x:Key="Configuration.Title">Configuration</sys:String>
+    <sys:String x:Key="Configuration.Subtitle">Edit ServerDescription and WorldDescription</sys:String>
+    <sys:String x:Key="Configuration.StopHint">Stop the server before editing — otherwise the server will overwrite the configuration on shutdown.</sys:String>
+    <sys:String x:Key="Configuration.Server">Server</sys:String>
+    <sys:String x:Key="Configuration.ServerName">Name</sys:String>
+    <sys:String x:Key="Configuration.ServerName.Tip">Display name of the server. Players see this when connecting.</sys:String>
+    <sys:String x:Key="Configuration.InviteCode">Invite code</sys:String>
+    <sys:String x:Key="Configuration.InviteCode.Tip">Players enter this code in-game under 'Connect to Server'.</sys:String>
+    <sys:String x:Key="Configuration.InviteCode.Reroll">Re-roll</sys:String>
+    <sys:String x:Key="Configuration.InviteCode.RerollTip">Generates a new invite code from pirate-themed words (e.g. SailCove42).</sys:String>
+    <sys:String x:Key="Configuration.InviteCode.Hint">6+ chars, 0-9 a-z A-Z, case-sensitive. Once set — do not change if players are connecting. Persists across clean server restarts.</sys:String>
+    <sys:String x:Key="Configuration.MaxPlayers">Max players (1-4 recommended, up to 10 possible)</sys:String>
+    <sys:String x:Key="Configuration.MaxPlayers.Tip">Concurrent players. 4 recommended for smooth performance.</sys:String>
+    <sys:String x:Key="Configuration.P2pProxy">P2P proxy address</sys:String>
+    <sys:String x:Key="Configuration.P2pProxy.Tip">Local IP address of the listening socket. Usually keep 127.0.0.1.</sys:String>
+    <sys:String x:Key="Configuration.PasswordProtected">Password protected</sys:String>
+    <sys:String x:Key="Configuration.PasswordProtected.Tip">When active: players must also enter the password.</sys:String>
+    <sys:String x:Key="Configuration.PersistentServerId">Persistent Server ID (read-only)</sys:String>
+    <sys:String x:Key="Configuration.PersistentServerId.Tip">Generated automatically by the server on first run. Do not edit.</sys:String>
+    <sys:String x:Key="Configuration.PersistentServerId.Hint">Managed automatically by the server. Do not edit.</sys:String>
+    <sys:String x:Key="Configuration.SaveServer">Save server</sys:String>
+    <sys:String x:Key="Configuration.Actions">Actions</sys:String>
+    <sys:String x:Key="Configuration.OpenInstallDir">Open server folder</sys:String>
+    <sys:String x:Key="Configuration.OpenServerDescription">Open ServerDescription.json</sys:String>
+    <sys:String x:Key="Configuration.OpenWorldsRoot">Open Worlds folder</sys:String>
+    <sys:String x:Key="Configuration.World">World</sys:String>
+    <sys:String x:Key="Configuration.WorldSelection">World selection</sys:String>
+    <sys:String x:Key="Configuration.Activate">Activate</sys:String>
+    <sys:String x:Key="Configuration.NewWorld">New world</sys:String>
+    <sys:String x:Key="Configuration.WorldName">World name</sys:String>
+    <sys:String x:Key="Configuration.WorldName.Tip">Your own name for this world. Purely cosmetic.</sys:String>
+    <sys:String x:Key="Configuration.IslandId">Island ID</sys:String>
+    <sys:String x:Key="Configuration.CopyIslandIdTip">Copy island ID to clipboard.</sys:String>
+    <sys:String x:Key="Configuration.Preset">Preset</sys:String>
+    <sys:String x:Key="Configuration.Preset.Tip">Standard difficulty. When you tweak parameters manually it switches to 'Custom'.</sys:String>
+    <sys:String x:Key="Configuration.CombatDifficulty">Combat difficulty</sys:String>
+    <sys:String x:Key="Configuration.CombatDifficulty.Tip">Affects aggression and tactics of enemies.</sys:String>
+    <sys:String x:Key="Configuration.Parameters">Parameters</sys:String>
+    <sys:String x:Key="Configuration.MobHealth">Enemy HP (0.2 – 5.0)</sys:String>
+    <sys:String x:Key="Configuration.MobDamage">Enemy damage (0.2 – 5.0)</sys:String>
+    <sys:String x:Key="Configuration.ShipsHealth">Enemy ship HP (0.4 – 5.0)</sys:String>
+    <sys:String x:Key="Configuration.ShipsDamage">Enemy ship damage (0.2 – 2.5)</sys:String>
+    <sys:String x:Key="Configuration.BoardingDifficulty">Boarding difficulty (0.2 – 5.0)</sys:String>
+    <sys:String x:Key="Configuration.CoopMobScaling">Enemy scaling co-op (0.0 – 2.0)</sys:String>
+    <sys:String x:Key="Configuration.CoopShipScaling">Ship scaling co-op (0.0 – 2.0)</sys:String>
+    <sys:String x:Key="Configuration.ValueFormat">Current: {0:0.00} (1.0 = default)</sys:String>
+    <sys:String x:Key="Configuration.CoopExploration">Co-op / Exploration</sys:String>
+    <sys:String x:Key="Configuration.CoopSharedQuests">Shared quests (co-op)</sys:String>
+    <sys:String x:Key="Configuration.EasyExplore">Map without markers (harder)</sys:String>
+    <sys:String x:Key="Configuration.SaveWorld">Save world</sys:String>
+    <sys:String x:Key="Configuration.OpenWorldDir">Open world folder</sys:String>
+    <sys:String x:Key="Configuration.NoWorldsHint">No worlds exist — 'New world' creates one with default values.</sys:String>
+    <sys:String x:Key="Configuration.NewWorldName">New world {0:yyyy-MM-dd HH:mm}</sys:String>
+    <sys:String x:Key="Configuration.PresetApplied">Preset '{0}' applied — values updated.</sys:String>
+    <sys:String x:Key="Configuration.WorldNameEmpty">World name must not be empty.</sys:String>
+
+    <!-- Server Control / Log / Automation -->
+    <sys:String x:Key="ServerControl.Title">Log &amp; Automation</sys:String>
+    <sys:String x:Key="ServerControl.Subtitle">Live log and scheduled restarts</sys:String>
+    <sys:String x:Key="ServerControl.ScheduledRestarts">Scheduled restarts</sys:String>
+    <sys:String x:Key="ServerControl.Enabled">Enabled</sys:String>
+    <sys:String x:Key="ServerControl.At">at</sys:String>
+    <sys:String x:Key="ServerControl.ClockWarn">warning</sys:String>
+    <sys:String x:Key="ServerControl.MinBefore">min before</sys:String>
+    <sys:String x:Key="ServerControl.Weekdays">Weekdays (all selected = daily)</sys:String>
+    <sys:String x:Key="Weekday.Mon">Mon</sys:String>
+    <sys:String x:Key="Weekday.Tue">Tue</sys:String>
+    <sys:String x:Key="Weekday.Wed">Wed</sys:String>
+    <sys:String x:Key="Weekday.Thu">Thu</sys:String>
+    <sys:String x:Key="Weekday.Fri">Fri</sys:String>
+    <sys:String x:Key="Weekday.Sat">Sat</sys:String>
+    <sys:String x:Key="Weekday.Sun">Sun</sys:String>
+    <sys:String x:Key="ServerControl.AutoThresholds">Automatic restart thresholds</sys:String>
+    <sys:String x:Key="ServerControl.RamOver">When RAM usage over</sys:String>
+    <sys:String x:Key="ServerControl.RamOverSuffix">% (relative to host RAM)</sys:String>
+    <sys:String x:Key="ServerControl.UptimeOver">When uptime over</sys:String>
+    <sys:String x:Key="ServerControl.Hours">hours</sys:String>
+    <sys:String x:Key="ServerControl.SessionHistory">Session history</sys:String>
+    <sys:String x:Key="ServerControl.NoEventsYet">No events yet — start the server to build history.</sys:String>
+    <sys:String x:Key="ServerControl.LiveLog">Live log</sys:String>
+    <sys:String x:Key="ServerControl.Buffer">Buffer</sys:String>
+    <sys:String x:Key="ServerControl.LogFolder">Log folder</sys:String>
+    <sys:String x:Key="ServerControl.Export">Export</sys:String>
+    <sys:String x:Key="ServerControl.Clear">Clear</sys:String>
+    <sys:String x:Key="ServerControl.SearchLog">Search log...</sys:String>
+    <sys:String x:Key="ServerControl.LinesFormat">{0} lines</sys:String>
+    <sys:String x:Key="ServerControl.Filter.All">All</sys:String>
+    <sys:String x:Key="ServerControl.Filter.InfoPlus">Info+</sys:String>
+    <sys:String x:Key="ServerControl.Filter.WarningPlus">Warning+</sys:String>
+    <sys:String x:Key="ServerControl.Filter.ErrorOnly">Errors only</sys:String>
+    <sys:String x:Key="ServerControl.Save.Title">Export log</sys:String>
+    <sys:String x:Key="ServerControl.Save.TextFile">Text file</sys:String>
+
+    <!-- Backups -->
+    <sys:String x:Key="Backups.Title">Backups</sys:String>
+    <sys:String x:Key="Backups.Subtitle">Backs up the saves folder (R5\Saved\SaveProfiles\Default\RocksDB\...\Worlds\) as a ZIP.</sys:String>
+    <sys:String x:Key="Backups.BackupDir">Backup folder</sys:String>
+    <sys:String x:Key="Backups.BackupDir.Placeholder">Default: %LocalAppData%\WindroseServerManager\Backups</sys:String>
+    <sys:String x:Key="Backups.PickBackupDir.Title">Pick backup folder</sys:String>
+    <sys:String x:Key="Backups.AutoBackups">Automatic backups</sys:String>
+    <sys:String x:Key="Backups.IntervalMin">Interval (min)</sys:String>
+    <sys:String x:Key="Backups.MaxKeep">Max to keep</sys:String>
+    <sys:String x:Key="Backups.CreateNow">Create backup now</sys:String>
+    <sys:String x:Key="Backups.Restore">Restore</sys:String>
+    <sys:String x:Key="Backups.OpenBackupDir">Open backup folder</sys:String>
+    <sys:String x:Key="Backups.Col.File">File</sys:String>
+    <sys:String x:Key="Backups.Col.Created">Created</sys:String>
+    <sys:String x:Key="Backups.Col.SizeMb">Size (MB)</sys:String>
+    <sys:String x:Key="Backups.Col.Automatic">Automatic</sys:String>
+    <sys:String x:Key="Backups.None">No backups yet — click 'Create backup now'</sys:String>
+
+    <!-- Settings -->
+    <sys:String x:Key="Settings.Title">Settings</sys:String>
+    <sys:String x:Key="Settings.Subtitle">App configuration</sys:String>
+    <sys:String x:Key="Settings.Language.Title">Language</sys:String>
+    <sys:String x:Key="Settings.Language.Hint">Choose 'Automatic' to follow the Windows language.</sys:String>
+    <sys:String x:Key="Settings.Language.Auto">Automatic</sys:String>
+    <sys:String x:Key="Settings.Language.German">Deutsch</sys:String>
+    <sys:String x:Key="Settings.Language.English">English</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.Title">Server start (launch args)</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.ConsoleLog">Enable console log (-log)</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.Extra">Additional launch args (optional)</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.Extra.Placeholder">e.g. -NOSEAMLESSTRAVEL</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.Hint">Windrose uses automatic NAT punch-through. Fixed ports are not supported — this field is for future undocked args.</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.AutoRestartOnCrash">Auto-restart on crash</sys:String>
+    <sys:String x:Key="Settings.LaunchArgs.GracefulShutdown">Graceful shutdown (seconds)</sys:String>
+    <sys:String x:Key="Settings.Steam.Title">Steam &amp; SteamCMD</sys:String>
+    <sys:String x:Key="Settings.Steam.AppId">Steam App ID</sys:String>
+    <sys:String x:Key="Settings.Steam.Login">Steam login (empty = anonymous)</sys:String>
+    <sys:String x:Key="Settings.Steam.Hint">Usually not needed. Change only for beta branches or alternate Steam accounts.</sys:String>
+    <sys:String x:Key="Settings.Network.Title">Network &amp; ports</sys:String>
+    <sys:String x:Key="Settings.Network.Hint">Windrose ports: UDP 7777 (game) + 7778 (query). NAT punch-through preferred. Firewall exception for WindroseServer.exe recommended. External hosters must open both ports.</sys:String>
+    <sys:String x:Key="Settings.Firewall.Title">Windows Firewall</sys:String>
+    <sys:String x:Key="Settings.Firewall.Installed">Firewall rule: installed</sys:String>
+    <sys:String x:Key="Settings.Firewall.NotInstalled">Firewall rule: not installed</sys:String>
+    <sys:String x:Key="Settings.Firewall.Add">Add rule</sys:String>
+    <sys:String x:Key="Settings.Firewall.Remove">Remove rule</sys:String>
+    <sys:String x:Key="Settings.Firewall.Check">Check status</sys:String>
+    <sys:String x:Key="Settings.Firewall.Hint">Requires admin rights. Accept the UAC prompt.</sys:String>
+    <sys:String x:Key="Settings.AutoStart.Title">Autostart</sys:String>
+    <sys:String x:Key="Settings.AutoStart.Label">Run Windrose Server Manager at Windows startup</sys:String>
+    <sys:String x:Key="Settings.AutoStart.Hint">Adds an entry to HKCU\Software\Microsoft\Windows\CurrentVersion\Run.</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.Title">App updates</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.Hint">Checks GitHub for a newer version of Windrose Server Manager. Automatic every 6 hours.</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.CheckNow">Check for update now</sys:String>
+    <sys:String x:Key="Settings.About.Title">About</sys:String>
+    <sys:String x:Key="Settings.About.VersionFormat">Version {0}</sys:String>
+    <sys:String x:Key="Settings.About.License">MIT License · © 2026 Manuel Staggl</sys:String>
+    <sys:String x:Key="Settings.About.Show">About Windrose Server Manager</sys:String>
+
+    <!-- About Dialog -->
+    <sys:String x:Key="About.Title">About Windrose Server Manager</sys:String>
+    <sys:String x:Key="About.Tagline">Dedicated Server Manager for Windrose</sys:String>
+    <sys:String x:Key="About.SteamLink">Windrose Steam page</sys:String>
+    <sys:String x:Key="About.GitHubLink">GitHub repository</sys:String>
+    <sys:String x:Key="About.Disclaimer">Windrose Server Manager is an unofficial community tool. Windrose is a trademark of Red Rook Games. Not affiliated with or endorsed by the developers.</sys:String>
+
+    <!-- Update Banner -->
+    <sys:String x:Key="Update.Banner.Subtitle">A newer version of Windrose Server Manager is available.</sys:String>
+    <sys:String x:Key="Update.Banner.AvailableFormat">Update available: v{0}</sys:String>
+
+    <!-- Toasts / Feedback -->
+    <sys:String x:Key="Toast.SettingsSaved">Settings saved.</sys:String>
+    <sys:String x:Key="Toast.AutomationSaved">Automation saved.</sys:String>
+    <sys:String x:Key="Toast.ServerStarting">Server is starting...</sys:String>
+    <sys:String x:Key="Toast.ServerStopping">Server is stopping...</sys:String>
+    <sys:String x:Key="Toast.ServerRestarting">Server is restarting...</sys:String>
+    <sys:String x:Key="Toast.RestartInProgress">Restart in progress...</sys:String>
+    <sys:String x:Key="Toast.ServerKilled">Server terminated (force-kill).</sys:String>
+    <sys:String x:Key="Toast.StopTooSlow">Server did not stop in time.</sys:String>
+    <sys:String x:Key="Toast.LogCleared">Log cleared.</sys:String>
+    <sys:String x:Key="Toast.LogExportedFormat">Log exported: {0}</sys:String>
+    <sys:String x:Key="Toast.ExportFailedFormat">Export failed: {0}</sys:String>
+    <sys:String x:Key="Toast.PathCopied">Path copied.</sys:String>
+    <sys:String x:Key="Toast.InviteCopiedFormat">Invite code copied: {0}</sys:String>
+    <sys:String x:Key="Toast.IslandIdCopiedFormat">Island ID copied: {0}</sys:String>
+    <sys:String x:Key="Toast.NewInviteFormat">New invite code: {0}</sys:String>
+    <sys:String x:Key="Toast.ServerDescriptionSaved">ServerDescription saved.</sys:String>
+    <sys:String x:Key="Toast.WorldDescriptionSaved">WorldDescription saved.</sys:String>
+    <sys:String x:Key="Toast.WorldCreatedFormat">World created: {0}</sys:String>
+    <sys:String x:Key="Toast.ActiveWorldFormat">Active world: {0}</sys:String>
+    <sys:String x:Key="Toast.WorldDeletedFormat">World deleted: {0}</sys:String>
+    <sys:String x:Key="Toast.BackupDirUpdated">Backup folder updated.</sys:String>
+    <sys:String x:Key="Toast.BackupCreatedFormat">Backup created: {0}</sys:String>
+    <sys:String x:Key="Toast.BackupDeletedFormat">Deleted: {0}</sys:String>
+    <sys:String x:Key="Toast.BackupRestoredFormat">Restored: {0}</sys:String>
+    <sys:String x:Key="Toast.SavesFolderMissing">Saves folder not found.</sys:String>
+    <sys:String x:Key="Toast.ServerRunningStopFirst">Server is running — please stop it first.</sys:String>
+    <sys:String x:Key="Toast.FirewallBinaryMissing">Server binary not found. Please install first.</sys:String>
+    <sys:String x:Key="Toast.FirewallRuleActive">Firewall rule is active.</sys:String>
+    <sys:String x:Key="Toast.FirewallNoRule">No firewall rule present.</sys:String>
+    <sys:String x:Key="Toast.FirewallAdminNeeded">App needs to be restarted with admin rights.</sys:String>
+    <sys:String x:Key="Toast.FirewallRuleRemoved">Firewall rule removed.</sys:String>
+    <sys:String x:Key="Toast.FirewallRuleNotRemoved">Could not remove firewall rule.</sys:String>
+    <sys:String x:Key="Toast.FirewallRuleAdded">Firewall rule added.</sys:String>
+    <sys:String x:Key="Toast.FirewallRuleNotAdded">Could not add firewall rule.</sys:String>
+    <sys:String x:Key="Toast.FirewallCheckFailedFormat">Status check failed: {0}</sys:String>
+    <sys:String x:Key="Toast.AppPathUnknown">Could not determine app path.</sys:String>
+    <sys:String x:Key="Toast.AutoStartOn">Autostart enabled.</sys:String>
+    <sys:String x:Key="Toast.AutoStartOff">Autostart disabled.</sys:String>
+    <sys:String x:Key="Toast.AutoStartErrorFormat">Autostart error: {0}</sys:String>
+    <sys:String x:Key="Toast.UpdateChecking">Checking for updates…</sys:String>
+    <sys:String x:Key="Toast.UpdateCheckFailed">Update check failed.</sys:String>
+    <sys:String x:Key="Toast.UpdateCheckFailedFormat">Update check failed: {0}</sys:String>
+    <sys:String x:Key="Toast.ReleasePageFailed">Could not open release page.</sys:String>
+    <sys:String x:Key="Toast.AutoRestartPrefix">Auto-restart: {0}</sys:String>
+    <sys:String x:Key="Toast.TimeFormatInvalid">Invalid time format (HH:mm expected).</sys:String>
+    <sys:String x:Key="Toast.InstallPathUnset">Install path not set.</sys:String>
+    <sys:String x:Key="Toast.LogFolderMissing">UE5 log folder does not exist yet (start the server at least once).</sys:String>
+    <sys:String x:Key="Toast.Cancelled">Cancelled.</sys:String>
+
+    <!-- Confirm Dialog labels -->
+    <sys:String x:Key="Confirm.Kill.Title">Force-kill process</sys:String>
+    <sys:String x:Key="Confirm.Kill.Message">Unsaved world changes will be lost. Terminate anyway?</sys:String>
+    <sys:String x:Key="Confirm.Kill.Label">Force-kill</sys:String>
+    <sys:String x:Key="Confirm.BackupRunning.Title">Server is running</sys:String>
+    <sys:String x:Key="Confirm.BackupRunning.Message">A backup while the server is running may be inconsistent (RocksDB is writing). Continue?</sys:String>
+    <sys:String x:Key="Confirm.BackupRunning.Label">Create backup anyway</sys:String>
+    <sys:String x:Key="Confirm.BackupDelete.Title">Delete backup?</sys:String>
+    <sys:String x:Key="Confirm.BackupDelete.MessageFormat">Really delete backup '{0}'? This action cannot be undone.</sys:String>
+    <sys:String x:Key="Confirm.BackupDelete.Label">Delete</sys:String>
+    <sys:String x:Key="Confirm.BackupRestore.Title">Restore backup?</sys:String>
+    <sys:String x:Key="Confirm.BackupRestore.MessageFormat">Backup '{0}' will overwrite the current saves. Before restoring, a safety snapshot of the current saves is automatically created.</sys:String>
+    <sys:String x:Key="Confirm.BackupRestore.Label">Restore</sys:String>
+    <sys:String x:Key="Confirm.WorldDelete.Title">Delete world?</sys:String>
+    <sys:String x:Key="Confirm.WorldDelete.MessageFormat">Really delete world '{0}'? This action cannot be undone.</sys:String>
+    <sys:String x:Key="Confirm.WorldDelete.Label">Delete</sys:String>
+
+    <!-- Enum Labels: ServerStatus -->
+    <sys:String x:Key="ServerStatus.Stopped">Stopped</sys:String>
+    <sys:String x:Key="ServerStatus.Starting">Starting…</sys:String>
+    <sys:String x:Key="ServerStatus.Running">Running</sys:String>
+    <sys:String x:Key="ServerStatus.Stopping">Stopping…</sys:String>
+    <sys:String x:Key="ServerStatus.Crashed">Crashed</sys:String>
+
+    <!-- Enum Labels: WorldPresetType -->
+    <sys:String x:Key="WorldPreset.Easy">Easy</sys:String>
+    <sys:String x:Key="WorldPreset.Medium">Medium</sys:String>
+    <sys:String x:Key="WorldPreset.Hard">Hard</sys:String>
+    <sys:String x:Key="WorldPreset.Custom">Custom</sys:String>
+
+    <!-- Enum Labels: CombatDifficulty -->
+    <sys:String x:Key="Combat.Easy">Easy</sys:String>
+    <sys:String x:Key="Combat.Normal">Normal</sys:String>
+    <sys:String x:Key="Combat.Hard">Hard</sys:String>
+
+    <!-- Enum Labels: InstallPhase -->
+    <sys:String x:Key="InstallPhase.Preparing">Preparing</sys:String>
+    <sys:String x:Key="InstallPhase.DownloadingSteamCmd">Downloading SteamCMD</sys:String>
+    <sys:String x:Key="InstallPhase.RunningSteamCmd">Running SteamCMD</sys:String>
+    <sys:String x:Key="InstallPhase.DownloadingServer">Downloading server</sys:String>
+    <sys:String x:Key="InstallPhase.Validating">Validating</sys:String>
+    <sys:String x:Key="InstallPhase.Complete">Complete</sys:String>
+    <sys:String x:Key="InstallPhase.Failed">Failed</sys:String>
+
+    <!-- Events (session history) -->
+    <sys:String x:Key="Event.Started">Started</sys:String>
+    <sys:String x:Key="Event.Stopped">Stopped</sys:String>
+    <sys:String x:Key="Event.Crashed">Crash</sys:String>
+    <sys:String x:Key="Event.ScheduledRestart">Scheduled restart</sys:String>
+    <sys:String x:Key="Event.AutoRestartRam">Auto-restart (RAM)</sys:String>
+    <sys:String x:Key="Event.AutoRestartUptime">Auto-restart (uptime)</sys:String>
+    <sys:String x:Key="Event.SessionDurationHm">Session duration: {0}h {1}m</sys:String>
+    <sys:String x:Key="Event.SessionDurationMs">Session duration: {0}m {1}s</sys:String>
+</ResourceDictionary>

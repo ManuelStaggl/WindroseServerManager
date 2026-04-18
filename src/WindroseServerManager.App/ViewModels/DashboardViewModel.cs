@@ -78,9 +78,45 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
 
     public bool IsFirstRun => InstallInfo?.IsInstalled != true || string.IsNullOrEmpty(InviteCode);
 
+    public string LastCrashPathDisplay => string.IsNullOrEmpty(LastCrashPath)
+        ? string.Empty
+        : Loc.Format("Dashboard.Crash.LogFormat", LastCrashPath);
+
+    public string InstalledStatusText =>
+        InstallInfo?.IsInstalled == true ? Loc.Get("Status.Installed") : Loc.Get("Status.NotInstalled");
+
+    public string BuildIdText => Loc.Format("Dashboard.BuildFormat", InstallInfo?.BuildId ?? "—");
+
+    public string ProcCpuDisplay => Loc.Format("Dashboard.CpuFormat", ProcCpuText);
+    public string ProcRamDisplay => Loc.Format("Dashboard.RamFormat", ProcRamText);
+    public string HostCpuDisplay => Loc.Format("Dashboard.HostCpuFormat", HostCpu);
+    public string HostRamDisplay => Loc.Format("Dashboard.HostRamFormat", HostRamText);
+    public string DiskDisplay => Loc.Format("Dashboard.DiskFormat", DiskText);
+
+    partial void OnLastCrashPathChanged(string? value) => OnPropertyChanged(nameof(LastCrashPathDisplay));
+    partial void OnProcCpuTextChanged(string value) => OnPropertyChanged(nameof(ProcCpuDisplay));
+    partial void OnProcRamTextChanged(string value) => OnPropertyChanged(nameof(ProcRamDisplay));
+    partial void OnHostCpuChanged(double value) => OnPropertyChanged(nameof(HostCpuDisplay));
+    partial void OnHostRamTextChanged(string value) => OnPropertyChanged(nameof(HostRamDisplay));
+    partial void OnDiskTextChanged(string value) => OnPropertyChanged(nameof(DiskDisplay));
+
+    private void RaiseLocalizedDisplayBindings()
+    {
+        OnPropertyChanged(nameof(LastCrashPathDisplay));
+        OnPropertyChanged(nameof(InstalledStatusText));
+        OnPropertyChanged(nameof(BuildIdText));
+        OnPropertyChanged(nameof(ProcCpuDisplay));
+        OnPropertyChanged(nameof(ProcRamDisplay));
+        OnPropertyChanged(nameof(HostCpuDisplay));
+        OnPropertyChanged(nameof(HostRamDisplay));
+        OnPropertyChanged(nameof(DiskDisplay));
+    }
+
     partial void OnInstallInfoChanged(ServerInstallInfo? value)
     {
         OnPropertyChanged(nameof(IsFirstRun));
+        OnPropertyChanged(nameof(InstalledStatusText));
+        OnPropertyChanged(nameof(BuildIdText));
     }
 
     partial void OnServerNameChanged(string value)
@@ -100,7 +136,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         IAppSettingsService settings,
         IServerConfigService config,
         INavigationService nav,
-        IToastService toasts)
+        IToastService toasts,
+        ILocalizationService localization)
     {
         _install = install;
         _proc = proc;
@@ -111,6 +148,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _toasts = toasts;
         _proc.StatusChanged += OnServerStatusChanged;
         _status = _proc.Status;
+
+        localization.LanguageChanged += RaiseLocalizedDisplayBindings;
 
         _timer = new System.Timers.Timer(2000);
         _timer.Elapsed += async (_, _) => await RefreshAsync();
@@ -151,7 +190,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
         if (top?.Clipboard is null) return;
         await top.Clipboard.SetTextAsync(LastCrashPath);
-        _toasts.Success("Pfad kopiert.");
+        _toasts.Success(Loc.Get("Toast.PathCopied"));
     }
 
     [RelayCommand]
@@ -253,7 +292,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
         if (top?.Clipboard is null) return;
         await top.Clipboard.SetTextAsync(InviteCode);
-        _toasts.Success($"Invite-Code kopiert: {InviteCode}");
+        _toasts.Success(Loc.Format("Toast.InviteCopiedFormat", InviteCode));
     }
 
     [RelayCommand]
@@ -283,14 +322,14 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     {
         ErrorMessage = _proc.ValidateCanStart();
         if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
-        try { await _proc.StartAsync(); _toasts.Success("Server wird gestartet..."); }
+        try { await _proc.StartAsync(); _toasts.Success(Loc.Get("Toast.ServerStarting")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
     [RelayCommand]
     private async Task StopAsync()
     {
-        try { await _proc.StopAsync(); _toasts.Info("Server wird gestoppt..."); }
+        try { await _proc.StopAsync(); _toasts.Info(Loc.Get("Toast.ServerStopping")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
@@ -304,15 +343,15 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             {
                 var confirmed = await ConfirmDialog.ShowAsync(
                     owner,
-                    "Prozess hart beenden",
-                    "Ungesicherte Welt-Änderungen gehen verloren. Trotzdem beenden?",
-                    confirmLabel: "Hart beenden",
+                    Loc.Get("Confirm.Kill.Title"),
+                    Loc.Get("Confirm.Kill.Message"),
+                    confirmLabel: Loc.Get("Confirm.Kill.Label"),
                     danger: true);
                 if (!confirmed) return;
             }
         }
 
-        try { await _proc.KillAsync(); _toasts.Warning("Server beendet (Force-Kill)."); }
+        try { await _proc.KillAsync(); _toasts.Warning(Loc.Get("Toast.ServerKilled")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
@@ -323,7 +362,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         IsBusy = true;
         try
         {
-            _toasts.Info("Neustart läuft...");
+            _toasts.Info(Loc.Get("Toast.RestartInProgress"));
 
             try { await _proc.StopAsync(); }
             catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); return; }
@@ -339,14 +378,14 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
 
             if (_proc.Status != ServerStatus.Stopped)
             {
-                _toasts.Warning("Server konnte nicht rechtzeitig gestoppt werden.");
+                _toasts.Warning(Loc.Get("Toast.StopTooSlow"));
                 return;
             }
 
             ErrorMessage = _proc.ValidateCanStart();
             if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
 
-            try { await _proc.StartAsync(); _toasts.Success("Server wird neu gestartet..."); }
+            try { await _proc.StartAsync(); _toasts.Success(Loc.Get("Toast.ServerRestarting")); }
             catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
         }
         finally

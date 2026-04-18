@@ -6,7 +6,7 @@
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Background="{DynamicResource BrandNavySurfaceBrush}"
-        Title="Über Windrose Server Manager">
+        Title="{DynamicResource About.Title}">
     <Border CornerRadius="8"
             Background="{DynamicResource BrandNavySurfaceBrush}"
             BorderBrush="{DynamicResource BrandNavyBorderBrush}"
@@ -36,32 +36,32 @@
                     </Canvas>
                 </Viewbox>
                 <StackPanel VerticalAlignment="Center" Spacing="2">
-                    <TextBlock Classes="page-title" Text="Windrose Server Manager" />
+                    <TextBlock Classes="page-title" Text="{DynamicResource App.Title}" />
                     <TextBlock x:Name="VersionText" Classes="caption" />
                 </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Spacing="12" Margin="0,20,0,0">
                 <TextBlock Classes="body" TextWrapping="Wrap"
-                           Text="Dedicated Server Manager für Windrose" />
-                <TextBlock Classes="caption" Text="MIT Lizenz · © 2026 Manuel Staggl" />
+                           Text="{DynamicResource About.Tagline}" />
+                <TextBlock Classes="caption" Text="{DynamicResource Settings.About.License}" />
 
                 <StackPanel Spacing="6" Margin="0,12,0,0">
                     <Button Classes="subtle" HorizontalAlignment="Left"
-                            Content="Windrose Steam-Seite" Tag="https://store.steampowered.com/app/3041230/Windrose/"
+                            Content="{DynamicResource About.SteamLink}" Tag="https://store.steampowered.com/app/3041230/Windrose/"
                             Click="OnLinkClick" />
                     <Button Classes="subtle" HorizontalAlignment="Left"
-                            Content="GitHub-Repository" Tag="https://github.com/ManuelStaggl/WindroseServerManager"
+                            Content="{DynamicResource About.GitHubLink}" Tag="https://github.com/ManuelStaggl/WindroseServerManager"
                             Click="OnLinkClick" />
                 </StackPanel>
 
                 <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,8,0,0"
                            Foreground="{DynamicResource BrandTextMutedBrush}"
-                           Text="Windrose Server Manager ist ein inoffizielles Community-Tool. Windrose ist eine Marke von Red Rook Games. Nicht verbunden mit oder unterstützt von den Entwicklern." />
+                           Text="{DynamicResource About.Disclaimer}" />
             </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <Button Classes="primary" Content="Schließen" Click="OnCloseClick" />
+                <Button Classes="primary" Content="{DynamicResource Action.Close}" Click="OnCloseClick" />
             </StackPanel>
         </Grid>
     </Border>

@@ -179,7 +179,7 @@ public partial class ConfigurationViewModel : ViewModelBase
         var top = GetOwnerWindow();
         if (top?.Clipboard is null) return;
         await top.Clipboard.SetTextAsync(SelectedWorldId);
-        _toasts.Success($"Island-ID kopiert: {SelectedWorldId}");
+        _toasts.Success(Loc.Format("Toast.IslandIdCopiedFormat", SelectedWorldId));
     }
 
     [RelayCommand]
@@ -187,7 +187,7 @@ public partial class ConfigurationViewModel : ViewModelBase
     {
         if (Server is null) return;
         InviteCode = Core.Services.InviteCodeGenerator.Generate();
-        _toasts.Info($"Neuer Invite-Code: {InviteCode}");
+        _toasts.Info(Loc.Format("Toast.NewInviteFormat", InviteCode));
     }
 
     [RelayCommand]
@@ -356,7 +356,7 @@ public partial class ConfigurationViewModel : ViewModelBase
                     CoopSharedQuests = true; EasyExplore = true;
                     break;
             }
-            _toasts.Info($"Preset '{preset}' angewendet — Werte aktualisiert.");
+            _toasts.Info(Loc.Format("Configuration.PresetApplied", Loc.Get($"WorldPreset.{preset}")));
         }
         finally
         {
@@ -366,7 +366,7 @@ public partial class ConfigurationViewModel : ViewModelBase
 
     partial void OnWorldNameChanged(string value)
     {
-        WorldNameError = string.IsNullOrWhiteSpace(value) ? "Welt-Name darf nicht leer sein." : null;
+        WorldNameError = string.IsNullOrWhiteSpace(value) ? Loc.Get("Configuration.WorldNameEmpty") : null;
     }
 
     private void MaybeSwitchToCustom()
@@ -391,8 +391,8 @@ public partial class ConfigurationViewModel : ViewModelBase
         try
         {
             await _config.SaveServerDescriptionAsync(Server);
-            StatusMessage = "ServerDescription gespeichert.";
-            _toasts.Success("ServerDescription gespeichert.");
+            StatusMessage = Loc.Get("Toast.ServerDescriptionSaved");
+            _toasts.Success(Loc.Get("Toast.ServerDescriptionSaved"));
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
@@ -428,7 +428,7 @@ public partial class ConfigurationViewModel : ViewModelBase
         if (World is null || string.IsNullOrEmpty(SelectedWorldId)) return;
         if (string.IsNullOrWhiteSpace(WorldName))
         {
-            WorldNameError = "Welt-Name darf nicht leer sein.";
+            WorldNameError = Loc.Get("Configuration.WorldNameEmpty");
             _toasts.Error(WorldNameError);
             return;
         }
@@ -457,8 +457,8 @@ public partial class ConfigurationViewModel : ViewModelBase
             WriteTag(WorldParameterCatalog.CombatDifficulty, combatValue);
 
             await _config.SaveWorldDescriptionAsync(SelectedWorldId, World);
-            StatusMessage = "WorldDescription gespeichert.";
-            _toasts.Success("WorldDescription gespeichert.");
+            StatusMessage = Loc.Get("Toast.WorldDescriptionSaved");
+            _toasts.Success(Loc.Get("Toast.WorldDescriptionSaved"));
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
@@ -472,7 +472,7 @@ public partial class ConfigurationViewModel : ViewModelBase
             var newWorld = new WorldDescription
             {
                 IslandId = id,
-                WorldName = $"Neue Welt {DateTime.Now:yyyy-MM-dd HH:mm}",
+                WorldName = Loc.Format("Configuration.NewWorldName", DateTime.Now),
                 WorldPresetType = WorldPresetType.Medium,
                 CreationTime = (double)DateTime.UtcNow.Ticks,
             };
@@ -494,7 +494,7 @@ public partial class ConfigurationViewModel : ViewModelBase
             await _config.SaveWorldDescriptionAsync(id, newWorld);
             WorldIds.Add(id);
             SelectedWorldId = id;
-            _toasts.Success($"Welt erstellt: {newWorld.WorldName}");
+            _toasts.Success(Loc.Format("Toast.WorldCreatedFormat", newWorld.WorldName));
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
@@ -507,8 +507,9 @@ public partial class ConfigurationViewModel : ViewModelBase
         {
             Server.WorldIslandId = SelectedWorldId!;
             await _config.SaveServerDescriptionAsync(Server);
-            StatusMessage = $"Aktive Welt: {SelectedWorldId}";
-            _toasts.Success($"Aktive Welt: {SelectedWorldId}");
+            var m = Loc.Format("Toast.ActiveWorldFormat", SelectedWorldId);
+            StatusMessage = m;
+            _toasts.Success(m);
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
@@ -524,9 +525,9 @@ public partial class ConfigurationViewModel : ViewModelBase
         {
             var confirmed = await ConfirmDialog.ShowAsync(
                 owner,
-                "Welt löschen?",
-                $"Möchten Sie die Welt '{id}' wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
-                confirmLabel: "Löschen",
+                Loc.Get("Confirm.WorldDelete.Title"),
+                Loc.Format("Confirm.WorldDelete.MessageFormat", id),
+                confirmLabel: Loc.Get("Confirm.WorldDelete.Label"),
                 danger: true);
             if (!confirmed) return;
         }
@@ -536,7 +537,7 @@ public partial class ConfigurationViewModel : ViewModelBase
             await _config.DeleteWorldAsync(id);
             WorldIds.Remove(id);
             SelectedWorldId = WorldIds.FirstOrDefault();
-            _toasts.Success($"Welt gelöscht: {id}");
+            _toasts.Success(Loc.Format("Toast.WorldDeletedFormat", id));
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }

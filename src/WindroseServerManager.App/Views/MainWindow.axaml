@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:Class="WindroseServerManager.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Windrose Server Manager"
+        Title="{DynamicResource App.Title}"
         Icon="/Assets/app.ico"
         Width="1440" Height="960"
         MinWidth="1024" MinHeight="640"
@@ -97,7 +97,7 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Windrose" FontSize="16" FontWeight="SemiBold"
                                    Foreground="{DynamicResource BrandTextPrimaryBrush}" />
-                        <TextBlock Text="Server Manager" FontSize="12"
+                        <TextBlock Text="{DynamicResource App.Subtitle}" FontSize="12"
                                    Foreground="{DynamicResource BrandAmberBrush}" FontWeight="SemiBold" />
                     </StackPanel>
                 </StackPanel>
@@ -149,9 +149,9 @@
                             <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
                         </Style>
                     </StackPanel.Styles>
-                    <Button Classes="window-btn" Content="&#xE921;" Click="OnMinimize" ToolTip.Tip="Minimieren" />
-                    <Button Classes="window-btn" Content="&#xE922;" Click="OnToggleMaximize" ToolTip.Tip="Maximieren" />
-                    <Button Classes="window-btn close" Content="&#xE8BB;" Click="OnClose" ToolTip.Tip="Schließen" />
+                    <Button Classes="window-btn" Content="&#xE921;" Click="OnMinimize" ToolTip.Tip="{DynamicResource Window.Minimize}" />
+                    <Button Classes="window-btn" Content="&#xE922;" Click="OnToggleMaximize" ToolTip.Tip="{DynamicResource Window.Maximize}" />
+                    <Button Classes="window-btn close" Content="&#xE8BB;" Click="OnClose" ToolTip.Tip="{DynamicResource Window.Close}" />
                 </StackPanel>
             </Grid>
             <!-- App-Update-Banner: erscheint wenn neuere Version auf GitHub gefunden wurde -->
@@ -176,13 +176,13 @@
                                    FontWeight="SemiBold"
                                    FontSize="14"
                                    Foreground="#FFFFFF" />
-                        <TextBlock Text="Eine neuere Version des Windrose Server Managers ist verfügbar."
+                        <TextBlock Text="{DynamicResource Update.Banner.Subtitle}"
                                    FontSize="12"
                                    Foreground="#F5E6D3"
                                    TextWrapping="Wrap" />
                     </StackPanel>
                     <Button Grid.Column="2"
-                            Content="Download"
+                            Content="{DynamicResource Action.Download}"
                             Command="{Binding DownloadUpdateCommand}"
                             Background="#FFFFFF"
                             Foreground="{DynamicResource BrandAmberBrush}"
@@ -192,7 +192,7 @@
                             Margin="12,0,8,0"
                             Cursor="Hand" />
                     <Button Grid.Column="3"
-                            Content="Später"
+                            Content="{DynamicResource Action.Later}"
                             Command="{Binding DismissUpdateCommand}"
                             Background="Transparent"
                             Foreground="#FFFFFF"

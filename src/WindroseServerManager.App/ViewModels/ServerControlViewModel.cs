@@ -52,6 +52,8 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
 
     public int[] LogBufferSizeOptions { get; } = { 500, 2000, 10000 };
 
+    public string FilteredLinesDisplay => Loc.Format("ServerControl.LinesFormat", FilteredLog.Count);
+
     public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
                                     && Directory.Exists(_settings.Current.ServerInstallDir);
 
@@ -104,8 +106,11 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         set { if (value) CurrentLogFilter = LogLevelFilter.ErrorOnly; }
     }
 
-    public ServerControlViewModel(IServerProcessService proc, IAppSettingsService settings, IServerConfigService config, IToastService toasts, IServerEventLog eventLog)
+    public ServerControlViewModel(IServerProcessService proc, IAppSettingsService settings, IServerConfigService config, IToastService toasts, IServerEventLog eventLog, ILocalizationService localization)
     {
+        FilteredLog.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredLinesDisplay));
+        localization.LanguageChanged += () => OnPropertyChanged(nameof(FilteredLinesDisplay));
+
         _proc = proc;
         _settings = settings;
         _config = config;
@@ -241,7 +246,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
         if (top?.Clipboard is null) return;
         await top.Clipboard.SetTextAsync(InviteCode);
-        _toasts.Success($"Invite-Code kopiert: {InviteCode}");
+        _toasts.Success(Loc.Format("Toast.InviteCopiedFormat", InviteCode));
     }
 
     [RelayCommand]
@@ -299,14 +304,14 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     {
         ErrorMessage = _proc.ValidateCanStart();
         if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
-        try { await _proc.StartAsync(); _toasts.Success("Server wird gestartet..."); }
+        try { await _proc.StartAsync(); _toasts.Success(Loc.Get("Toast.ServerStarting")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
     [RelayCommand]
     private async Task StopAsync()
     {
-        try { await _proc.StopAsync(); _toasts.Info("Server wird gestoppt..."); }
+        try { await _proc.StopAsync(); _toasts.Info(Loc.Get("Toast.ServerStopping")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
@@ -321,15 +326,15 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             {
                 var confirmed = await ConfirmDialog.ShowAsync(
                     owner,
-                    "Prozess hart beenden",
-                    "Ungesicherte Welt-Änderungen gehen verloren. Trotzdem beenden?",
-                    confirmLabel: "Hart beenden",
+                    Loc.Get("Confirm.Kill.Title"),
+                    Loc.Get("Confirm.Kill.Message"),
+                    confirmLabel: Loc.Get("Confirm.Kill.Label"),
                     danger: true);
                 if (!confirmed) return;
             }
         }
 
-        try { await _proc.KillAsync(); _toasts.Warning("Server beendet (Force-Kill)."); }
+        try { await _proc.KillAsync(); _toasts.Warning(Loc.Get("Toast.ServerKilled")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
     }
 
@@ -340,7 +345,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         IsBusy = true;
         try
         {
-            _toasts.Info("Neustart läuft...");
+            _toasts.Info(Loc.Get("Toast.RestartInProgress"));
 
             try { await _proc.StopAsync(); }
             catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); return; }
@@ -357,14 +362,14 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
 
             if (_proc.Status != ServerStatus.Stopped)
             {
-                _toasts.Warning("Server konnte nicht rechtzeitig gestoppt werden.");
+                _toasts.Warning(Loc.Get("Toast.StopTooSlow"));
                 return;
             }
 
             ErrorMessage = _proc.ValidateCanStart();
             if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
 
-            try { await _proc.StartAsync(); _toasts.Success("Server wird neu gestartet..."); }
+            try { await _proc.StartAsync(); _toasts.Success(Loc.Get("Toast.ServerRestarting")); }
             catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
         }
         finally
@@ -378,7 +383,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     {
         Log.Clear();
         FilteredLog.Clear();
-        _toasts.Info("Log geleert.");
+        _toasts.Info(Loc.Get("Toast.LogCleared"));
     }
 
     [RelayCommand]
@@ -390,12 +395,12 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         var ts = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         var file = await owner.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Log exportieren",
+            Title = Loc.Get("ServerControl.Save.Title"),
             SuggestedFileName = $"windrose-log-{ts}.txt",
             DefaultExtension = "txt",
             FileTypeChoices = new[]
             {
-                new FilePickerFileType("Textdatei") { Patterns = new[] { "*.txt" } },
+                new FilePickerFileType(Loc.Get("ServerControl.Save.TextFile")) { Patterns = new[] { "*.txt" } },
             },
         });
         if (file is null) return;
@@ -406,11 +411,11 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             // Snapshot nehmen — Log kann währenddessen wachsen.
             var snapshot = Log.ToArray();
             await File.WriteAllLinesAsync(path, snapshot);
-            _toasts.Success($"Log exportiert: {Path.GetFileName(path)}");
+            _toasts.Success(Loc.Format("Toast.LogExportedFormat", Path.GetFileName(path)));
         }
         catch (Exception ex)
         {
-            _toasts.Error($"Export fehlgeschlagen: {ErrorMessageHelper.FriendlyMessage(ex)}");
+            _toasts.Error(Loc.Format("Toast.ExportFailedFormat", ErrorMessageHelper.FriendlyMessage(ex)));
         }
     }
 
@@ -418,12 +423,12 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     private void OpenLogFolder()
     {
         var installDir = _settings.Current.ServerInstallDir;
-        if (string.IsNullOrWhiteSpace(installDir)) { _toasts.Warning("Installationspfad nicht gesetzt."); return; }
+        if (string.IsNullOrWhiteSpace(installDir)) { _toasts.Warning(Loc.Get("Toast.InstallPathUnset")); return; }
 
         var logDir = Path.Combine(installDir, "R5", "Saved", "Logs");
         if (!Directory.Exists(logDir))
         {
-            _toasts.Warning("UE5-Log-Ordner existiert noch nicht (Server mindestens einmal starten).");
+            _toasts.Warning(Loc.Get("Toast.LogFolderMissing"));
             return;
         }
         try { Process.Start(new ProcessStartInfo { FileName = logDir, UseShellExecute = true }); }
@@ -439,7 +444,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
                 System.Text.RegularExpressions.RegexOptions.None,
                 TimeSpan.FromSeconds(1)))
         {
-            _toasts.Warning("Ungültiges Zeitformat (HH:mm erwartet).");
+            _toasts.Warning(Loc.Get("Toast.TimeFormatInvalid"));
             return;
         }
 
@@ -464,7 +469,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             s.AutoRestartOnMaxUptimeEnabled = AutoRestartOnMaxUptimeEnabled;
             s.AutoRestartMaxUptimeHours = Math.Max(1, AutoRestartMaxUptimeHours);
         });
-        _toasts.Success("Automatisierung gespeichert.");
+        _toasts.Success(Loc.Get("Toast.AutomationSaved"));
     }
 
     private async Task LoadEventsAsync()

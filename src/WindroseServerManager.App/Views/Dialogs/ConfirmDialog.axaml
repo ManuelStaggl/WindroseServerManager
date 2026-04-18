@@ -7,7 +7,7 @@
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Background="{DynamicResource BrandNavySurfaceBrush}"
-        Title="Bestätigen">
+        Title="{DynamicResource Dialog.Confirm.Title}">
     <Border CornerRadius="8"
             Background="{DynamicResource BrandNavySurfaceBrush}"
             BorderBrush="{DynamicResource BrandNavyBorderBrush}"
@@ -17,8 +17,8 @@
             <TextBlock x:Name="TitleText" Classes="section-header" TextWrapping="Wrap" />
             <TextBlock x:Name="MessageText" Classes="body" TextWrapping="Wrap" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
-                <Button x:Name="CancelButton" Content="Abbrechen" Click="OnCancelClick" />
-                <Button x:Name="ConfirmButton" Classes="primary" Content="Bestätigen" Click="OnConfirmClick" />
+                <Button x:Name="CancelButton" Content="{DynamicResource Action.Cancel}" Click="OnCancelClick" />
+                <Button x:Name="ConfirmButton" Classes="primary" Content="{DynamicResource Action.Confirm}" Click="OnConfirmClick" />
             </StackPanel>
         </StackPanel>
     </Border>

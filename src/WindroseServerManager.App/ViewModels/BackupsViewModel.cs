@@ -53,14 +53,14 @@ public partial class BackupsViewModel : ViewModelBase
         if (owner is null) return;
         var picks = await owner.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "Backup-Ordner wählen",
+            Title = Loc.Get("Backups.PickBackupDir.Title"),
             AllowMultiple = false,
         });
         if (picks.Count == 0) return;
         var path = picks[0].Path.LocalPath;
         BackupDir = path;
         await _settings.UpdateAsync(s => s.BackupDir = path);
-        _toasts.Success("Backup-Ordner aktualisiert.");
+        _toasts.Success(Loc.Get("Toast.BackupDirUpdated"));
         Refresh();
     }
 
@@ -104,9 +104,9 @@ public partial class BackupsViewModel : ViewModelBase
             {
                 var confirmed = await ConfirmDialog.ShowAsync(
                     owner,
-                    "Server läuft",
-                    "Ein Backup während laufendem Server kann inkonsistent werden (RocksDB schreibt gerade). Fortfahren?",
-                    confirmLabel: "Backup trotzdem erstellen",
+                    Loc.Get("Confirm.BackupRunning.Title"),
+                    Loc.Get("Confirm.BackupRunning.Message"),
+                    confirmLabel: Loc.Get("Confirm.BackupRunning.Label"),
                     danger: true);
                 if (!confirmed) return;
             }
@@ -116,8 +116,8 @@ public partial class BackupsViewModel : ViewModelBase
         try
         {
             var b = await _backup.CreateBackupAsync(isAutomatic: false);
-            if (b is null) { ErrorMessage = "Saves-Ordner nicht gefunden."; _toasts.Error("Saves-Ordner nicht gefunden."); }
-            else { StatusMessage = $"Backup erstellt: {b.FileName}"; _toasts.Success($"Backup erstellt: {b.FileName}"); }
+            if (b is null) { var m = Loc.Get("Toast.SavesFolderMissing"); ErrorMessage = m; _toasts.Error(m); }
+            else { var m = Loc.Format("Toast.BackupCreatedFormat", b.FileName); StatusMessage = m; _toasts.Success(m); }
             Refresh();
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
@@ -135,9 +135,9 @@ public partial class BackupsViewModel : ViewModelBase
         {
             var confirmed = await ConfirmDialog.ShowAsync(
                 owner,
-                "Backup löschen?",
-                $"Möchten Sie das Backup '{fileName}' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-                confirmLabel: "Löschen",
+                Loc.Get("Confirm.BackupDelete.Title"),
+                Loc.Format("Confirm.BackupDelete.MessageFormat", fileName),
+                confirmLabel: Loc.Get("Confirm.BackupDelete.Label"),
                 danger: true);
             if (!confirmed) return;
         }
@@ -145,8 +145,9 @@ public partial class BackupsViewModel : ViewModelBase
         try
         {
             _backup.DeleteBackup(fileName);
-            StatusMessage = $"Gelöscht: {fileName}";
-            _toasts.Success($"Gelöscht: {fileName}");
+            var m = Loc.Format("Toast.BackupDeletedFormat", fileName);
+            StatusMessage = m;
+            _toasts.Success(m);
             Refresh();
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
@@ -158,7 +159,7 @@ public partial class BackupsViewModel : ViewModelBase
         if (Selected is null) return;
         if (_proc.Status is ServerStatus.Running or ServerStatus.Starting)
         {
-            _toasts.Warning("Server läuft — bitte zuerst stoppen.");
+            _toasts.Warning(Loc.Get("Toast.ServerRunningStopFirst"));
             return;
         }
 
@@ -169,9 +170,9 @@ public partial class BackupsViewModel : ViewModelBase
         {
             var confirmed = await ConfirmDialog.ShowAsync(
                 owner,
-                "Backup wiederherstellen?",
-                $"Das Backup '{fileName}' wird die aktuellen Saves überschreiben. Vor der Wiederherstellung wird automatisch ein Safety-Snapshot der aktuellen Saves erstellt.",
-                confirmLabel: "Wiederherstellen",
+                Loc.Get("Confirm.BackupRestore.Title"),
+                Loc.Format("Confirm.BackupRestore.MessageFormat", fileName),
+                confirmLabel: Loc.Get("Confirm.BackupRestore.Label"),
                 danger: false);
             if (!confirmed) return;
         }
@@ -180,8 +181,9 @@ public partial class BackupsViewModel : ViewModelBase
         try
         {
             await _backup.RestoreBackupAsync(fileName);
-            StatusMessage = $"Wiederhergestellt: {fileName}";
-            _toasts.Success($"Wiederhergestellt: {fileName}");
+            var m = Loc.Format("Toast.BackupRestoredFormat", fileName);
+            StatusMessage = m;
+            _toasts.Success(m);
             Refresh();
         }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
@@ -197,7 +199,7 @@ public partial class BackupsViewModel : ViewModelBase
             s.AutoBackupIntervalMinutes = Math.Max(5, AutoBackupIntervalMinutes);
             s.MaxBackupsToKeep = Math.Max(1, MaxBackupsToKeep);
         });
-        StatusMessage = "Einstellungen gespeichert.";
-        _toasts.Success("Einstellungen gespeichert.");
+        StatusMessage = Loc.Get("Toast.SettingsSaved");
+        _toasts.Success(Loc.Get("Toast.SettingsSaved"));
     }
 }

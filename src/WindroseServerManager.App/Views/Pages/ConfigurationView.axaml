@@ -9,42 +9,40 @@
     </UserControl.KeyBindings>
     <ScrollViewer>
         <StackPanel Margin="0,0,0,24">
-            <TextBlock Classes="page-title" Text="Konfiguration" />
-            <TextBlock Classes="caption" Text="ServerDescription und WorldDescription bearbeiten" Margin="0,4,0,20" />
+            <TextBlock Classes="page-title" Text="{DynamicResource Configuration.Title}" />
+            <TextBlock Classes="caption" Text="{DynamicResource Configuration.Subtitle}" Margin="0,4,0,20" />
 
-            <!-- ==================== HINWEIS ==================== -->
             <Border Classes="card" Margin="0,0,0,16"
                     BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="!" FontSize="18" FontWeight="Bold"
                                Foreground="{DynamicResource BrandWarningBrush}" VerticalAlignment="Center" />
                     <TextBlock Classes="body" TextWrapping="Wrap"
-                               Text="Vor dem Ändern den Server stoppen — sonst überschreibt der Server die Konfiguration beim Herunterfahren." />
+                               Text="{DynamicResource Configuration.StopHint}" />
                 </StackPanel>
             </Border>
 
-            <!-- ==================== SERVER ==================== -->
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Server" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Configuration.Server}" />
 
                     <StackPanel Spacing="4" DataContext="{Binding Server}">
-                        <TextBlock Classes="caption" Text="Name" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Configuration.ServerName}" />
                         <TextBox Text="{Binding ServerName}"
-                                 ToolTip.Tip="Anzeigename des Servers. Spieler sehen den beim Verbinden." />
+                                 ToolTip.Tip="{DynamicResource Configuration.ServerName.Tip}" />
                     </StackPanel>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Invite-Code" />
+                        <TextBlock Classes="caption" Text="{DynamicResource Configuration.InviteCode}" />
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <TextBox Grid.Column="0" Text="{Binding InviteCode}" FontFamily="Consolas,Courier New"
-                                     ToolTip.Tip="Spieler geben diesen Code im Spiel unter 'Connect to Server' ein." />
-                            <Button Grid.Column="1" Classes="subtle" Content="Neu würfeln"
+                                     ToolTip.Tip="{DynamicResource Configuration.InviteCode.Tip}" />
+                            <Button Grid.Column="1" Classes="subtle" Content="{DynamicResource Configuration.InviteCode.Reroll}"
                                     Command="{Binding GenerateInviteCodeCommand}"
-                                    ToolTip.Tip="Erzeugt einen neuen Invite-Code im Piraten-Wortschatz (z. B. SailCove42)." />
+                                    ToolTip.Tip="{DynamicResource Configuration.InviteCode.RerollTip}" />
                         </Grid>
                         <TextBlock Classes="caption"
-                                   Text="6+ Zeichen, 0-9 a-z A-Z, case-sensitive. Einmal fixiert — nicht mehr ändern, wenn Spieler beitreten sollen. Bleibt nach sauberem Serverneustart erhalten."
+                                   Text="{DynamicResource Configuration.InviteCode.Hint}"
                                    TextWrapping="Wrap" />
                         <TextBlock Classes="caption"
                                    Foreground="{DynamicResource BrandErrorBrush}"
@@ -55,27 +53,27 @@
 
                     <Grid ColumnDefinitions="*,*" DataContext="{Binding Server}">
                         <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                            <TextBlock Classes="caption" Text="Max. Spieler (empfohlen 1-4, bis 10 möglich)" />
+                            <TextBlock Classes="caption" Text="{DynamicResource Configuration.MaxPlayers}" />
                             <NumericUpDown Value="{Binding MaxPlayerCount}" Minimum="1" Maximum="10" Increment="1"
-                                           ToolTip.Tip="Gleichzeitige Spieler. 4 empfohlen für flüssige Performance." />
+                                           ToolTip.Tip="{DynamicResource Configuration.MaxPlayers.Tip}" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="4" Margin="8,0,0,0">
-                            <TextBlock Classes="caption" Text="P2P-Proxy-Adresse" />
-                            <TextBox Text="{Binding P2pProxyAddress}" PlaceholderText="127.0.0.1"
-                                     ToolTip.Tip="Lokale IP-Adresse des Listening-Sockets. Normalerweise 127.0.0.1 lassen." />
+                            <TextBlock Classes="caption" Text="{DynamicResource Configuration.P2pProxy}" />
+                            <TextBox Text="{Binding P2pProxyAddress}" Watermark="127.0.0.1"
+                                     ToolTip.Tip="{DynamicResource Configuration.P2pProxy.Tip}" />
                         </StackPanel>
                     </Grid>
 
                     <StackPanel Spacing="4" DataContext="{Binding Server}">
-                        <CheckBox Content="Passwort-Schutz" IsChecked="{Binding IsPasswordProtected}"
-                                  ToolTip.Tip="Wenn aktiv: Spieler müssen zusätzlich das Passwort eingeben." />
+                        <CheckBox Content="{DynamicResource Configuration.PasswordProtected}" IsChecked="{Binding IsPasswordProtected}"
+                                  ToolTip.Tip="{DynamicResource Configuration.PasswordProtected.Tip}" />
                         <TextBox Text="{Binding Password}" PasswordChar="•" IsEnabled="{Binding IsPasswordProtected}" />
                     </StackPanel>
 
                     <StackPanel Spacing="2"
                                 IsVisible="{Binding PersistentServerId, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                ToolTip.Tip="Wird vom Server automatisch generiert beim ersten Start. Nicht editieren.">
-                        <TextBlock Classes="caption" Text="Persistent Server ID (read-only)" />
+                                ToolTip.Tip="{DynamicResource Configuration.PersistentServerId.Tip}">
+                        <TextBlock Classes="caption" Text="{DynamicResource Configuration.PersistentServerId}" />
                         <SelectableTextBlock
                                    FontFamily="Consolas, Courier New, monospace"
                                    FontSize="12"
@@ -84,46 +82,44 @@
                                    TextWrapping="Wrap" />
                         <TextBlock Classes="caption"
                                    Foreground="{DynamicResource BrandTextMutedBrush}"
-                                   Text="Wird vom Server automatisch verwaltet. Nicht editieren." />
+                                   Text="{DynamicResource Configuration.PersistentServerId.Hint}" />
                     </StackPanel>
 
-                    <Button Classes="primary" Content="Server speichern"
+                    <Button Classes="primary" Content="{DynamicResource Configuration.SaveServer}"
                             Command="{Binding SaveServerCommand}"
                             HorizontalAlignment="Left" />
                 </StackPanel>
             </Border>
 
-            <!-- ==================== AKTIONEN ==================== -->
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="Aktionen" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Configuration.Actions}" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Classes="subtle" Content="Server-Ordner öffnen"
+                        <Button Classes="subtle" Content="{DynamicResource Configuration.OpenInstallDir}"
                                 Command="{Binding OpenInstallDirCommand}"
                                 IsEnabled="{Binding CanOpenInstallDir}" />
-                        <Button Classes="subtle" Content="ServerDescription.json öffnen"
+                        <Button Classes="subtle" Content="{DynamicResource Configuration.OpenServerDescription}"
                                 Command="{Binding OpenServerDescriptionCommand}"
                                 IsEnabled="{Binding CanOpenServerDescription}" />
-                        <Button Classes="subtle" Content="Worlds-Ordner öffnen"
+                        <Button Classes="subtle" Content="{DynamicResource Configuration.OpenWorldsRoot}"
                                 Command="{Binding OpenWorldsRootCommand}"
                                 IsEnabled="{Binding CanOpenWorldsRoot}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
-            <!-- ==================== WELT ==================== -->
             <Border Classes="card">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Welt" />
+                    <TextBlock Classes="section-header" Text="{DynamicResource Configuration.World}" />
 
                     <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
-                        <TextBlock Grid.Column="0" Classes="body" Text="Welt-Auswahl" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="0" Classes="body" Text="{DynamicResource Configuration.WorldSelection}" VerticalAlignment="Center" />
                         <ComboBox Grid.Column="1" ItemsSource="{Binding WorldIds}"
                                   SelectedItem="{Binding SelectedWorldId}" HorizontalAlignment="Stretch" />
-                        <Button Grid.Column="2" Content="Aktivieren" Command="{Binding ActivateWorldCommand}"
+                        <Button Grid.Column="2" Content="{DynamicResource Configuration.Activate}" Command="{Binding ActivateWorldCommand}"
                                 IsEnabled="{Binding SelectedWorldId, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                        <Button Grid.Column="3" Content="Neue Welt" Command="{Binding CreateWorldCommand}" />
-                        <Button Grid.Column="4" Classes="danger" Content="Löschen"
+                        <Button Grid.Column="3" Content="{DynamicResource Configuration.NewWorld}" Command="{Binding CreateWorldCommand}" />
+                        <Button Grid.Column="4" Classes="danger" Content="{DynamicResource Action.Delete}"
                                 Command="{Binding DeleteWorldCommand}"
                                 IsEnabled="{Binding SelectedWorldId, Converter={x:Static ObjectConverters.IsNotNull}}" />
                     </Grid>
@@ -133,15 +129,15 @@
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                             <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="Welt-Name" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.WorldName}" />
                                 <TextBox Text="{Binding WorldName}"
-                                         ToolTip.Tip="Dein eigener Name für diese Welt. Rein kosmetisch." />
+                                         ToolTip.Tip="{DynamicResource Configuration.WorldName.Tip}" />
                                 <TextBlock Classes="caption" Foreground="{DynamicResource BrandErrorBrush}"
                                            Text="{Binding WorldNameError}"
                                            IsVisible="{Binding WorldNameError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="Island-ID" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.IslandId}" />
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                     <SelectableTextBlock Grid.Column="0"
                                                FontFamily="Consolas, Courier New, monospace"
@@ -150,132 +146,134 @@
                                                TextWrapping="Wrap"
                                                VerticalAlignment="Center"
                                                Text="{Binding SelectedWorldId}" />
-                                    <Button Grid.Column="1" Classes="subtle" Content="Kopieren"
+                                    <Button Grid.Column="1" Classes="subtle" Content="{DynamicResource Action.Copy}"
                                             Command="{Binding CopyIslandIdCommand}"
-                                            ToolTip.Tip="Island-ID in die Zwischenablage kopieren." />
+                                            ToolTip.Tip="{DynamicResource Configuration.CopyIslandIdTip}" />
                                 </Grid>
                             </StackPanel>
                         </Grid>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                             <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="Preset" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.Preset}" />
                                 <ComboBox ItemsSource="{Binding PresetOptions}"
                                           SelectedItem="{Binding WorldPresetType}"
                                           HorizontalAlignment="Stretch"
-                                          ToolTip.Tip="Standard-Schwierigkeit. Bei manueller Parameter-Änderung wechselt das zu 'Custom'." />
+                                          ToolTip.Tip="{DynamicResource Configuration.Preset.Tip}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ., Converter={x:Static vm:WorldPresetTypeToLocalizedTextConverter.Instance}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="Kampf-Schwierigkeit" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.CombatDifficulty}" />
                                 <ComboBox ItemsSource="{Binding CombatOptions}"
                                           SelectedItem="{Binding CombatDifficulty}"
                                           HorizontalAlignment="Stretch"
-                                          ToolTip.Tip="Beeinflusst Aggression und Taktik von Gegnern." />
+                                          ToolTip.Tip="{DynamicResource Configuration.CombatDifficulty.Tip}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ., Converter={x:Static vm:CombatDifficultyToLocalizedTextConverter.Instance}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </StackPanel>
                         </Grid>
 
-                        <!-- Parameter -->
-                        <TextBlock Classes="section-header" Text="Parameter" Margin="0,12,0,0" />
+                        <TextBlock Classes="section-header" Text="{DynamicResource Configuration.Parameters}" Margin="0,12,0,0" />
                         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                               ColumnSpacing="24" RowSpacing="12">
 
-                            <!-- Row helpers via styles -->
                             <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="Gegner-HP (0.2 – 5.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.MobHealth}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
-                                            Value="{Binding MobHealth}"
-                                            ToolTip.Tip="{Binding MobHealth, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding MobHealth}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.2" Maximum="5.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding MobHealth}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="Gegner-Schaden (0.2 – 5.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.MobDamage}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
-                                            Value="{Binding MobDamage}"
-                                            ToolTip.Tip="{Binding MobDamage, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding MobDamage}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.2" Maximum="5.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding MobDamage}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="Schiffs-HP Feind (0.4 – 5.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.ShipsHealth}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.4" Maximum="5.0" TickFrequency="0.1"
-                                            Value="{Binding ShipsHealth}"
-                                            ToolTip.Tip="{Binding ShipsHealth, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding ShipsHealth}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.4" Maximum="5.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding ShipsHealth}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="Schiffs-Schaden Feind (0.2 – 2.5)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.ShipsDamage}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="2.5" TickFrequency="0.1"
-                                            Value="{Binding ShipsDamage}"
-                                            ToolTip.Tip="{Binding ShipsDamage, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding ShipsDamage}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.2" Maximum="2.5" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding ShipsDamage}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="2" Spacing="4">
-                                <TextBlock Classes="caption" Text="Enter-Schwierigkeit (0.2 – 5.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.BoardingDifficulty}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
-                                            Value="{Binding BoardingDifficulty}"
-                                            ToolTip.Tip="{Binding BoardingDifficulty, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding BoardingDifficulty}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.2" Maximum="5.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding BoardingDifficulty}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="2" Spacing="4">
-                                <TextBlock Classes="caption" Text="Gegner-Skalierung Coop (0.0 – 2.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.CoopMobScaling}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.0" Maximum="2.0" TickFrequency="0.1"
-                                            Value="{Binding CoopStatsCorrection}"
-                                            ToolTip.Tip="{Binding CoopStatsCorrection, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding CoopStatsCorrection}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.0" Maximum="2.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding CoopStatsCorrection}" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="3" Spacing="4">
-                                <TextBlock Classes="caption" Text="Schiffs-Skalierung Coop (0.0 – 2.0)" />
+                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.CoopShipScaling}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.0" Maximum="2.0" TickFrequency="0.1"
-                                            Value="{Binding CoopShipStatsCorrection}"
-                                            ToolTip.Tip="{Binding CoopShipStatsCorrection, StringFormat='Aktuell: {0:0.00} (1,0 = Standard)'}" />
+                                            Value="{Binding CoopShipStatsCorrection}" />
                                     <NumericUpDown Grid.Column="1" Minimum="0.0" Maximum="2.0" Increment="0.1"
                                                    FormatString="0.00" Value="{Binding CoopShipStatsCorrection}" />
                                 </Grid>
                             </StackPanel>
                         </Grid>
 
-                        <!-- Coop Bool Parameters -->
-                        <TextBlock Classes="section-header" Text="Coop / Exploration" Margin="0,12,0,0" />
+                        <TextBlock Classes="section-header" Text="{DynamicResource Configuration.CoopExploration}" Margin="0,12,0,0" />
                         <StackPanel Spacing="8">
-                            <CheckBox Content="Geteilte Quests (Coop)" IsChecked="{Binding CoopSharedQuests}" />
-                            <CheckBox Content="Karte ohne Marker (schwerer)" IsChecked="{Binding EasyExplore}" />
+                            <CheckBox Content="{DynamicResource Configuration.CoopSharedQuests}" IsChecked="{Binding CoopSharedQuests}" />
+                            <CheckBox Content="{DynamicResource Configuration.EasyExplore}" IsChecked="{Binding EasyExplore}" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
-                            <Button Classes="primary" Content="Welt speichern"
+                            <Button Classes="primary" Content="{DynamicResource Configuration.SaveWorld}"
                                     Command="{Binding SaveWorldCommand}" />
-                            <Button Classes="subtle" Content="Welt-Ordner öffnen"
+                            <Button Classes="subtle" Content="{DynamicResource Configuration.OpenWorldDir}"
                                     Command="{Binding OpenSelectedWorldDirCommand}"
                                     IsEnabled="{Binding CanOpenSelectedWorldDir}" />
                         </StackPanel>
                     </StackPanel>
 
                     <TextBlock Classes="caption"
-                               Text="Keine Welten vorhanden — 'Neue Welt' erstellt eine mit Default-Werten."
+                               Text="{DynamicResource Configuration.NoWorldsHint}"
                                IsVisible="{Binding World, Converter={x:Static ObjectConverters.IsNull}}" />
                 </StackPanel>
             </Border>

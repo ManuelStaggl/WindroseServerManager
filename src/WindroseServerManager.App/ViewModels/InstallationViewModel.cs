@@ -35,17 +35,50 @@ public partial class InstallationViewModel : ViewModelBase
 
     public ObservableCollection<string> Log { get; } = new();
 
+    public string InstalledStatusText =>
+        InstallInfo?.IsInstalled == true
+            ? Loc.Get("Status.Installed")
+            : (InstallInfo is null ? Loc.Get("Installation.NotCheckedYet") : Loc.Get("Status.NotInstalled"));
+
+    public string BuildIdDisplay => InstallInfo is null ? string.Empty : Loc.Format("Installation.BuildIdFormat", InstallInfo.BuildId);
+    public string BinaryDisplay => string.IsNullOrEmpty(BinaryPath)
+        ? Loc.Get("Installation.BinaryPlaceholder")
+        : Loc.Format("Installation.BinaryFormat", BinaryPath);
+    public string LastUpdatedDisplay =>
+        InstallInfo is null ? string.Empty : Loc.Format("Installation.LastUpdatedFormat", InstallInfo.LastUpdatedUtc);
+    public string UpdateMessageDisplay =>
+        string.IsNullOrEmpty(UpdateMessage) ? Loc.Get("Installation.UpdateStatusPlaceholder") : UpdateMessage!;
+
+    partial void OnInstallInfoChanged(ServerInstallInfo? value)
+    {
+        OnPropertyChanged(nameof(InstalledStatusText));
+        OnPropertyChanged(nameof(BuildIdDisplay));
+        OnPropertyChanged(nameof(LastUpdatedDisplay));
+    }
+
+    partial void OnBinaryPathChanged(string? value) => OnPropertyChanged(nameof(BinaryDisplay));
+    partial void OnUpdateMessageChanged(string? value) => OnPropertyChanged(nameof(UpdateMessageDisplay));
+
     public InstallationViewModel(
         IServerInstallService install,
         IAppSettingsService settings,
         IToastService toasts,
-        IUpdateCheckService updateCheck)
+        IUpdateCheckService updateCheck,
+        ILocalizationService localization)
     {
         _install = install;
         _settings = settings;
         _toasts = toasts;
         _updateCheck = updateCheck;
         InstallDir = settings.Current.ServerInstallDir;
+        localization.LanguageChanged += () =>
+        {
+            OnPropertyChanged(nameof(InstalledStatusText));
+            OnPropertyChanged(nameof(BuildIdDisplay));
+            OnPropertyChanged(nameof(BinaryDisplay));
+            OnPropertyChanged(nameof(LastUpdatedDisplay));
+            OnPropertyChanged(nameof(UpdateMessageDisplay));
+        };
         _ = RefreshAsync();
     }
 
@@ -66,7 +99,7 @@ public partial class InstallationViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            _toasts.Error($"Update-Check fehlgeschlagen: {ErrorMessageHelper.FriendlyMessage(ex)}");
+            _toasts.Error(Loc.Format("Toast.UpdateCheckFailedFormat", ErrorMessageHelper.FriendlyMessage(ex)));
         }
         finally
         {
@@ -104,7 +137,7 @@ public partial class InstallationViewModel : ViewModelBase
         if (top is null) return;
         var picks = await top.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "Installations-Ordner wählen",
+            Title = Loc.Get("Installation.PickFolder.Title"),
             AllowMultiple = false,
         });
         if (picks.Count > 0)
@@ -127,7 +160,7 @@ public partial class InstallationViewModel : ViewModelBase
         {
             await foreach (var p in _install.InstallOrUpdateAsync(InstallDir, _cts.Token))
             {
-                CurrentPhase = $"{p.Phase}: {p.Message}";
+                CurrentPhase = $"{Loc.Get($"InstallPhase.{p.Phase}")}: {p.Message}";
                 ProgressPercent = p.Percent;
                 if (!string.IsNullOrWhiteSpace(p.LogLine))
                     Avalonia.Threading.Dispatcher.UIThread.Post(() =>
@@ -136,11 +169,11 @@ public partial class InstallationViewModel : ViewModelBase
                         if (Log.Count > 500) Log.RemoveAt(0);
                     });
                 if (p.Phase == InstallPhase.Failed) { ErrorMessage = p.Message; _toasts.Error(p.Message); }
-                else if (p.Phase == InstallPhase.Complete) _toasts.Success("Installation abgeschlossen.");
+                else if (p.Phase == InstallPhase.Complete) _toasts.Success(Loc.Get("Installation.Complete"));
             }
             await RefreshAsync();
         }
-        catch (OperationCanceledException) { CurrentPhase = "Abgebrochen."; _toasts.Info("Abgebrochen."); }
+        catch (OperationCanceledException) { CurrentPhase = Loc.Get("Installation.Cancelled"); _toasts.Info(Loc.Get("Toast.Cancelled")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
         finally
         {

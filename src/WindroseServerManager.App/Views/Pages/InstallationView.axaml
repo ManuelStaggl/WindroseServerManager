@@ -5,25 +5,25 @@
              x:Class="WindroseServerManager.App.Views.Pages.InstallationView"
              x:DataType="vm:InstallationViewModel">
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-        <TextBlock Grid.Row="0" Classes="page-title" Text="Installation" />
-        <TextBlock Grid.Row="1" Classes="caption" Text="Windrose Dedicated Server via SteamCMD (App-ID 4129620)" Margin="0,4,0,20" />
+        <TextBlock Grid.Row="0" Classes="page-title" Text="{DynamicResource Installation.Title}" />
+        <TextBlock Grid.Row="1" Classes="caption" Text="{DynamicResource Installation.Subtitle}" Margin="0,4,0,20" />
 
         <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="12">
-                <TextBlock Classes="section-header" Text="Installations-Ordner" />
+                <TextBlock Classes="section-header" Text="{DynamicResource Installation.InstallDir}" />
                 <Grid ColumnDefinitions="*,Auto" >
-                    <TextBox Grid.Column="0" Text="{Binding InstallDir}" PlaceholderText="z. B. G:\Windrose Server" />
-                    <Button Grid.Column="1" Content="Durchsuchen" Command="{Binding PickFolderCommand}" Margin="8,0,0,0" />
+                    <TextBox Grid.Column="0" Text="{Binding InstallDir}" Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
+                    <Button Grid.Column="1" Content="{DynamicResource Action.Browse}" Command="{Binding PickFolderCommand}" Margin="8,0,0,0" />
                 </Grid>
                 <TextBlock Classes="caption" TextWrapping="Wrap"
-                           Text="Pfad darf kein Leerzeichen/Sonderzeichen am Ende haben. Empfohlen: eigene Partition (z. B. G:\Windrose Server)." />
+                           Text="{DynamicResource Installation.PathHint}" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Classes="primary" Content="Installieren / Aktualisieren"
+                    <Button Classes="primary" Content="{DynamicResource Installation.InstallOrUpdate}"
                             Command="{Binding InstallCommand}"
                             IsEnabled="{Binding !IsInstalling}" />
-                    <Button Content="Abbrechen" Command="{Binding CancelCommand}" IsEnabled="{Binding IsInstalling}" />
-                    <Button Content="Neu prüfen" Command="{Binding RefreshCommand}" />
-                    <Button Content="Im Explorer öffnen" Command="{Binding OpenInstallDirCommand}"
+                    <Button Content="{DynamicResource Action.Cancel}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsInstalling}" />
+                    <Button Content="{DynamicResource Action.Recheck}" Command="{Binding RefreshCommand}" />
+                    <Button Content="{DynamicResource Action.OpenInExplorer}" Command="{Binding OpenInstallDirCommand}"
                             IsEnabled="{Binding CanOpenInstallDir}" />
                 </StackPanel>
                 <TextBlock Classes="body muted" Text="{Binding CurrentPhase}" IsVisible="{Binding IsInstalling}" />
@@ -33,7 +33,7 @@
 
         <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="12">
-                <TextBlock Classes="section-header" Text="Status" />
+                <TextBlock Classes="section-header" Text="{DynamicResource Installation.Status}" />
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                     <Panel Width="12" Height="12">
                         <Ellipse Width="12" Height="12"
@@ -44,16 +44,16 @@
                                  IsVisible="{Binding !InstallInfo.IsInstalled, FallbackValue=True}" />
                     </Panel>
                     <TextBlock Classes="body"
-                               Text="{Binding InstallInfo.IsInstalled, Converter={x:Static vm:BoolToInstalledConverter.Instance}, FallbackValue='Noch nicht geprüft'}" />
+                               Text="{Binding InstalledStatusText}" />
                 </StackPanel>
-                <TextBlock Classes="body muted" Text="{Binding InstallInfo.BuildId, StringFormat='Build ID: {0}'}" />
-                <TextBlock Classes="body muted" Text="{Binding BinaryPath, StringFormat='Binary: {0}', FallbackValue='Binary: —'}" TextWrapping="Wrap" />
-                <TextBlock Classes="body muted" Text="{Binding InstallInfo.LastUpdatedUtc, StringFormat='Zuletzt aktualisiert: {0:yyyy-MM-dd HH:mm}'}" />
+                <TextBlock Classes="body muted" Text="{Binding BuildIdDisplay}" />
+                <TextBlock Classes="body muted" Text="{Binding BinaryDisplay}" TextWrapping="Wrap" />
+                <TextBlock Classes="body muted" Text="{Binding LastUpdatedDisplay}" />
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="0,8,0,0">
-                    <TextBlock Classes="body" Text="{Binding UpdateMessage, FallbackValue='Update-Status: noch nicht geprüft'}" TextWrapping="Wrap" />
+                    <TextBlock Classes="body" Text="{Binding UpdateMessageDisplay}" TextWrapping="Wrap" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Content="Nach Update suchen" Command="{Binding CheckUpdateCommand}"
+                    <Button Content="{DynamicResource Installation.CheckUpdate}" Command="{Binding CheckUpdateCommand}"
                             IsEnabled="{Binding !IsCheckingUpdate}" />
                 </StackPanel>
             </StackPanel>
@@ -61,7 +61,7 @@
 
         <Border Grid.Row="4" Classes="card">
             <Grid RowDefinitions="Auto,*">
-                <TextBlock Grid.Row="0" Classes="section-header" Text="Log" Margin="0,0,0,8" />
+                <TextBlock Grid.Row="0" Classes="section-header" Text="{DynamicResource Installation.Log}" Margin="0,0,0,8" />
                 <ScrollViewer Grid.Row="1" svc:AutoScrollBehavior.IsEnabled="True">
                     <ItemsControl ItemsSource="{Binding Log}">
                         <ItemsControl.ItemTemplate>
