@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="WindroseServerManager.App.Views.Dialogs.AboutDialog"
-        Width="480" Height="360"
+        Width="480" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
@@ -53,9 +53,6 @@
                     <Button Classes="subtle" HorizontalAlignment="Left"
                             Content="GitHub-Repository" Tag="https://github.com/ManuelStaggl/WindroseServerManager"
                             Click="OnLinkClick" />
-                    <Button Classes="subtle" HorizontalAlignment="Left"
-                            Content="Community-Discord" Tag="https://discord.gg/windrose"
-                            Click="OnLinkClick" />
                 </StackPanel>
 
                 <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,8,0,0"
@@ -63,7 +60,7 @@
                            Text="Windrose Server Manager ist ein inoffizielles Community-Tool. Windrose ist eine Marke von Red Rook Games. Nicht verbunden mit oder unterstützt von den Entwicklern." />
             </StackPanel>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                 <Button Classes="primary" Content="Schließen" Click="OnCloseClick" />
             </StackPanel>
         </Grid>

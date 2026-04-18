@@ -2,7 +2,6 @@ namespace WindroseServerManager.Core.Models;
 
 public sealed class AppSettings
 {
-    public ThemeMode Theme { get; set; } = ThemeMode.Dark;
     public string Language { get; set; } = "de";
 
     // Server paths
@@ -23,10 +22,25 @@ public sealed class AppSettings
     public bool LogEnabled { get; set; } = true;
     public string ExtraLaunchArgs { get; set; } = "";
 
+    /// <summary>Max. Zeilen im Live-Log-Puffer (UI). 500 / 2000 / 10000 sind typische Werte.</summary>
+    public int LogBufferSize { get; set; } = 2000;
+
     // Scheduled restart
     public bool ScheduledRestartEnabled { get; set; } = false;
     /// <summary>Format "HH:mm" in local time, 24h.</summary>
     public string DailyRestartTime { get; set; } = "04:00";
+    /// <summary>Wochentage an denen der geplante Restart ausgeführt wird. Leer = täglich.</summary>
+    public List<DayOfWeek> RestartDays { get; set; } = new();
+    /// <summary>Vorwarnzeit in Minuten vor einem geplanten Restart (Toast). 0 = keine Vorwarnung.</summary>
+    public int RestartWarnMinutes { get; set; } = 5;
+
+    // Auto-Restart-Schwellen
+    public bool AutoRestartOnHighRamEnabled { get; set; } = false;
+    /// <summary>RAM-Auslastung des Game-Prozesses in % ab der ein Restart ausgelöst wird.</summary>
+    public int AutoRestartRamThresholdPercent { get; set; } = 80;
+    public bool AutoRestartOnMaxUptimeEnabled { get; set; } = false;
+    /// <summary>Max. Uptime in Stunden, danach Restart.</summary>
+    public int AutoRestartMaxUptimeHours { get; set; } = 24;
 
     // Backups
     public string BackupDir { get; set; } = string.Empty;

@@ -39,23 +39,40 @@ public sealed class MetricsService : IMetricsService, IDisposable
 
     public ProcessMetrics? GetServerProcessMetrics()
     {
-        var pid = _serverProc.ProcessId;
-        if (pid is null) return null;
+        var bootstrapPid = _serverProc.ProcessId;
+        if (bootstrapPid is null) return null;
 
         try
         {
-            using var p = Process.GetProcessById(pid.Value);
+            // WindroseServer.exe ist nur ein Bootstrap-Launcher. Der eigentliche Game-Server
+            // läuft als WindroseServer-Win64-Shipping.exe (UE5-Binary unter R5\Binaries\Win64\).
+            // Für Metriken bevorzugen wir den echten Prozess.
+            using var p = FindGameProcess() ?? Process.GetProcessById(bootstrapPid.Value);
             var sampledCpu = SampleProcessCpu(p);
             var uptime = _serverProc.StartedAtUtc is null
                 ? TimeSpan.Zero
                 : DateTime.UtcNow - _serverProc.StartedAtUtc.Value;
-            return new ProcessMetrics(pid.Value, sampledCpu, p.WorkingSet64, uptime);
+            return new ProcessMetrics(p.Id, sampledCpu, p.WorkingSet64, uptime);
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "Cannot read server process metrics (pid={Pid})", pid);
+            _logger.LogWarning(ex, "Cannot read server process metrics (bootstrapPid={Pid})", bootstrapPid);
             return null;
         }
+    }
+
+    private static Process? FindGameProcess()
+    {
+        foreach (var proc in Process.GetProcessesByName("WindroseServer-Win64-Shipping"))
+        {
+            try
+            {
+                if (!proc.HasExited) return proc;
+            }
+            catch { }
+            proc.Dispose();
+        }
+        return null;
     }
 
     private double SampleHostCpu()

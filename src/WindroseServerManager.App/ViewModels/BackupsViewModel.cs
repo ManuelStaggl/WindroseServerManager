@@ -4,6 +4,7 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
@@ -26,6 +27,7 @@ public partial class BackupsViewModel : ViewModelBase
     [ObservableProperty] private bool _autoBackupEnabled;
     [ObservableProperty] private int _autoBackupIntervalMinutes;
     [ObservableProperty] private int _maxBackupsToKeep;
+    [ObservableProperty] private string _backupDir = string.Empty;
     [ObservableProperty] private string? _statusMessage;
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private bool _isBusy;
@@ -40,6 +42,25 @@ public partial class BackupsViewModel : ViewModelBase
         AutoBackupEnabled = settings.Current.AutoBackupEnabled;
         AutoBackupIntervalMinutes = settings.Current.AutoBackupIntervalMinutes;
         MaxBackupsToKeep = settings.Current.MaxBackupsToKeep;
+        BackupDir = settings.Current.BackupDir;
+        Refresh();
+    }
+
+    [RelayCommand]
+    private async Task PickBackupDirAsync()
+    {
+        var owner = GetOwnerWindow();
+        if (owner is null) return;
+        var picks = await owner.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Backup-Ordner wählen",
+            AllowMultiple = false,
+        });
+        if (picks.Count == 0) return;
+        var path = picks[0].Path.LocalPath;
+        BackupDir = path;
+        await _settings.UpdateAsync(s => s.BackupDir = path);
+        _toasts.Success("Backup-Ordner aktualisiert.");
         Refresh();
     }
 

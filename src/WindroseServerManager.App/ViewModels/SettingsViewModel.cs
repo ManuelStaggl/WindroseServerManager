@@ -1,10 +1,8 @@
 using System.Reflection;
-using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.Views.Dialogs;
-using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
@@ -12,17 +10,13 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly IAppSettingsService _settings;
-    private readonly IThemeService _themes;
     private readonly IToastService _toasts;
     private readonly IFirewallService _firewall;
     private readonly IAutoStartService _autoStart;
     private readonly IAppUpdateService _appUpdate;
 
-    [ObservableProperty] private ThemeMode _theme;
     [ObservableProperty] private bool _autoRestartOnCrash;
     [ObservableProperty] private int _gracefulShutdownSeconds;
-    [ObservableProperty] private string _serverInstallDir = string.Empty;
-    [ObservableProperty] private string _backupDir = string.Empty;
 
     // Launch-Args (strukturiert)
     [ObservableProperty] private bool _logEnabled = true;
@@ -47,29 +41,22 @@ public partial class SettingsViewModel : ViewModelBase
 
     private bool _suppressAutoStartWrite;
 
-    public Array ThemeOptions { get; } = Enum.GetValues(typeof(ThemeMode));
-
     public SettingsViewModel(
         IAppSettingsService settings,
-        IThemeService themes,
         IToastService toasts,
         IFirewallService firewall,
         IAutoStartService autoStart,
         IAppUpdateService appUpdate)
     {
         _settings = settings;
-        _themes = themes;
         _toasts = toasts;
         _firewall = firewall;
         _autoStart = autoStart;
         _appUpdate = appUpdate;
 
         var c = settings.Current;
-        _theme = c.Theme;
         _autoRestartOnCrash = c.AutoRestartOnCrash;
         _gracefulShutdownSeconds = c.GracefulShutdownSeconds;
-        _serverInstallDir = c.ServerInstallDir;
-        _backupDir = c.BackupDir;
 
         _logEnabled = c.LogEnabled;
         _extraLaunchArgs = c.ExtraLaunchArgs;
@@ -81,22 +68,35 @@ public partial class SettingsViewModel : ViewModelBase
         _autoStartEnabled = _autoStart.IsEnabled();
         _suppressAutoStartWrite = false;
 
-        _ = CheckFirewallAsync();
+        _settings.Changed += OnSettingsChanged;
+        _ = CheckFirewallCoreAsync(showToast: false);
     }
 
     [RelayCommand]
-    private async Task CheckFirewallAsync()
+    private Task CheckFirewallAsync() => CheckFirewallCoreAsync(showToast: true);
+
+    private async Task CheckFirewallCoreAsync(bool showToast)
     {
         var binary = ResolveServerBinary();
         if (string.IsNullOrWhiteSpace(binary))
         {
             IsFirewallRuleInstalled = false;
+            if (showToast) _toasts.Warning("Server-Binary nicht gefunden. Bitte zuerst installieren.");
             return;
         }
         try
         {
             IsFirewallBusy = true;
             IsFirewallRuleInstalled = await _firewall.IsRuleInstalledAsync(binary);
+            if (showToast)
+            {
+                if (IsFirewallRuleInstalled) _toasts.Success("Firewall-Regel ist aktiv.");
+                else _toasts.Info("Keine Firewall-Regel vorhanden.");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (showToast) _toasts.Error($"Status-Prüfung fehlgeschlagen: {ErrorMessageHelper.FriendlyMessage(ex)}");
         }
         finally
         {
@@ -136,7 +136,7 @@ public partial class SettingsViewModel : ViewModelBase
                 if (ok) _toasts.Success("Firewall-Regel hinzugefügt.");
                 else _toasts.Error("Firewall-Regel konnte nicht hinzugefügt werden.");
             }
-            await CheckFirewallAsync();
+            await CheckFirewallCoreAsync(showToast: false);
         }
         finally
         {
@@ -144,8 +144,13 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
+    private void OnSettingsChanged(WindroseServerManager.Core.Models.AppSettings settings)
+    {
+        _ = CheckFirewallCoreAsync(showToast: false);
+    }
+
     private string? ResolveServerBinary()
-        => ServerInstallService.FindServerBinary(ServerInstallDir);
+        => ServerInstallService.FindServerBinary(_settings.Current.ServerInstallDir);
 
     partial void OnAutoStartEnabledChanged(bool value)
     {
@@ -177,44 +182,13 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
-    partial void OnThemeChanged(ThemeMode value) => _themes.Apply(value);
-
-    [RelayCommand]
-    private async Task PickInstallDirAsync()
-    {
-        var path = await PickFolderAsync("Installations-Ordner wählen");
-        if (path is not null) ServerInstallDir = path;
-    }
-
-    [RelayCommand]
-    private async Task PickBackupDirAsync()
-    {
-        var path = await PickFolderAsync("Backup-Ordner wählen");
-        if (path is not null) BackupDir = path;
-    }
-
-    private static async Task<string?> PickFolderAsync(string title)
-    {
-        var top = Avalonia.Application.Current?.ApplicationLifetime
-            is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
-        if (top is null) return null;
-        var picks = await top.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-        {
-            Title = title, AllowMultiple = false,
-        });
-        return picks.Count > 0 ? picks[0].Path.LocalPath : null;
-    }
-
     [RelayCommand]
     private async Task SaveAsync()
     {
         await _settings.UpdateAsync(s =>
         {
-            s.Theme = Theme;
             s.AutoRestartOnCrash = AutoRestartOnCrash;
             s.GracefulShutdownSeconds = Math.Max(5, GracefulShutdownSeconds);
-            s.ServerInstallDir = ServerInstallDir;
-            s.BackupDir = BackupDir;
 
             s.LogEnabled = LogEnabled;
             s.ExtraLaunchArgs = ExtraLaunchArgs?.Trim() ?? string.Empty;

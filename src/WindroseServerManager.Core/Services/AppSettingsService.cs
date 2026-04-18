@@ -20,11 +20,28 @@ public sealed class AppSettingsService : IAppSettingsService
     public AppSettingsService(ILogger<AppSettingsService> logger)
     {
         _logger = logger;
-        var dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "WindroseServerManager");
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var dir = Path.Combine(appData, "WindroseServerManager");
         Directory.CreateDirectory(dir);
         _settingsPath = Path.Combine(dir, "settings.json");
+
+        // Einmalige Migration vom alten Projektnamen "WindroseCommand".
+        if (!File.Exists(_settingsPath))
+        {
+            var legacyPath = Path.Combine(appData, "WindroseCommand", "settings.json");
+            if (File.Exists(legacyPath))
+            {
+                try
+                {
+                    File.Copy(legacyPath, _settingsPath);
+                    _logger.LogInformation("Migrated settings from legacy path {Legacy} to {New}", legacyPath, _settingsPath);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to migrate settings from {Legacy}", legacyPath);
+                }
+            }
+        }
     }
 
     public AppSettings Current => _current;

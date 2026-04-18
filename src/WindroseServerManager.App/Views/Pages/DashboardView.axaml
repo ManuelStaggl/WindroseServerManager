@@ -88,21 +88,42 @@
                 </Grid>
             </Border>
 
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Classes="caption" Text="Server-Status" />
+                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                <Ellipse Width="12" Height="12"
+                                         Fill="{Binding Status, Converter={x:Static vm:ServerStatusToBrushConverter.Instance}}" />
+                                <TextBlock Classes="section-header" Text="{Binding Status}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="4" HorizontalAlignment="Right">
+                            <TextBlock Classes="caption" Text="Uptime" HorizontalAlignment="Right" />
+                            <TextBlock Classes="section-header" Text="{Binding UptimeText}" />
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Classes="primary" Content="Start" Command="{Binding StartCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Content="Stop" Command="{Binding StopCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Content="Neustart" Command="{Binding RestartCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Classes="danger" Content="Force-Kill" Command="{Binding KillCommand}" IsEnabled="{Binding !IsBusy}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Classes="subtle" Content="Server-Ordner öffnen"
+                                Command="{Binding OpenServerDirCommand}"
+                                IsEnabled="{Binding CanOpenServerDir}" />
+                        <Button Classes="subtle" Content="ServerDescription.json öffnen"
+                                Command="{Binding OpenServerDescriptionCommand}"
+                                IsEnabled="{Binding CanOpenServerDescription}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
 
                 <Border Grid.Row="0" Grid.Column="0" Classes="card">
-                    <StackPanel Spacing="12">
-                        <TextBlock Classes="caption" Text="Server-Status" />
-                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                            <Ellipse Width="12" Height="12"
-                                     Fill="{Binding Status, Converter={x:Static vm:ServerStatusToBrushConverter.Instance}}" />
-                            <TextBlock Classes="section-header" Text="{Binding Status}" />
-                        </StackPanel>
-                        <TextBlock Classes="body muted" Text="{Binding UptimeText, StringFormat='Uptime: {0}'}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="1" Classes="card">
                     <StackPanel Spacing="12">
                         <TextBlock Classes="caption" Text="Installation" />
                         <TextBlock Classes="section-header"
@@ -112,27 +133,28 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="0" Classes="card">
+                <Border Grid.Row="0" Grid.Column="1" Classes="card">
                     <StackPanel Spacing="12">
-                        <TextBlock Classes="caption" Text="Host" />
-                        <StackPanel>
-                            <TextBlock Classes="body" Text="{Binding HostCpu, StringFormat='CPU: {0:0.0}%'}" />
-                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostCpu}" Height="6" Margin="0,4,0,0" />
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBlock Classes="body" Text="{Binding HostRamText, StringFormat='RAM: {0}'}" />
-                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostRamPercent}" Height="6" Margin="0,4,0,0" />
-                        </StackPanel>
-                        <TextBlock Classes="body muted" Text="{Binding DiskText, StringFormat='Disk: {0}'}" />
+                        <TextBlock Classes="caption" Text="Server-Prozess" />
+                        <TextBlock Classes="body" Text="{Binding ProcCpuText, StringFormat='CPU: {0}'}" />
+                        <TextBlock Classes="body" Text="{Binding ProcRamText, StringFormat='RAM: {0}'}" />
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="1" Classes="card">
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Classes="card">
                     <StackPanel Spacing="12">
-                        <TextBlock Classes="caption" Text="Server-Prozess" />
-                        <TextBlock Classes="body" Text="{Binding ProcCpu, StringFormat='CPU: {0:0.0}%'}" />
-                        <TextBlock Classes="body" Text="{Binding ProcRamText, StringFormat='RAM: {0}'}" />
-                        <TextBlock Classes="body muted" Text="{Binding UptimeText, StringFormat='Uptime: {0}'}" />
+                        <TextBlock Classes="caption" Text="Host" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Classes="body" Text="{Binding HostCpu, StringFormat='CPU: {0:0.0}%'}" />
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostCpu}" Height="6" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Classes="body" Text="{Binding HostRamText, StringFormat='RAM: {0}'}" />
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostRamPercent}" Height="6" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Classes="body muted" Text="{Binding DiskText, StringFormat='Disk: {0}'}" />
                     </StackPanel>
                 </Border>
             </Grid>

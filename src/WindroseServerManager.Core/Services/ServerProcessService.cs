@@ -11,16 +11,18 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
     private readonly ILogger<ServerProcessService> _logger;
     private readonly IAppSettingsService _settings;
+    private readonly IServerEventLog _events;
     private readonly object _lock = new();
 
     private readonly ConcurrentQueue<ServerLogLine> _logBuffer = new();
     private Process? _process;
     private CancellationTokenSource? _monitorCts;
 
-    public ServerProcessService(ILogger<ServerProcessService> logger, IAppSettingsService settings)
+    public ServerProcessService(ILogger<ServerProcessService> logger, IAppSettingsService settings, IServerEventLog events)
     {
         _logger = logger;
         _settings = settings;
+        _events = events;
     }
 
     public ServerStatus Status { get; private set; } = ServerStatus.Stopped;
@@ -136,6 +138,9 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             }, _monitorCts.Token);
 
             _logger.LogInformation("Started Windrose server pid={Pid} exe={Exe}", ProcessId, exe);
+
+            _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, ServerEventType.Started, $"Start via App (pid={ProcessId})"));
+
             return Task.FromResult(true);
         }
     }
@@ -197,6 +202,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         finally
         {
             // Exited event fires OnExited → cleanup.
+            KillOrphanServerProcesses();
         }
     }
 
@@ -224,15 +230,64 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             _logger.LogError(ex, "Kill failed");
             AppendSystem($"[FEHLER] Kill fehlgeschlagen: {ex.Message}");
         }
+        finally
+        {
+            KillOrphanServerProcesses();
+        }
+    }
+
+    private void KillOrphanServerProcesses()
+    {
+        var installDir = _settings.Current.ServerInstallDir;
+        if (string.IsNullOrWhiteSpace(installDir) || !Directory.Exists(installDir)) return;
+
+        // Sowohl Bootstrap (WindroseServer.exe) als auch echten UE5-Prozess (WindroseServer-Win64-Shipping.exe)
+        // verfolgen — letzterer läuft typischerweise in R5\Binaries\Win64\ und ist nach dem Bootstrap-Kill
+        // oft noch am Leben (das "cmd-Fenster" des Servers).
+        string[] names = { "WindroseServer", "WindroseServer-Win64-Shipping" };
+
+        foreach (var name in names)
+        {
+            foreach (var proc in Process.GetProcessesByName(name))
+            {
+                try
+                {
+                    string? procPath = null;
+                    try { procPath = proc.MainModule?.FileName; } catch { /* access denied */ }
+
+                    // Wenn wir den Pfad lesen können: nur Prozesse aus unserem Install-Dir töten.
+                    if (procPath is not null
+                        && !procPath.StartsWith(Path.GetFullPath(installDir), StringComparison.OrdinalIgnoreCase))
+                    {
+                        proc.Dispose();
+                        continue;
+                    }
+
+                    _logger.LogWarning("Killing orphan server process pid={Pid} name={Name} path={Path}", proc.Id, name, procPath);
+                    AppendSystem($"Orphan-Prozess beendet ({name}, pid={proc.Id}).");
+                    proc.Kill(entireProcessTree: true);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "Failed to kill orphan pid={Pid}", proc.Id);
+                }
+                finally
+                {
+                    proc.Dispose();
+                }
+            }
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
     {
         int? code = null;
         ServerStatus previous;
+        DateTime? startedAt;
         lock (_lock)
         {
             previous = Status;
+            startedAt = StartedAtUtc;
             try { code = _process?.ExitCode; } catch { /* ignore */ }
             LastExitCode = code;
             CleanupProcess();
@@ -246,6 +301,14 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
         AppendSystem($"=== Prozess beendet. ExitCode={code?.ToString() ?? "?"}");
         _logger.LogInformation("Server exited: code={Code} previousStatus={Prev}", code, previous);
+
+        var sessionDuration = startedAt is null ? (TimeSpan?)null : DateTime.UtcNow - startedAt.Value;
+        var crashed = previous != ServerStatus.Stopping && code != 0;
+        var evtType = crashed ? ServerEventType.Crashed : ServerEventType.Stopped;
+        var reason = crashed
+            ? $"Crash (ExitCode={code?.ToString() ?? "?"})"
+            : $"Stop (ExitCode={code?.ToString() ?? "?"})";
+        _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, evtType, reason, code, sessionDuration));
 
         // Auto-restart on crash if enabled and we weren't the one who stopped it
         if (previous != ServerStatus.Stopping && _settings.Current.AutoRestartOnCrash)

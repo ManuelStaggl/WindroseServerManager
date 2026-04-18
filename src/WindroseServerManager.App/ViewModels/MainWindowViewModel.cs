@@ -26,7 +26,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public IToastService Toasts { get; }
 
     [ObservableProperty] private ViewModelBase? _currentPage;
-    [ObservableProperty] private NavItem? _selectedNavItem;
+    [ObservableProperty] private NavItem? _selectedMainItem;
+    [ObservableProperty] private NavItem? _selectedFooterItem;
+    private bool _suppressSelectionSync;
 
     // --- App-Update-Banner ---
     [ObservableProperty] private bool _isUpdateBannerVisible;
@@ -39,6 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IToastService toasts,
         IAppSettingsService settings,
         IAppUpdateService appUpdate,
+        RestartScheduler restartScheduler,
         ILogger<MainWindowViewModel> logger)
     {
         _nav = nav;
@@ -47,11 +50,13 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger = logger;
         _nav.Navigated += vm => CurrentPage = vm;
 
+        restartScheduler.RestartNotified += OnRestartNotified;
+
         NavItems = new ObservableCollection<NavItem>
         {
             new() { Title = "Dashboard", Icon = "\uE80F", VmType = typeof(DashboardViewModel) },
             new() { Title = "Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
-            new() { Title = "Server-Steuerung", Icon = "\uE7C8", VmType = typeof(ServerControlViewModel) },
+            new() { Title = "Log & Automatisierung", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
             new() { Title = "Konfiguration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
             new() { Title = "Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },
         };
@@ -62,20 +67,52 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var hasInstall = !string.IsNullOrWhiteSpace(settings.Current.ServerInstallDir)
                          && System.IO.Directory.Exists(settings.Current.ServerInstallDir);
-        SelectedNavItem = hasInstall ? NavItems[0] : NavItems[1];
+        SelectedMainItem = hasInstall ? NavItems[0] : NavItems[1];
 
         appUpdate.UpdateChecked += OnUpdateChecked;
     }
 
-    partial void OnSelectedNavItemChanged(NavItem? value)
+    partial void OnSelectedMainItemChanged(NavItem? value)
     {
-        if (value is null) return;
-        var vm = (ViewModelBase)App.Services.GetService(value.VmType)!;
+        if (_suppressSelectionSync || value is null) return;
+        _suppressSelectionSync = true;
+        try { SelectedFooterItem = null; }
+        finally { _suppressSelectionSync = false; }
+        NavigateToItem(value);
+    }
+
+    partial void OnSelectedFooterItemChanged(NavItem? value)
+    {
+        if (_suppressSelectionSync || value is null) return;
+        _suppressSelectionSync = true;
+        try { SelectedMainItem = null; }
+        finally { _suppressSelectionSync = false; }
+        NavigateToItem(value);
+    }
+
+    private void NavigateToItem(NavItem item)
+    {
+        var vm = (ViewModelBase)App.Services.GetService(item.VmType)!;
         _nav.NavigateTo(vm);
     }
 
     [RelayCommand]
-    private void NavigateTo(NavItem item) => SelectedNavItem = item;
+    private void NavigateTo(NavItem item)
+    {
+        if (NavItems.Contains(item)) SelectedMainItem = item;
+        else if (FooterItems.Contains(item)) SelectedFooterItem = item;
+    }
+
+    private void OnRestartNotified(WindroseServerManager.Core.Services.RestartEvent evt)
+    {
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            if (evt.Trigger == WindroseServerManager.Core.Services.RestartTrigger.ScheduledWarning)
+                Toasts.Warning(evt.Reason);
+            else
+                Toasts.Info($"Auto-Restart: {evt.Reason}");
+        });
+    }
 
     private void OnUpdateChecked(AppUpdateResult result)
     {

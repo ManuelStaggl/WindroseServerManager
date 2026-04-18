@@ -32,8 +32,6 @@ public partial class App : Application
         var settings = Services.GetRequiredService<IAppSettingsService>();
         settings.LoadAsync().GetAwaiter().GetResult();
 
-        Services.GetRequiredService<IThemeService>().Apply(settings.Current.Theme);
-
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var main = Services.GetRequiredService<MainWindowViewModel>();
@@ -75,12 +73,13 @@ public partial class App : Application
         s.AddSingleton<IServerConfigService, ServerConfigService>();
         s.AddSingleton<IBackupService, BackupService>();
         s.AddSingleton<IMetricsService, MetricsService>();
+        s.AddSingleton<IServerEventLog, ServerEventLog>();
 
         s.AddHostedService<BackupScheduler>();
-        s.AddHostedService<RestartScheduler>();
+        s.AddSingleton<RestartScheduler>();
+        s.AddHostedService(sp => sp.GetRequiredService<RestartScheduler>());
 
         s.AddSingleton<INavigationService, NavigationService>();
-        s.AddSingleton<IThemeService, ThemeService>();
         s.AddSingleton<IToastService, ToastService>();
         s.AddSingleton<IFirewallService, FirewallService>();
         s.AddSingleton<IUpdateCheckService, UpdateCheckService>();

@@ -9,17 +9,7 @@
     <ScrollViewer>
         <StackPanel>
             <TextBlock Classes="page-title" Text="Einstellungen" />
-            <TextBlock Classes="caption" Text="App-Konfiguration und Pfade" Margin="0,4,0,20" />
-
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="10">
-                    <TextBlock Classes="section-header" Text="Darstellung" />
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Theme" />
-                        <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding Theme}" MinWidth="200" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+            <TextBlock Classes="caption" Text="App-Konfiguration" Margin="0,4,0,20" />
 
             <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
@@ -56,26 +46,6 @@
                     </StackPanel>
                     <TextBlock Classes="caption" TextWrapping="Wrap"
                                Text="Normalerweise nicht nötig. Ändern nur für Beta-Branches oder alternative Steam-Konten." />
-                </StackPanel>
-            </Border>
-
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="Pfade" />
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Installations-Ordner" />
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBox Grid.Column="0" Text="{Binding ServerInstallDir}" />
-                            <Button Grid.Column="1" Content="..." Command="{Binding PickInstallDirCommand}" Margin="8,0,0,0" />
-                        </Grid>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="Backup-Ordner" />
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBox Grid.Column="0" Text="{Binding BackupDir}" />
-                            <Button Grid.Column="1" Content="..." Command="{Binding PickBackupDirCommand}" Margin="8,0,0,0" />
-                        </Grid>
-                    </StackPanel>
                 </StackPanel>
             </Border>
 

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Avalonia.Input.Platform;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
@@ -26,16 +27,30 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     private readonly IAppSettingsService _settings;
     private readonly IServerConfigService _config;
     private readonly IToastService _toasts;
+    private readonly IServerEventLog _eventLog;
     private readonly System.Timers.Timer _refreshTimer;
+
+    public ObservableCollection<ServerEvent> Events { get; } = new();
 
     [ObservableProperty] private ServerStatus _status;
     [ObservableProperty] private string _uptimeText = "—";
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private bool _scheduledRestartEnabled;
     [ObservableProperty] private string _dailyRestartTime = "04:00";
+    [ObservableProperty] private int _restartWarnMinutes = 5;
+    [ObservableProperty] private bool _restartMon, _restartTue, _restartWed, _restartThu, _restartFri, _restartSat, _restartSun;
+
+    [ObservableProperty] private bool _autoRestartOnHighRamEnabled;
+    [ObservableProperty] private int _autoRestartRamThresholdPercent = 80;
+    [ObservableProperty] private bool _autoRestartOnMaxUptimeEnabled;
+    [ObservableProperty] private int _autoRestartMaxUptimeHours = 24;
     [ObservableProperty] private string? _inviteCode;
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private LogLevelFilter _currentLogFilter = LogLevelFilter.All;
+    [ObservableProperty] private string _searchQuery = string.Empty;
+    [ObservableProperty] private int _logBufferSize = 2000;
+
+    public int[] LogBufferSizeOptions { get; } = { 500, 2000, 10000 };
 
     public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
                                     && Directory.Exists(_settings.Current.ServerInstallDir);
@@ -89,21 +104,43 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         set { if (value) CurrentLogFilter = LogLevelFilter.ErrorOnly; }
     }
 
-    public ServerControlViewModel(IServerProcessService proc, IAppSettingsService settings, IServerConfigService config, IToastService toasts)
+    public ServerControlViewModel(IServerProcessService proc, IAppSettingsService settings, IServerConfigService config, IToastService toasts, IServerEventLog eventLog)
     {
         _proc = proc;
         _settings = settings;
         _config = config;
         _toasts = toasts;
+        _eventLog = eventLog;
         _proc.StatusChanged += OnStatus;
         _proc.LogAppended += OnLog;
+        _eventLog.Appended += OnEventAppended;
         _status = _proc.Status;
 
         foreach (var line in _proc.RecentLog) Log.Add(line.Text);
         RebuildFilteredLog();
 
+        _ = LoadEventsAsync();
+
         ScheduledRestartEnabled = settings.Current.ScheduledRestartEnabled;
         DailyRestartTime = settings.Current.DailyRestartTime;
+        RestartWarnMinutes = settings.Current.RestartWarnMinutes;
+        LogBufferSize = settings.Current.LogBufferSize > 0 ? settings.Current.LogBufferSize : 2000;
+
+        var days = settings.Current.RestartDays ?? new List<DayOfWeek>();
+        // Leere Liste = täglich → alle Tage aktiv.
+        var allDays = days.Count == 0;
+        RestartMon = allDays || days.Contains(DayOfWeek.Monday);
+        RestartTue = allDays || days.Contains(DayOfWeek.Tuesday);
+        RestartWed = allDays || days.Contains(DayOfWeek.Wednesday);
+        RestartThu = allDays || days.Contains(DayOfWeek.Thursday);
+        RestartFri = allDays || days.Contains(DayOfWeek.Friday);
+        RestartSat = allDays || days.Contains(DayOfWeek.Saturday);
+        RestartSun = allDays || days.Contains(DayOfWeek.Sunday);
+
+        AutoRestartOnHighRamEnabled = settings.Current.AutoRestartOnHighRamEnabled;
+        AutoRestartRamThresholdPercent = settings.Current.AutoRestartRamThresholdPercent;
+        AutoRestartOnMaxUptimeEnabled = settings.Current.AutoRestartOnMaxUptimeEnabled;
+        AutoRestartMaxUptimeHours = settings.Current.AutoRestartMaxUptimeHours;
 
         _ = LoadInviteCodeAsync();
 
@@ -126,6 +163,22 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         RebuildFilteredLog();
     }
 
+    partial void OnSearchQueryChanged(string value) => RebuildFilteredLog();
+
+    partial void OnLogBufferSizeChanged(int value)
+    {
+        if (value <= 0) return;
+        _ = _settings.UpdateAsync(s => s.LogBufferSize = value);
+        TrimLog();
+    }
+
+    private void TrimLog()
+    {
+        var max = Math.Max(100, LogBufferSize);
+        while (Log.Count > max) Log.RemoveAt(0);
+        while (FilteredLog.Count > max) FilteredLog.RemoveAt(0);
+    }
+
     private static LogLevelFilter ClassifyLine(string line)
     {
         if (string.IsNullOrEmpty(line)) return LogLevelFilter.InfoPlus;
@@ -142,6 +195,10 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
 
     private bool MatchesFilter(string line)
     {
+        if (!string.IsNullOrWhiteSpace(SearchQuery)
+            && line.IndexOf(SearchQuery, StringComparison.OrdinalIgnoreCase) < 0)
+            return false;
+
         var level = ClassifyLine(line);
         return CurrentLogFilter switch
         {
@@ -211,13 +268,14 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
 
     private void OnLog(ServerLogLine line) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
     {
+        var max = Math.Max(100, LogBufferSize);
         Log.Add(line.Text);
-        if (Log.Count > 500) Log.RemoveAt(0);
+        if (Log.Count > max) Log.RemoveAt(0);
 
         if (MatchesFilter(line.Text))
         {
             FilteredLog.Add(line.Text);
-            if (FilteredLog.Count > 500) FilteredLog.RemoveAt(0);
+            if (FilteredLog.Count > max) FilteredLog.RemoveAt(0);
         }
     });
 
@@ -316,6 +374,63 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
+    private void ClearLog()
+    {
+        Log.Clear();
+        FilteredLog.Clear();
+        _toasts.Info("Log geleert.");
+    }
+
+    [RelayCommand]
+    private async Task ExportLogAsync()
+    {
+        var owner = GetOwnerWindow();
+        if (owner is null) return;
+
+        var ts = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        var file = await owner.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Log exportieren",
+            SuggestedFileName = $"windrose-log-{ts}.txt",
+            DefaultExtension = "txt",
+            FileTypeChoices = new[]
+            {
+                new FilePickerFileType("Textdatei") { Patterns = new[] { "*.txt" } },
+            },
+        });
+        if (file is null) return;
+
+        try
+        {
+            var path = file.Path.LocalPath;
+            // Snapshot nehmen — Log kann währenddessen wachsen.
+            var snapshot = Log.ToArray();
+            await File.WriteAllLinesAsync(path, snapshot);
+            _toasts.Success($"Log exportiert: {Path.GetFileName(path)}");
+        }
+        catch (Exception ex)
+        {
+            _toasts.Error($"Export fehlgeschlagen: {ErrorMessageHelper.FriendlyMessage(ex)}");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenLogFolder()
+    {
+        var installDir = _settings.Current.ServerInstallDir;
+        if (string.IsNullOrWhiteSpace(installDir)) { _toasts.Warning("Installationspfad nicht gesetzt."); return; }
+
+        var logDir = Path.Combine(installDir, "R5", "Saved", "Logs");
+        if (!Directory.Exists(logDir))
+        {
+            _toasts.Warning("UE5-Log-Ordner existiert noch nicht (Server mindestens einmal starten).");
+            return;
+        }
+        try { Process.Start(new ProcessStartInfo { FileName = logDir, UseShellExecute = true }); }
+        catch (Exception ex) { _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex)); }
+    }
+
+    [RelayCommand]
     private async Task SaveRestartScheduleAsync()
     {
         if (!System.Text.RegularExpressions.Regex.IsMatch(
@@ -328,13 +443,46 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             return;
         }
 
+        var days = new List<DayOfWeek>();
+        if (RestartMon) days.Add(DayOfWeek.Monday);
+        if (RestartTue) days.Add(DayOfWeek.Tuesday);
+        if (RestartWed) days.Add(DayOfWeek.Wednesday);
+        if (RestartThu) days.Add(DayOfWeek.Thursday);
+        if (RestartFri) days.Add(DayOfWeek.Friday);
+        if (RestartSat) days.Add(DayOfWeek.Saturday);
+        if (RestartSun) days.Add(DayOfWeek.Sunday);
+
         await _settings.UpdateAsync(s =>
         {
             s.ScheduledRestartEnabled = ScheduledRestartEnabled;
             s.DailyRestartTime = DailyRestartTime;
+            s.RestartWarnMinutes = Math.Max(0, RestartWarnMinutes);
+            // 7 von 7 Tagen aktiv ist semantisch "täglich" → leere Liste speichern.
+            s.RestartDays = days.Count == 7 ? new List<DayOfWeek>() : days;
+            s.AutoRestartOnHighRamEnabled = AutoRestartOnHighRamEnabled;
+            s.AutoRestartRamThresholdPercent = Math.Clamp(AutoRestartRamThresholdPercent, 10, 100);
+            s.AutoRestartOnMaxUptimeEnabled = AutoRestartOnMaxUptimeEnabled;
+            s.AutoRestartMaxUptimeHours = Math.Max(1, AutoRestartMaxUptimeHours);
         });
-        _toasts.Success("Restart-Zeitplan gespeichert.");
+        _toasts.Success("Automatisierung gespeichert.");
     }
+
+    private async Task LoadEventsAsync()
+    {
+        var list = await _eventLog.ReadRecentAsync(50).ConfigureAwait(false);
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            Events.Clear();
+            foreach (var e in list) Events.Add(e);
+        });
+    }
+
+    private void OnEventAppended(ServerEvent evt) =>
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            Events.Insert(0, evt);
+            while (Events.Count > 50) Events.RemoveAt(Events.Count - 1);
+        });
 
     public void Dispose()
     {
@@ -342,5 +490,6 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         _refreshTimer.Dispose();
         _proc.StatusChanged -= OnStatus;
         _proc.LogAppended -= OnLog;
+        _eventLog.Appended -= OnEventAppended;
     }
 }

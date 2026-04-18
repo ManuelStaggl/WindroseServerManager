@@ -3,13 +3,24 @@
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
              x:Class="WindroseServerManager.App.Views.Pages.BackupsView"
              x:DataType="vm:BackupsViewModel">
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
         <TextBlock Grid.Row="0" Classes="page-title" Text="Backups" />
         <TextBlock Grid.Row="1" Classes="caption" TextWrapping="Wrap"
                    Text="Sichert den Saves-Ordner (R5\Saved\SaveProfiles\Default\RocksDB\...\Worlds\) als ZIP."
                    Margin="0,4,0,20" />
 
         <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+                <TextBlock Classes="section-header" Text="Backup-Ordner" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0" Text="{Binding BackupDir}" IsReadOnly="True"
+                             Watermark="Standard: %LocalAppData%\WindroseServerManager\Backups" />
+                    <Button Grid.Column="1" Content="Ändern..." Command="{Binding PickBackupDirCommand}" Margin="8,0,0,0" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="12">
                 <TextBlock Classes="section-header" Text="Automatische Backups" />
                 <StackPanel Orientation="Horizontal" Spacing="16">
@@ -27,7 +38,7 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
+        <Border Grid.Row="4" Classes="card" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button Classes="primary" Content="Backup jetzt erstellen" Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" />
                 <Button Content="Wiederherstellen" Command="{Binding RestoreCommand}" IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
@@ -37,7 +48,7 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="4" Classes="card">
+        <Border Grid.Row="5" Classes="card">
             <Grid>
                 <DataGrid ItemsSource="{Binding Backups}" SelectedItem="{Binding Selected}"
                           IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None" HeadersVisibility="Column">

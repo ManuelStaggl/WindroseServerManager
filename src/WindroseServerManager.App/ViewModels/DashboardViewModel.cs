@@ -5,6 +5,7 @@ using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
+using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
@@ -29,6 +30,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string _hostRamText = "—";
     [ObservableProperty] private string _diskText = "—";
     [ObservableProperty] private double _procCpu;
+    [ObservableProperty] private string _procCpuText = "—";
     [ObservableProperty] private string _procRamText = "—";
     [ObservableProperty] private string? _inviteCode;
     [ObservableProperty] private string _serverName = "—";
@@ -37,6 +39,20 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private bool _hasActiveWorld;
     [ObservableProperty] private bool _hasRecentCrash;
     [ObservableProperty] private string? _lastCrashPath;
+    [ObservableProperty] private bool _isBusy;
+    [ObservableProperty] private string? _errorMessage;
+
+    public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
+                                    && Directory.Exists(_settings.Current.ServerInstallDir);
+
+    public bool CanOpenServerDescription
+    {
+        get
+        {
+            var p = _config.GetServerDescriptionPath();
+            return !string.IsNullOrWhiteSpace(p) && File.Exists(p);
+        }
+    }
 
     public bool HasServerName => !string.IsNullOrWhiteSpace(ServerName) && ServerName != "—";
 
@@ -181,12 +197,14 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             if (p is not null)
             {
                 ProcCpu = p.CpuPercent;
-                ProcRamText = FormatGb(p.RamBytes);
+                ProcCpuText = FormatCpu(p.CpuPercent);
+                ProcRamText = FormatBytesAuto(p.RamBytes);
                 UptimeText = FormatUptime(p.Uptime);
             }
             else
             {
                 ProcCpu = 0;
+                ProcCpuText = "—";
                 ProcRamText = "—";
                 UptimeText = "—";
             }
@@ -220,6 +238,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
                 }
             }
             catch { }
+
+            OnPropertyChanged(nameof(CanOpenServerDir));
+            OnPropertyChanged(nameof(CanOpenServerDescription));
         }
         catch { }
     }
@@ -247,6 +268,123 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     {
         var vm = (InstallationViewModel)App.Services.GetService(typeof(InstallationViewModel))!;
         _nav.NavigateTo(vm);
+    }
+
+    private static Avalonia.Controls.Window? GetOwnerWindow()
+    {
+        return Avalonia.Application.Current?.ApplicationLifetime
+            is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d
+                ? d.MainWindow
+                : null;
+    }
+
+    [RelayCommand]
+    private async Task StartAsync()
+    {
+        ErrorMessage = _proc.ValidateCanStart();
+        if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
+        try { await _proc.StartAsync(); _toasts.Success("Server wird gestartet..."); }
+        catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
+    }
+
+    [RelayCommand]
+    private async Task StopAsync()
+    {
+        try { await _proc.StopAsync(); _toasts.Info("Server wird gestoppt..."); }
+        catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
+    }
+
+    [RelayCommand]
+    private async Task KillAsync()
+    {
+        if (_proc.Status is ServerStatus.Running or ServerStatus.Starting)
+        {
+            var owner = GetOwnerWindow();
+            if (owner is not null)
+            {
+                var confirmed = await ConfirmDialog.ShowAsync(
+                    owner,
+                    "Prozess hart beenden",
+                    "Ungesicherte Welt-Änderungen gehen verloren. Trotzdem beenden?",
+                    confirmLabel: "Hart beenden",
+                    danger: true);
+                if (!confirmed) return;
+            }
+        }
+
+        try { await _proc.KillAsync(); _toasts.Warning("Server beendet (Force-Kill)."); }
+        catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
+    }
+
+    [RelayCommand]
+    private async Task RestartAsync()
+    {
+        if (IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            _toasts.Info("Neustart läuft...");
+
+            try { await _proc.StopAsync(); }
+            catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); return; }
+
+            var maxWait = TimeSpan.FromSeconds(10);
+            var step = TimeSpan.FromMilliseconds(500);
+            var waited = TimeSpan.Zero;
+            while (_proc.Status != ServerStatus.Stopped && waited < maxWait)
+            {
+                await Task.Delay(step);
+                waited += step;
+            }
+
+            if (_proc.Status != ServerStatus.Stopped)
+            {
+                _toasts.Warning("Server konnte nicht rechtzeitig gestoppt werden.");
+                return;
+            }
+
+            ErrorMessage = _proc.ValidateCanStart();
+            if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
+
+            try { await _proc.StartAsync(); _toasts.Success("Server wird neu gestartet..."); }
+            catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenServerDir()
+    {
+        var path = _settings.Current.ServerInstallDir;
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = path, UseShellExecute = true }); } catch { }
+    }
+
+    [RelayCommand]
+    private void OpenServerDescription()
+    {
+        var path = _config.GetServerDescriptionPath();
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = path, UseShellExecute = true }); } catch { }
+    }
+
+    private static string FormatCpu(double percent)
+    {
+        if (percent <= 0) return "0 %";
+        if (percent < 0.1) return "<0.1 %";
+        return $"{percent:0.0} %";
+    }
+
+    private static string FormatBytesAuto(long bytes)
+    {
+        if (bytes <= 0) return "—";
+        double gb = bytes / 1024.0 / 1024.0 / 1024.0;
+        if (gb >= 1.0) return $"{gb:0.00} GB";
+        double mb = bytes / 1024.0 / 1024.0;
+        return $"{mb:0} MB";
     }
 
     private static string FormatGb(long bytes) =>

@@ -83,3 +83,93 @@ public sealed class SizeToMbConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }
+
+public sealed class ServerEventTypeToIconConverter : IValueConverter
+{
+    public static readonly ServerEventTypeToIconConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is ServerEventType t ? t switch
+        {
+            ServerEventType.Started => "▶",
+            ServerEventType.Stopped => "■",
+            ServerEventType.Crashed => "⚠",
+            ServerEventType.ScheduledRestart => "⟳",
+            ServerEventType.AutoRestartHighRam => "⟳",
+            ServerEventType.AutoRestartMaxUptime => "⟳",
+            _ => "·",
+        } : "·";
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class ServerEventTypeToBrushConverter : IValueConverter
+{
+    public static readonly ServerEventTypeToBrushConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = value is ServerEventType t ? t switch
+        {
+            ServerEventType.Started => "BrandSuccessBrush",
+            ServerEventType.Stopped => "BrandTextMutedBrush",
+            ServerEventType.Crashed => "BrandErrorBrush",
+            ServerEventType.ScheduledRestart => "BrandInfoBrush",
+            ServerEventType.AutoRestartHighRam or ServerEventType.AutoRestartMaxUptime => "BrandWarningBrush",
+            _ => "BrandTextMutedBrush",
+        } : "BrandTextMutedBrush";
+
+        var app = Application.Current;
+        if (app is not null &&
+            app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) &&
+            res is IBrush brush)
+        {
+            return brush;
+        }
+        return Brushes.Gray;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class ServerEventToTitleConverter : IValueConverter
+{
+    public static readonly ServerEventToTitleConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not ServerEvent e) return string.Empty;
+        var typeLabel = e.Type switch
+        {
+            ServerEventType.Started => "Gestartet",
+            ServerEventType.Stopped => "Gestoppt",
+            ServerEventType.Crashed => "Crash",
+            ServerEventType.ScheduledRestart => "Geplanter Restart",
+            ServerEventType.AutoRestartHighRam => "Auto-Restart (RAM)",
+            ServerEventType.AutoRestartMaxUptime => "Auto-Restart (Uptime)",
+            _ => e.Type.ToString(),
+        };
+        var ts = e.TimestampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", culture);
+        return $"{ts}  ·  {typeLabel}";
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class ServerEventToDetailConverter : IValueConverter
+{
+    public static readonly ServerEventToDetailConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not ServerEvent e) return string.Empty;
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(e.Reason)) parts.Add(e.Reason);
+        if (e.SessionDuration is { } d && d.TotalSeconds > 0)
+        {
+            var durStr = d.TotalHours >= 1
+                ? $"Session-Dauer: {(int)d.TotalHours}h {d.Minutes}m"
+                : $"Session-Dauer: {d.Minutes}m {d.Seconds}s";
+            parts.Add(durStr);
+        }
+        return string.Join(" · ", parts);
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}

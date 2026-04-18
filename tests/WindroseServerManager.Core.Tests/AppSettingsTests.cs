@@ -14,7 +14,6 @@ public class AppSettingsTests
         Assert.Equal(5, s.GracefulShutdownSeconds);
         Assert.Equal("4129620", s.SteamAppId);
         Assert.Equal("de", s.Language);
-        Assert.Equal(ThemeMode.Dark, s.Theme);
         Assert.False(s.AutoRestartOnCrash);
         Assert.False(s.AutoBackupEnabled);
         Assert.Equal(20, s.MaxBackupsToKeep);
