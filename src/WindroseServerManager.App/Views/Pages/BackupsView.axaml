@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             x:Class="WindroseServerManager.App.Views.Pages.BackupsView"
+             x:DataType="vm:BackupsViewModel">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <TextBlock Grid.Row="0" Classes="page-title" Text="Backups" />
+        <TextBlock Grid.Row="1" Classes="caption" TextWrapping="Wrap"
+                   Text="Sichert den Saves-Ordner (R5\Saved\SaveProfiles\Default\RocksDB\...\Worlds\) als ZIP."
+                   Margin="0,4,0,20" />
+
+        <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+                <TextBlock Classes="section-header" Text="Automatische Backups" />
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <CheckBox Content="Aktiviert" IsChecked="{Binding AutoBackupEnabled}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="body" Text="Intervall (min)" VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding AutoBackupIntervalMinutes}" Minimum="5" Maximum="1440" Width="120" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="body" Text="Max. behalten" VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding MaxBackupsToKeep}" Minimum="1" Maximum="500" Width="120" />
+                    </StackPanel>
+                    <Button Classes="primary" Content="Speichern" Command="{Binding SaveSettingsCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="primary" Content="Backup jetzt erstellen" Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" />
+                <Button Content="Wiederherstellen" Command="{Binding RestoreCommand}" IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Button Classes="danger" Content="Löschen" Command="{Binding DeleteCommand}" IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Button Content="Aktualisieren" Command="{Binding RefreshCommand}" />
+                <Button Classes="subtle" Content="Backup-Ordner öffnen" Command="{Binding OpenBackupDirCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Classes="card">
+            <Grid>
+                <DataGrid ItemsSource="{Binding Backups}" SelectedItem="{Binding Selected}"
+                          IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
+                        <DataGridTextColumn Header="Erstellt" Binding="{Binding CreatedUtc, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="180" />
+                        <DataGridTextColumn Header="Größe (MB)" Binding="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}}" Width="120" />
+                        <DataGridTextColumn Header="Automatisch" Binding="{Binding IsAutomatic}" Width="140" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Text="Noch keine Backups — Klicke auf 'Backup jetzt erstellen'"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           IsVisible="{Binding Backups.Count, Converter={x:Static vm:CountToInverseBoolConverter.Instance}}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

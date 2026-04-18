@@ -1,0 +1,145 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <!-- Brand colors -->
+            <Color x:Key="BrandAmberColor">#D97706</Color>
+            <Color x:Key="BrandAmberHoverColor">#F59E0B</Color>
+            <Color x:Key="BrandAmberPressColor">#B45309</Color>
+            <Color x:Key="BrandNavyColor">#0F1E2E</Color>
+            <Color x:Key="BrandNavySurfaceColor">#1A2F4A</Color>
+            <Color x:Key="BrandNavySurfaceAltColor">#233D5C</Color>
+            <Color x:Key="BrandNavyBorderColor">#35527A</Color>
+            <Color x:Key="BrandTextPrimaryColor">#F1F5F9</Color>
+            <Color x:Key="BrandTextSecondaryColor">#94A3B8</Color>
+            <Color x:Key="BrandTextMutedColor">#64748B</Color>
+            <Color x:Key="BrandSuccessColor">#10B981</Color>
+            <Color x:Key="BrandWarningColor">#F59E0B</Color>
+            <Color x:Key="BrandErrorColor">#EF4444</Color>
+
+            <SolidColorBrush x:Key="BrandAmberBrush" Color="{StaticResource BrandAmberColor}" />
+            <SolidColorBrush x:Key="BrandAmberHoverBrush" Color="{StaticResource BrandAmberHoverColor}" />
+            <SolidColorBrush x:Key="BrandAmberPressBrush" Color="{StaticResource BrandAmberPressColor}" />
+            <SolidColorBrush x:Key="BrandNavyBrush" Color="{StaticResource BrandNavyColor}" />
+            <SolidColorBrush x:Key="BrandNavySurfaceBrush" Color="{StaticResource BrandNavySurfaceColor}" />
+            <SolidColorBrush x:Key="BrandNavySurfaceAltBrush" Color="{StaticResource BrandNavySurfaceAltColor}" />
+            <SolidColorBrush x:Key="BrandNavyBorderBrush" Color="{StaticResource BrandNavyBorderColor}" />
+            <SolidColorBrush x:Key="BrandTextPrimaryBrush" Color="{StaticResource BrandTextPrimaryColor}" />
+            <SolidColorBrush x:Key="BrandTextSecondaryBrush" Color="{StaticResource BrandTextSecondaryColor}" />
+            <SolidColorBrush x:Key="BrandTextMutedBrush" Color="{StaticResource BrandTextMutedColor}" />
+            <SolidColorBrush x:Key="BrandSuccessBrush" Color="{StaticResource BrandSuccessColor}" />
+            <SolidColorBrush x:Key="BrandWarningBrush" Color="{StaticResource BrandWarningColor}" />
+            <SolidColorBrush x:Key="BrandErrorBrush" Color="{StaticResource BrandErrorColor}" />
+
+            <!-- FluentAvalonia / System accent overrides (Amber) -->
+            <Color x:Key="SystemAccentColor">#D97706</Color>
+            <Color x:Key="SystemAccentColorDark1">#B45309</Color>
+            <Color x:Key="SystemAccentColorDark2">#92400E</Color>
+            <Color x:Key="SystemAccentColorDark3">#78350F</Color>
+            <Color x:Key="SystemAccentColorLight1">#F59E0B</Color>
+            <Color x:Key="SystemAccentColorLight2">#FBBF24</Color>
+            <Color x:Key="SystemAccentColorLight3">#FCD34D</Color>
+
+            <!-- Semi.Avalonia brand palette overrides (Dark: inverted so dark shades are low index) -->
+            <Color x:Key="SemiBrand0">#78350F</Color>
+            <Color x:Key="SemiBrand1">#92400E</Color>
+            <Color x:Key="SemiBrand2">#B45309</Color>
+            <Color x:Key="SemiBrand3">#D97706</Color>
+            <Color x:Key="SemiBrand4">#F59E0B</Color>
+            <Color x:Key="SemiBrand5">#FB923C</Color>
+            <Color x:Key="SemiBrand6">#FDBA74</Color>
+            <Color x:Key="SemiBrand7">#FED7AA</Color>
+            <Color x:Key="SemiBrand8">#FFEDD5</Color>
+
+            <!-- Override Semi's blue so nothing falls back to it -->
+            <Color x:Key="SemiBlue0">#78350F</Color>
+            <Color x:Key="SemiBlue1">#92400E</Color>
+            <Color x:Key="SemiBlue2">#B45309</Color>
+            <Color x:Key="SemiBlue3">#D97706</Color>
+            <Color x:Key="SemiBlue4">#F59E0B</Color>
+            <Color x:Key="SemiBlue5">#FB923C</Color>
+            <Color x:Key="SemiBlue6">#FDBA74</Color>
+            <Color x:Key="SemiBlue7">#FED7AA</Color>
+            <Color x:Key="SemiBlue8">#FFEDD5</Color>
+
+            <SolidColorBrush x:Key="SemiColorPrimary" Color="#D97706" />
+            <SolidColorBrush x:Key="SemiColorPrimaryHover" Color="#F59E0B" />
+            <SolidColorBrush x:Key="SemiColorPrimaryActive" Color="#B45309" />
+            <SolidColorBrush x:Key="SemiColorPrimaryDisabled" Color="#92400E" />
+            <SolidColorBrush x:Key="SemiColorLink" Color="#F59E0B" />
+            <SolidColorBrush x:Key="SemiColorLinkHover" Color="#FBBF24" />
+            <SolidColorBrush x:Key="SemiColorLinkActive" Color="#D97706" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <!-- Brand colors -->
+            <Color x:Key="BrandAmberColor">#D97706</Color>
+            <Color x:Key="BrandAmberHoverColor">#B45309</Color>
+            <Color x:Key="BrandAmberPressColor">#92400E</Color>
+            <Color x:Key="BrandNavyColor">#F4F6FA</Color>
+            <Color x:Key="BrandNavySurfaceColor">#FFFFFF</Color>
+            <Color x:Key="BrandNavySurfaceAltColor">#EDF0F5</Color>
+            <Color x:Key="BrandNavyBorderColor">#D5DBE4</Color>
+            <Color x:Key="BrandTextPrimaryColor">#0F172A</Color>
+            <Color x:Key="BrandTextSecondaryColor">#475569</Color>
+            <Color x:Key="BrandTextMutedColor">#94A3B8</Color>
+            <Color x:Key="BrandSuccessColor">#047857</Color>
+            <Color x:Key="BrandWarningColor">#B45309</Color>
+            <Color x:Key="BrandErrorColor">#B91C1C</Color>
+
+            <SolidColorBrush x:Key="BrandAmberBrush" Color="{StaticResource BrandAmberColor}" />
+            <SolidColorBrush x:Key="BrandAmberHoverBrush" Color="{StaticResource BrandAmberHoverColor}" />
+            <SolidColorBrush x:Key="BrandAmberPressBrush" Color="{StaticResource BrandAmberPressColor}" />
+            <SolidColorBrush x:Key="BrandNavyBrush" Color="{StaticResource BrandNavyColor}" />
+            <SolidColorBrush x:Key="BrandNavySurfaceBrush" Color="{StaticResource BrandNavySurfaceColor}" />
+            <SolidColorBrush x:Key="BrandNavySurfaceAltBrush" Color="{StaticResource BrandNavySurfaceAltColor}" />
+            <SolidColorBrush x:Key="BrandNavyBorderBrush" Color="{StaticResource BrandNavyBorderColor}" />
+            <SolidColorBrush x:Key="BrandTextPrimaryBrush" Color="{StaticResource BrandTextPrimaryColor}" />
+            <SolidColorBrush x:Key="BrandTextSecondaryBrush" Color="{StaticResource BrandTextSecondaryColor}" />
+            <SolidColorBrush x:Key="BrandTextMutedBrush" Color="{StaticResource BrandTextMutedColor}" />
+            <SolidColorBrush x:Key="BrandSuccessBrush" Color="{StaticResource BrandSuccessColor}" />
+            <SolidColorBrush x:Key="BrandWarningBrush" Color="{StaticResource BrandWarningColor}" />
+            <SolidColorBrush x:Key="BrandErrorBrush" Color="{StaticResource BrandErrorColor}" />
+
+            <!-- FluentAvalonia / System accent overrides (Amber) -->
+            <Color x:Key="SystemAccentColor">#D97706</Color>
+            <Color x:Key="SystemAccentColorDark1">#B45309</Color>
+            <Color x:Key="SystemAccentColorDark2">#92400E</Color>
+            <Color x:Key="SystemAccentColorDark3">#78350F</Color>
+            <Color x:Key="SystemAccentColorLight1">#F59E0B</Color>
+            <Color x:Key="SystemAccentColorLight2">#FBBF24</Color>
+            <Color x:Key="SystemAccentColorLight3">#FCD34D</Color>
+
+            <!-- Semi.Avalonia brand palette overrides (Light: light shades low, dark high) -->
+            <Color x:Key="SemiBrand0">#FFF7ED</Color>
+            <Color x:Key="SemiBrand1">#FFEDD5</Color>
+            <Color x:Key="SemiBrand2">#FED7AA</Color>
+            <Color x:Key="SemiBrand3">#FDBA74</Color>
+            <Color x:Key="SemiBrand4">#FB923C</Color>
+            <Color x:Key="SemiBrand5">#D97706</Color>
+            <Color x:Key="SemiBrand6">#B45309</Color>
+            <Color x:Key="SemiBrand7">#92400E</Color>
+            <Color x:Key="SemiBrand8">#78350F</Color>
+
+            <Color x:Key="SemiBlue0">#FFF7ED</Color>
+            <Color x:Key="SemiBlue1">#FFEDD5</Color>
+            <Color x:Key="SemiBlue2">#FED7AA</Color>
+            <Color x:Key="SemiBlue3">#FDBA74</Color>
+            <Color x:Key="SemiBlue4">#FB923C</Color>
+            <Color x:Key="SemiBlue5">#D97706</Color>
+            <Color x:Key="SemiBlue6">#B45309</Color>
+            <Color x:Key="SemiBlue7">#92400E</Color>
+            <Color x:Key="SemiBlue8">#78350F</Color>
+
+            <SolidColorBrush x:Key="SemiColorPrimary" Color="#D97706" />
+            <SolidColorBrush x:Key="SemiColorPrimaryHover" Color="#B45309" />
+            <SolidColorBrush x:Key="SemiColorPrimaryActive" Color="#92400E" />
+            <SolidColorBrush x:Key="SemiColorPrimaryDisabled" Color="#FDBA74" />
+            <SolidColorBrush x:Key="SemiColorLink" Color="#B45309" />
+            <SolidColorBrush x:Key="SemiColorLinkHover" Color="#D97706" />
+            <SolidColorBrush x:Key="SemiColorLinkActive" Color="#92400E" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

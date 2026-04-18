@@ -1,0 +1,166 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             x:Class="WindroseServerManager.App.Views.Pages.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+    </UserControl.KeyBindings>
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Classes="page-title" Text="Einstellungen" />
+            <TextBlock Classes="caption" Text="App-Konfiguration und Pfade" Margin="0,4,0,20" />
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="section-header" Text="Darstellung" />
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Theme" />
+                        <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding Theme}" MinWidth="200" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="Server-Start (Launch-Args)" />
+
+                    <CheckBox Content="Console-Log aktivieren (-log)" IsChecked="{Binding LogEnabled}" />
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Zusätzliche Launch-Args (optional)" />
+                        <TextBox Text="{Binding ExtraLaunchArgs}" PlaceholderText="z.B. -NOSEAMLESSTRAVEL" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="Windrose nutzt automatische NAT-Punch-Through. Feste Ports sind nicht vorgesehen — das Feld ist nur für ungedockte Zukunfts-Args." />
+                    </StackPanel>
+
+                    <CheckBox Content="Automatischer Neustart bei Crash" IsChecked="{Binding AutoRestartOnCrash}" />
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Graceful-Shutdown (Sekunden)" />
+                        <NumericUpDown Value="{Binding GracefulShutdownSeconds}" Minimum="5" Maximum="600" FormatString="0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="Steam &amp; SteamCMD" />
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Steam App-ID" />
+                        <TextBox Text="{Binding SteamAppId}" PlaceholderText="4129620" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Steam Login (leer = anonymous)" />
+                        <TextBox Text="{Binding SteamLogin}" PlaceholderText="anonymous" />
+                    </StackPanel>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="Normalerweise nicht nötig. Ändern nur für Beta-Branches oder alternative Steam-Konten." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="Pfade" />
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Installations-Ordner" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBox Grid.Column="0" Text="{Binding ServerInstallDir}" />
+                            <Button Grid.Column="1" Content="..." Command="{Binding PickInstallDirCommand}" Margin="8,0,0,0" />
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="caption" Text="Backup-Ordner" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBox Grid.Column="0" Text="{Binding BackupDir}" />
+                            <Button Grid.Column="1" Content="..." Command="{Binding PickBackupDirCommand}" Margin="8,0,0,0" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header" Text="Netzwerk &amp; Ports" />
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="Windrose-Ports: UDP 7777 (Game) + 7778 (Query). NAT-Punch-through bevorzugt. Firewall-Ausnahme für WindroseServer.exe empfohlen. Externe Hoster müssen beide Ports öffnen." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="Windows Firewall" />
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Panel Width="12" Height="12">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{DynamicResource BrandSuccessBrush}"
+                                     IsVisible="{Binding IsFirewallRuleInstalled}" />
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{DynamicResource BrandTextMutedBrush}"
+                                     IsVisible="{Binding !IsFirewallRuleInstalled}" />
+                        </Panel>
+                        <TextBlock Classes="body" Text="Firewall-Regel: installiert"
+                                   IsVisible="{Binding IsFirewallRuleInstalled}" />
+                        <TextBlock Classes="body" Text="Firewall-Regel: nicht installiert"
+                                   IsVisible="{Binding !IsFirewallRuleInstalled}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Classes="primary" Content="Regel hinzufügen"
+                                Command="{Binding ToggleFirewallCommand}"
+                                IsVisible="{Binding !IsFirewallRuleInstalled}"
+                                IsEnabled="{Binding !IsFirewallBusy}" />
+                        <Button Content="Regel entfernen"
+                                Command="{Binding ToggleFirewallCommand}"
+                                IsVisible="{Binding IsFirewallRuleInstalled}"
+                                IsEnabled="{Binding !IsFirewallBusy}" />
+                        <Button Content="Status prüfen" Command="{Binding CheckFirewallCommand}"
+                                IsEnabled="{Binding !IsFirewallBusy}" />
+                    </StackPanel>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="Erfordert Admin-Rechte. Bei UAC-Prompt zustimmen." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header" Text="Autostart" />
+                    <CheckBox Content="Windrose Server Manager beim Windows-Start ausführen"
+                              IsChecked="{Binding AutoStartEnabled}" />
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="Trägt einen Eintrag in HKCU\Software\Microsoft\Windows\CurrentVersion\Run ein." />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="primary" Content="Speichern" Command="{Binding SaveCommand}" />
+            </StackPanel>
+
+            <Border Classes="card" Margin="0,16,0,0">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header" Text="App-Updates" />
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="Prüft auf GitHub nach einer neueren Version des Windrose Server Managers. Automatisch alle 6 Stunden." />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Jetzt auf Update prüfen"
+                                Command="{Binding CheckAppUpdateCommand}"
+                                IsEnabled="{Binding !IsUpdateCheckBusy}" />
+                        <TextBlock Text="{Binding UpdateCheckStatus}"
+                                   Classes="caption"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,16,0,0">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header" Text="Über" />
+                    <TextBlock Classes="body" Text="{Binding AppVersion, StringFormat='Version {0}'}" />
+                    <TextBlock Classes="caption" Text="MIT Lizenz · © 2026 Manuel Staggl" />
+                    <Button Content="Über Windrose Server Manager" Command="{Binding ShowAboutCommand}"
+                            HorizontalAlignment="Left" Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

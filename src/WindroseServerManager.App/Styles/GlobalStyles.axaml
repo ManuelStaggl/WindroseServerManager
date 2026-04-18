@@ -1,0 +1,298 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{DynamicResource BrandNavyBrush}" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+    </Style>
+
+    <Style Selector="TextBlock.page-title">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="TextBlock.section-header">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.body">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.caption">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
+    </Style>
+
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <!-- ==================== BUTTONS ==================== -->
+
+    <!-- Primary: Amber filled -->
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button.primary /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberHoverBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberPressBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <!-- Danger -->
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button.danger /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+
+    <!-- Subtle: outlined secondary button -->
+    <Style Selector="Button.subtle">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Button.subtle /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button.subtle:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.subtle:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberPressBrush}" />
+    </Style>
+
+    <!-- Default Button (no class): make it look like subtle -->
+    <Style Selector="Window Button:not(.primary):not(.danger):not(.subtle):not(.nav-item)">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Window Button:not(.primary):not(.danger):not(.subtle):not(.nav-item) /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Window Button:not(.primary):not(.danger):not(.subtle):not(.nav-item):pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Window Button:not(.primary):not(.danger):not(.subtle):not(.nav-item):pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberPressBrush}" />
+    </Style>
+
+    <!-- ==================== NAV ==================== -->
+
+    <Style Selector="RadioButton.nav-item">
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="6,2" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="6"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="Center"
+                                      TextBlock.Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="RadioButton.nav-item:pointerover /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+    </Style>
+    <Style Selector="RadioButton.nav-item:checked">
+        <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="RadioButton.nav-item:checked /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+
+    <!-- ==================== INPUTS ==================== -->
+
+    <Style Selector="TextBox">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="CaretBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberHoverBrush}" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="TextBox:focus-within /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <!-- ComboBox -->
+    <Style Selector="ComboBox">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberHoverBrush}" />
+    </Style>
+    <Style Selector="ComboBox:focus /template/ Border#Background">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="ComboBox:focus-within /template/ Border#Background">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+
+    <!-- NumericUpDown -->
+    <Style Selector="NumericUpDown">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="NumericUpDown:focus-within /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <!-- CheckBox -->
+    <Style Selector="CheckBox">
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="CheckBox:checked /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberHoverBrush}" />
+    </Style>
+
+    <!-- RadioButton (non-nav) -->
+    <Style Selector="RadioButton:not(.nav-item)">
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="RadioButton:not(.nav-item):checked /template/ Ellipse#CheckGlyph">
+        <Setter Property="Fill" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+    <Style Selector="RadioButton:not(.nav-item):checked /template/ Ellipse#OuterEllipse">
+        <Setter Property="Stroke" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+
+    <!-- ==================== SCROLLBAR ==================== -->
+
+    <Style Selector="ScrollBar:vertical">
+        <Setter Property="Width" Value="8" />
+    </Style>
+    <Style Selector="ScrollBar:horizontal">
+        <Setter Property="Height" Value="8" />
+    </Style>
+    <Style Selector="ScrollBar /template/ Thumb">
+        <Setter Property="Background" Value="{DynamicResource BrandTextMutedBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <!-- ==================== DATAGRID ==================== -->
+
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="Padding" Value="12,8" />
+    </Style>
+    <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="Opacity" Value="0.6" />
+    </Style>
+    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#2AD97706" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+</Styles>

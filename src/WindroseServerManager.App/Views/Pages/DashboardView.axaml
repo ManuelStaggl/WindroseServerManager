@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             x:Class="WindroseServerManager.App.Views.Pages.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Classes="page-title" Text="Dashboard" />
+            <TextBlock Classes="caption" Text="Übersicht über Server und System" Margin="0,4,0,20" />
+
+            <!-- Crash Warning -->
+            <Border Classes="card" Margin="0,0,0,16" IsVisible="{Binding HasRecentCrash}"
+                    BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Classes="section-header" Text="App ist zuletzt abgestürzt" />
+                        <TextBlock Classes="caption" Text="{Binding LastCrashPath, StringFormat='Log-Datei: {0}'}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Button Classes="subtle" Content="Pfad kopieren" Command="{Binding CopyCrashPathCommand}" />
+                        <Button Classes="subtle" Content="Log öffnen" Command="{Binding OpenCrashLogCommand}" />
+                        <Button Classes="subtle" Content="✕" Command="{Binding DismissCrashWarningCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Welcome / Onboarding Card (First Run) -->
+            <Border Classes="card" Margin="0,0,0,16"
+                    IsVisible="{Binding IsFirstRun}">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="Willkommen bei Windrose Server Manager" />
+                    <TextBlock Classes="body muted"
+                               Text="Folge diesen Schritten, um deinen Server einzurichten:" />
+                    <StackPanel Spacing="8" Margin="0,4,0,0">
+                        <Grid ColumnDefinitions="32,*">
+                            <TextBlock Grid.Column="0" Classes="section-header" Text="1." Foreground="{DynamicResource BrandAmberBrush}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="body" FontWeight="SemiBold" Text="Installation" />
+                                <TextBlock Classes="caption" Text="Server via SteamCMD installieren" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="32,*">
+                            <TextBlock Grid.Column="0" Classes="section-header" Text="2." Foreground="{DynamicResource BrandAmberBrush}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="body" FontWeight="SemiBold" Text="Server-Steuerung" />
+                                <TextBlock Classes="caption" Text="Server einmal starten" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="32,*">
+                            <TextBlock Grid.Column="0" Classes="section-header" Text="3." Foreground="{DynamicResource BrandAmberBrush}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="body" FontWeight="SemiBold" Text="Konfiguration" />
+                                <TextBlock Classes="caption" Text="Welt &amp; Invite-Code anpassen" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                    <Button Classes="primary"
+                            Content="Jetzt installieren"
+                            HorizontalAlignment="Left"
+                            Margin="0,8,0,0"
+                            Command="{Binding GoToInstallationCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card" Margin="0,0,0,16"
+                    IsVisible="{Binding InviteCode, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Classes="section-header"
+                                   Text="{Binding ServerName}"
+                                   IsVisible="{Binding HasServerName}" />
+                        <TextBlock Classes="body muted"
+                                   Text="Kein Servername gesetzt"
+                                   IsVisible="{Binding !HasServerName}" />
+                        <TextBlock Classes="caption" Text="Invite-Code" Margin="0,8,0,0" />
+                        <TextBlock Text="{Binding InviteCode, FallbackValue='—'}"
+                                   FontFamily="Consolas,Courier New"
+                                   FontSize="22"
+                                   FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Classes="subtle"
+                            Content="Kopieren"
+                            VerticalAlignment="Center"
+                            Command="{Binding CopyInviteCodeCommand}"
+                            IsEnabled="{Binding InviteCode, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+
+                <Border Grid.Row="0" Grid.Column="0" Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Classes="caption" Text="Server-Status" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{Binding Status, Converter={x:Static vm:ServerStatusToBrushConverter.Instance}}" />
+                            <TextBlock Classes="section-header" Text="{Binding Status}" />
+                        </StackPanel>
+                        <TextBlock Classes="body muted" Text="{Binding UptimeText, StringFormat='Uptime: {0}'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="0" Grid.Column="1" Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Classes="caption" Text="Installation" />
+                        <TextBlock Classes="section-header"
+                                   Text="{Binding InstallInfo.IsInstalled, Converter={x:Static vm:BoolToInstalledConverter.Instance}, FallbackValue='Nicht installiert'}" />
+                        <TextBlock Classes="body muted"
+                                   Text="{Binding InstallInfo.BuildId, StringFormat='Build: {0}', FallbackValue='—'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="0" Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Classes="caption" Text="Host" />
+                        <StackPanel>
+                            <TextBlock Classes="body" Text="{Binding HostCpu, StringFormat='CPU: {0:0.0}%'}" />
+                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostCpu}" Height="6" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Classes="body" Text="{Binding HostRamText, StringFormat='RAM: {0}'}" />
+                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostRamPercent}" Height="6" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <TextBlock Classes="body muted" Text="{Binding DiskText, StringFormat='Disk: {0}'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="1" Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Classes="caption" Text="Server-Prozess" />
+                        <TextBlock Classes="body" Text="{Binding ProcCpu, StringFormat='CPU: {0:0.0}%'}" />
+                        <TextBlock Classes="body" Text="{Binding ProcRamText, StringFormat='RAM: {0}'}" />
+                        <TextBlock Classes="body muted" Text="{Binding UptimeText, StringFormat='Uptime: {0}'}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Classes="card" Margin="0,16,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Classes="caption" Text="Aktive Welt" />
+                        <StackPanel IsVisible="{Binding HasActiveWorld}" Spacing="2">
+                            <TextBlock Classes="section-header"
+                                       Text="{Binding ActiveWorldDisplayName}" />
+                            <TextBlock Classes="body muted"
+                                       FontFamily="Consolas,Courier New" FontSize="12"
+                                       Text="{Binding ActiveWorldId}"
+                                       IsVisible="{Binding ShowActiveWorldIdSubtitle}" />
+                        </StackPanel>
+                        <TextBlock Classes="body muted"
+                                   IsVisible="{Binding !HasActiveWorld}"
+                                   Text="Noch keine Welt konfiguriert." />
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="subtle" Content="Zur Konfiguration"
+                            VerticalAlignment="Center"
+                            Command="{Binding GoToConfigurationCommand}" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

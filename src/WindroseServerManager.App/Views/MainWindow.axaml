@@ -1,0 +1,256 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WindroseServerManager.App.ViewModels"
+        xmlns:svc="using:WindroseServerManager.App.Services"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+        x:Class="WindroseServerManager.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Windrose Server Manager"
+        Icon="/Assets/app.ico"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Background="{DynamicResource BrandNavyBrush}">
+
+    <Window.Resources>
+        <DataTemplate x:Key="NavItemTemplate" x:DataType="vm:NavItem">
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,4">
+                <TextBlock Text="{Binding Icon}" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                           FontSize="16" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="14" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="ListBox.nav">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem">
+            <Setter Property="Padding" Value="8,8" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BrandAmberHoverBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <Border Name="RootBorder"
+            CornerRadius="10"
+            Background="{DynamicResource BrandNavyBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            ClipToBounds="True">
+    <Panel>
+    <Grid ColumnDefinitions="240,*">
+
+        <Border Grid.Column="0"
+                Background="{DynamicResource BrandNavySurfaceBrush}"
+                BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                BorderThickness="0,0,1,0">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- Logo-Bereich dient zugleich als Drag-Zone für das Fenster -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="18,18,18,16" Spacing="12"
+                            Name="SidebarDragZone" Background="Transparent">
+                    <Viewbox Width="36" Height="36">
+                        <Canvas Width="64" Height="64">
+                            <Canvas.Resources>
+                                <LinearGradientBrush x:Key="CompassGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                                    <GradientStop Offset="0" Color="#F5B042" />
+                                    <GradientStop Offset="0.5" Color="#D97706" />
+                                    <GradientStop Offset="1" Color="#92400E" />
+                                </LinearGradientBrush>
+                            </Canvas.Resources>
+                            <Ellipse Width="56" Height="56" Canvas.Left="4" Canvas.Top="4"
+                                     Stroke="{StaticResource CompassGradient}" StrokeThickness="2" Fill="Transparent" />
+                            <Ellipse Width="44" Height="44" Canvas.Left="10" Canvas.Top="10"
+                                     Stroke="{StaticResource CompassGradient}" StrokeThickness="1.5" Fill="Transparent" />
+                            <Polygon Points="32,6 29,32 32,30 35,32" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="32,58 29,32 32,34 35,32" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="6,32 32,29 30,32 32,35" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="58,32 32,29 34,32 32,35" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="14,14 31,31 32,28 28,32" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="50,14 33,31 32,28 36,32" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="14,50 31,33 28,32 32,36" Fill="{StaticResource CompassGradient}" />
+                            <Polygon Points="50,50 33,33 36,32 32,36" Fill="{StaticResource CompassGradient}" />
+                            <Ellipse Width="5" Height="5" Canvas.Left="29.5" Canvas.Top="29.5"
+                                     Fill="{StaticResource CompassGradient}" />
+                        </Canvas>
+                    </Viewbox>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Windrose" FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}" />
+                        <TextBlock Text="Server Manager" FontSize="12"
+                                   Foreground="{DynamicResource BrandAmberBrush}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </StackPanel>
+
+                <ListBox Grid.Row="1"
+                         Classes="nav"
+                         ItemsSource="{Binding NavItems}"
+                         SelectedItem="{Binding SelectedNavItem}"
+                         ItemTemplate="{StaticResource NavItemTemplate}" />
+
+                <StackPanel Grid.Row="2" Margin="0,0,0,8">
+                    <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" Margin="8,8" />
+                    <ListBox Classes="nav"
+                             ItemsSource="{Binding FooterItems}"
+                             SelectedItem="{Binding SelectedNavItem}"
+                             ItemTemplate="{StaticResource NavItemTemplate}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" RowDefinitions="38,Auto,*">
+            <Grid Grid.Row="0" Background="Transparent" ColumnDefinitions="*,Auto">
+                <!-- Drag-Zone (links, füllt) — Doppelklick maximiert -->
+                <Panel Grid.Column="0" Background="Transparent" DoubleTapped="OnDragZoneDoubleTapped" />
+                <!-- Window-Controls -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
+                    <StackPanel.Styles>
+                        <Style Selector="Button.window-btn">
+                            <Setter Property="Width" Value="44" />
+                            <Setter Property="Height" Value="38" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="CornerRadius" Value="0" />
+                            <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                        <Style Selector="Button.window-btn /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="CornerRadius" Value="0" />
+                        </Style>
+                        <Style Selector="Button.window-btn:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+                        </Style>
+                        <Style Selector="Button.window-btn.close:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
+                            <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <Button Classes="window-btn" Content="&#xE921;" Click="OnMinimize" ToolTip.Tip="Minimieren" />
+                    <Button Classes="window-btn" Content="&#xE922;" Click="OnToggleMaximize" ToolTip.Tip="Maximieren" />
+                    <Button Classes="window-btn close" Content="&#xE8BB;" Click="OnClose" ToolTip.Tip="Schließen" />
+                </StackPanel>
+            </Grid>
+            <!-- App-Update-Banner: erscheint wenn neuere Version auf GitHub gefunden wurde -->
+            <Border Grid.Row="1"
+                    IsVisible="{Binding IsUpdateBannerVisible}"
+                    Margin="24,0,24,0"
+                    Padding="16,10"
+                    CornerRadius="8"
+                    Background="{DynamicResource BrandAmberBrush}"
+                    BorderBrush="{DynamicResource BrandAmberHoverBrush}"
+                    BorderThickness="1">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <TextBlock Grid.Column="0"
+                               Text="&#xE896;"
+                               FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="18"
+                               VerticalAlignment="Center"
+                               Foreground="#FFFFFF"
+                               Margin="0,0,12,0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding UpdateBannerMessage}"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="#FFFFFF" />
+                        <TextBlock Text="Eine neuere Version des Windrose Server Managers ist verfügbar."
+                                   FontSize="12"
+                                   Foreground="#F5E6D3"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2"
+                            Content="Download"
+                            Command="{Binding DownloadUpdateCommand}"
+                            Background="#FFFFFF"
+                            Foreground="{DynamicResource BrandAmberBrush}"
+                            FontWeight="SemiBold"
+                            Padding="14,6"
+                            CornerRadius="6"
+                            Margin="12,0,8,0"
+                            Cursor="Hand" />
+                    <Button Grid.Column="3"
+                            Content="Später"
+                            Command="{Binding DismissUpdateCommand}"
+                            Background="Transparent"
+                            Foreground="#FFFFFF"
+                            BorderBrush="#FFFFFF"
+                            BorderThickness="1"
+                            Padding="14,6"
+                            CornerRadius="6"
+                            Cursor="Hand" />
+                </Grid>
+            </Border>
+
+            <ContentControl Grid.Row="2" Content="{Binding CurrentPage}" Margin="24,12,24,24" />
+        </Grid>
+
+    </Grid>
+
+        <ItemsControl ItemsSource="{Binding Toasts.Toasts}"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                      Margin="0,0,20,20" MaxWidth="400" IsHitTestVisible="False">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" Spacing="8" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="svc:ToastItem">
+                    <Border Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            MinWidth="320" MaxWidth="400"
+                            BoxShadow="0 4 16 0 #40000000">
+                        <Grid ColumnDefinitions="4,Auto,*">
+                            <Border Grid.Column="0"
+                                    Background="{Binding BrushKey, Converter={x:Static vm:ResourceKeyToBrushConverter.Instance}}"
+                                    CornerRadius="6,0,0,6" />
+                            <Border Grid.Column="1" Width="28" Height="28"
+                                    Margin="10,10,0,10"
+                                    CornerRadius="14"
+                                    Background="{Binding BrushKey, Converter={x:Static vm:ResourceKeyToBrushConverter.Instance}}">
+                                <TextBlock Text="{Binding Icon}"
+                                           Foreground="#FFFFFF"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding Message}"
+                                       Margin="10,12,12,12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource BrandTextPrimaryBrush}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Panel>
+    </Border>
+</Window>

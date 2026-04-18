@@ -1,0 +1,37 @@
+# Build output
+bin/
+obj/
+out/
+publish/
+
+# VS / Rider
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# Test & coverage
+TestResults/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+appsettings.*.local.json
+secrets.json
+
+# Distribution
+artifacts/
+*.nupkg
+
+# Legacy (pre-Avalonia, nur lokal aufbewahrt)
+archive/

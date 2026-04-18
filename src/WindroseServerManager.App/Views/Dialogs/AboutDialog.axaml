@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WindroseServerManager.App.Views.Dialogs.AboutDialog"
+        Width="480" Height="360"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrandNavySurfaceBrush}"
+        Title="Über Windrose Server Manager">
+    <Border CornerRadius="8"
+            Background="{DynamicResource BrandNavySurfaceBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="16">
+                <Viewbox Width="48" Height="48">
+                    <Canvas Width="64" Height="64">
+                        <Canvas.Resources>
+                            <LinearGradientBrush x:Key="AboutCompassGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Offset="0" Color="#F5B042" />
+                                <GradientStop Offset="0.5" Color="#D97706" />
+                                <GradientStop Offset="1" Color="#92400E" />
+                            </LinearGradientBrush>
+                        </Canvas.Resources>
+                        <Ellipse Width="56" Height="56" Canvas.Left="4" Canvas.Top="4"
+                                 Stroke="{StaticResource AboutCompassGradient}" StrokeThickness="2" Fill="Transparent" />
+                        <Ellipse Width="44" Height="44" Canvas.Left="10" Canvas.Top="10"
+                                 Stroke="{StaticResource AboutCompassGradient}" StrokeThickness="1.5" Fill="Transparent" />
+                        <Polygon Points="32,6 29,32 32,30 35,32" Fill="{StaticResource AboutCompassGradient}" />
+                        <Polygon Points="32,58 29,32 32,34 35,32" Fill="{StaticResource AboutCompassGradient}" />
+                        <Polygon Points="6,32 32,29 30,32 32,35" Fill="{StaticResource AboutCompassGradient}" />
+                        <Polygon Points="58,32 32,29 34,32 32,35" Fill="{StaticResource AboutCompassGradient}" />
+                        <Ellipse Width="5" Height="5" Canvas.Left="29.5" Canvas.Top="29.5"
+                                 Fill="{StaticResource AboutCompassGradient}" />
+                    </Canvas>
+                </Viewbox>
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Classes="page-title" Text="Windrose Server Manager" />
+                    <TextBlock x:Name="VersionText" Classes="caption" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="12" Margin="0,20,0,0">
+                <TextBlock Classes="body" TextWrapping="Wrap"
+                           Text="Dedicated Server Manager für Windrose" />
+                <TextBlock Classes="caption" Text="MIT Lizenz · © 2026 Manuel Staggl" />
+
+                <StackPanel Spacing="6" Margin="0,12,0,0">
+                    <Button Classes="subtle" HorizontalAlignment="Left"
+                            Content="Windrose Steam-Seite" Tag="https://store.steampowered.com/app/3041230/Windrose/"
+                            Click="OnLinkClick" />
+                    <Button Classes="subtle" HorizontalAlignment="Left"
+                            Content="GitHub-Repository" Tag="https://github.com/ManuelStaggl/WindroseServerManager"
+                            Click="OnLinkClick" />
+                    <Button Classes="subtle" HorizontalAlignment="Left"
+                            Content="Community-Discord" Tag="https://discord.gg/windrose"
+                            Click="OnLinkClick" />
+                </StackPanel>
+
+                <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,8,0,0"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           Text="Windrose Server Manager ist ein inoffizielles Community-Tool. Windrose ist eine Marke von Red Rook Games. Nicht verbunden mit oder unterstützt von den Entwicklern." />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Classes="primary" Content="Schließen" Click="OnCloseClick" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

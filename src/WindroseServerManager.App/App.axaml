@@ -1,0 +1,42 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:semi="https://irihi.tech/semi"
+             x:Class="WindroseServerManager.App.App"
+             xmlns:local="using:WindroseServerManager.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://WindroseServerManager/Styles/BrandTheme.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <semi:SemiTheme Locale="de-DE" />
+        <semi:DataGridSemiTheme />
+        <StyleInclude Source="avares://WindroseServerManager/Styles/GlobalStyles.axaml" />
+    </Application.Styles>
+
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/avalonia-logo.ico" ToolTipText="Windrose Server Manager">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Öffnen" Click="OnTrayShowMainWindow"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Server starten" Click="OnTrayStartServer"/>
+                        <NativeMenuItem Header="Server stoppen" Click="OnTrayStopServer"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Beenden" Click="OnTrayQuit"/>
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
+</Application>

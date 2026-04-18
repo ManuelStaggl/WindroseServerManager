@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             xmlns:svc="using:WindroseServerManager.App.Services"
+             x:Class="WindroseServerManager.App.Views.Pages.ServerControlView"
+             x:DataType="vm:ServerControlViewModel">
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveRestartScheduleCommand}" />
+    </UserControl.KeyBindings>
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <TextBlock Grid.Row="0" Classes="page-title" Text="Server-Steuerung" />
+        <TextBlock Grid.Row="1" Classes="caption" Text="Start, Stop und Live-Log" Margin="0,4,0,20" />
+
+        <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="Auto,*">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Classes="caption" Text="Status" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{Binding Status, Converter={x:Static vm:ServerStatusToBrushConverter.Instance}}" />
+                            <TextBlock Classes="section-header" Text="{Binding Status}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                        <TextBlock Classes="caption" Text="Uptime" />
+                        <TextBlock Classes="section-header" Text="{Binding UptimeText}" />
+                    </StackPanel>
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Classes="primary" Content="Start" Command="{Binding StartCommand}" IsEnabled="{Binding !IsBusy}" />
+                    <Button Content="Stop" Command="{Binding StopCommand}" IsEnabled="{Binding !IsBusy}" />
+                    <Button Content="Neustart" Command="{Binding RestartCommand}" IsEnabled="{Binding !IsBusy}" />
+                    <Button Classes="danger" Content="Force-Kill" Command="{Binding KillCommand}" IsEnabled="{Binding !IsBusy}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"
+                            IsVisible="{Binding InviteCode, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Classes="caption" Text="Invite-Code:" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding InviteCode}"
+                               FontFamily="Consolas,Courier New" FontWeight="SemiBold" FontSize="14"
+                               VerticalAlignment="Center" />
+                    <Button Classes="subtle" Content="Kopieren" Command="{Binding CopyInviteCodeCommand}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Classes="subtle" Content="Server-Ordner öffnen"
+                            Command="{Binding OpenServerDirCommand}"
+                            IsEnabled="{Binding CanOpenServerDir}" />
+                    <Button Classes="subtle" Content="ServerDescription.json öffnen"
+                            Command="{Binding OpenServerDescriptionCommand}"
+                            IsEnabled="{Binding CanOpenServerDescription}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+                <TextBlock Classes="section-header" Text="Täglicher Restart" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <CheckBox Content="Aktiviert" IsChecked="{Binding ScheduledRestartEnabled}" />
+                    <TimePicker SelectedTime="{Binding DailyRestartTimeSpan}" MinuteIncrement="15" />
+                    <Button Classes="primary" Content="Speichern" Command="{Binding SaveRestartScheduleCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Classes="card">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <TextBlock Grid.Row="0" Classes="section-header" Text="Live-Log" Margin="0,0,0,12" />
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
+                    <RadioButton GroupName="LogFilter" Content="Alle" IsChecked="{Binding IsAllFilter}" />
+                    <RadioButton GroupName="LogFilter" Content="Info+" IsChecked="{Binding IsInfoPlusFilter}" />
+                    <RadioButton GroupName="LogFilter" Content="Warnung+" IsChecked="{Binding IsWarningPlusFilter}" />
+                    <RadioButton GroupName="LogFilter" Content="Nur Fehler" IsChecked="{Binding IsErrorOnlyFilter}" />
+                </StackPanel>
+                <ScrollViewer Grid.Row="2" svc:AutoScrollBehavior.IsEnabled="True">
+                    <ItemsControl ItemsSource="{Binding FilteredLog}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontFamily="Consolas,Courier New" FontSize="12" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
