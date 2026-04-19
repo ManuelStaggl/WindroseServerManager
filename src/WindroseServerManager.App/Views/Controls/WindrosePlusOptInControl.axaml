@@ -135,21 +135,27 @@
                             Padding="0"
                             Click="OnTogglePasswordVisibility"
                             ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconLabel}">
-                        <TextBlock FontSize="14" Text="&#xE7B3;" />
+                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="14"
+                                   Text="&#xE7B3;" />
                     </Button>
                     <Button Grid.Column="2"
                             Classes="subtle"
                             Width="32" Height="32"
                             Padding="0"
                             Click="OnCopyPassword">
-                        <TextBlock FontSize="14" Text="&#xE8C8;" />
+                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="14"
+                                   Text="&#xE8C8;" />
                     </Button>
                     <Button Grid.Column="3"
                             Classes="subtle"
                             Width="32" Height="32"
                             Padding="0"
                             Click="OnRegeneratePassword">
-                        <TextBlock FontSize="14" Text="&#xE72C;" />
+                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="14"
+                                   Text="&#xE72C;" />
                     </Button>
                 </Grid>
             </StackPanel>
@@ -175,6 +181,11 @@
                          Text="{Binding AdminSteamId, Mode=TwoWay}"
                          Watermark="{DynamicResource Wizard.WindrosePlus.SteamIdPlaceholder}"
                          LostFocus="OnSteamIdLostFocus" />
+                <TextBlock Classes="caption"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           IsVisible="{Binding IsSteamIdMissing}"
+                           Text="{DynamicResource Wizard.WindrosePlus.SteamIdRequired}" />
                 <TextBlock Classes="caption"
                            TextWrapping="Wrap"
                            Foreground="{DynamicResource BrandErrorBrush}"
