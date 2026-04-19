@@ -44,6 +44,16 @@ public sealed class AppSettingsService : IAppSettingsService
         }
     }
 
+    /// <summary>Konstruktor mit explizitem Settings-Pfad (z.B. für Tests). Überspringt Legacy-Migration.</summary>
+    public AppSettingsService(ILogger<AppSettingsService> logger, string settingsPath)
+    {
+        _logger = logger;
+        _settingsPath = settingsPath;
+        var dir = Path.GetDirectoryName(settingsPath);
+        if (!string.IsNullOrEmpty(dir))
+            Directory.CreateDirectory(dir);
+    }
+
     public AppSettings Current => _current;
     public event Action<AppSettings>? Changed;
 
@@ -56,6 +66,7 @@ public sealed class AppSettingsService : IAppSettingsService
             if (!File.Exists(_settingsPath))
             {
                 _logger.LogInformation("No settings file found, using defaults: {Path}", _settingsPath);
+                MigrateToV12(_current);
                 return;
             }
             await using var stream = File.OpenRead(_settingsPath);
@@ -74,6 +85,9 @@ public sealed class AppSettingsService : IAppSettingsService
                     _current.GracefulShutdownSeconds = 5;
                     needsResave = true;
                 }
+
+                // Phase 9 (v1.2): seed OptInState für alle bekannten Server.
+                MigrateToV12(_current);
             }
         }
         catch (Exception ex)
@@ -125,5 +139,20 @@ public sealed class AppSettingsService : IAppSettingsService
         mutate(_current);
         await SaveAsync(ct).ConfigureAwait(false);
         Changed?.Invoke(_current);
+    }
+
+    /// <summary>
+    /// Phase 9 (v1.2): seed <see cref="OptInState.NeverAsked"/> für jeden bekannten Server,
+    /// der noch keinen expliziten Opt-in-Eintrag hat. Idempotent — überschreibt niemals
+    /// existierende <c>OptedIn</c>/<c>OptedOut</c>-Entscheidungen und entfernt keine Orphan-Keys.
+    /// </summary>
+    private static void MigrateToV12(AppSettings s)
+    {
+        // Copy to list to avoid concurrent-modification edge cases on dictionary views.
+        foreach (var serverDir in s.WindrosePlusActiveByServer.Keys.ToList())
+        {
+            if (!s.WindrosePlusOptInStateByServer.ContainsKey(serverDir))
+                s.WindrosePlusOptInStateByServer[serverDir] = OptInState.NeverAsked;
+        }
     }
 }
