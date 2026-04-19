@@ -3,9 +3,9 @@
 ## Current Position
 
 Phase: 8 — WindrosePlus Bootstrap
-Plan: 02 (next — Wave 1 implementation)
-Status: Plan 08-01 complete — contract + fixtures + skipped behavior tests landed
-Last activity: 2026-04-19 — Plan 08-01 executed (3 tasks, 55 passed / 13 skipped / 0 failed)
+Plan: 03 (next — Wave 2 integration)
+Status: Plan 08-02 complete — WindrosePlusService implemented, 13 behavior tests green
+Last activity: 2026-04-19 — Plan 08-02 executed (1 task, 68 passed / 0 failed / 0 skipped)
 
 ## Project Reference
 
@@ -20,7 +20,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 
 | Phase | Status |
 |-------|--------|
-| 8. WindrosePlus Bootstrap | In progress — Plan 01/03 complete (contract + fixtures + skipped behavior tests) |
+| 8. WindrosePlus Bootstrap | In progress — Plans 01+02 complete (contract + service impl, 13 behavior tests green); Plan 03 next |
 | 9. Opt-in UX (Wizard + Retrofit) | Not started |
 | 10. Health & Support | Not started |
 | 11. Feature Views | Not started |
@@ -48,10 +48,18 @@ v1.2 scope decisions:
 - Wave-0 tests ship as `[Fact(Skip=...)]` against `IWindrosePlusService`; Plan 02 removes `Skip` args and instantiates the concrete class — minimal diff
 - `FakeGithubReleaseServer.FailWindrosePlusAsset` toggle added to support the atomic-install-failure test (mid-download 500 simulation)
 
+## Decisions (Plan 08-02)
+
+- `WindrosePlusService` constructor widened to `(ILogger<WindrosePlusService>, IHttpClientFactory, string? cacheDir = null)` — nullable default resolves to `%LocalAppData%\WindroseServerManager\cache\windroseplus\`. Plan 01's non-nullable spec is a subset; production DI gains a trivial one-line registration.
+- LICENSE copy runs BEFORE the atomic merge: the merge uses `File.Move` and empties `tempRoot`, so the LICENSE source file must be copied out first.
+- UE4SS fetch is tolerant: if UE4SS API+cache both fail, install proceeds without UE4SS payload (warning logged). Phase 10 health banner surfaces missing UE4SS, not this service.
+- Synthetic "cached" `WindrosePlusRelease` (Tag="cached", DownloadUrl="") activates only when API offline AND archive cache exists AND metadata cache absent — safety net for partial-cache seed scenarios.
+- `LoggerAdapter<T> : ILogger<T>` bridges Plan 01's non-generic `TestLogger` into the concrete service's `ILogger<WindrosePlusService>` dependency.
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Run `/gsd:execute-plan 8 2` to execute Plan 08-02 (Wave 1: `WindrosePlusService` implementation — unskip the 13 behavior tests).
+Run `/gsd:execute-plan 8 3` to execute Plan 08-03 (Wave 2: DI registration + `ServerProcessService` launcher integration + About-dialog Third-Party Licenses section).
