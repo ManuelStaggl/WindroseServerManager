@@ -67,6 +67,13 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // RedirectionSurface = GDI-sichtbare Rendering-Oberfläche. Default wäre
+            // WinUIComposition/DirectComposition — GPU-Surfaces, die BitBlt/PrintWindow
+            // (Greenshot, ShareX-GDI, klassische Screenshot-APIs) schwarz zurückgeben.
+            .With(new Avalonia.Win32PlatformOptions
+            {
+                CompositionMode = new[] { Avalonia.Win32CompositionMode.RedirectionSurface },
+            })
             .WithInterFont()
             .LogToTrace();
 

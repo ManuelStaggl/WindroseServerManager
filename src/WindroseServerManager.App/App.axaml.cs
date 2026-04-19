@@ -76,6 +76,8 @@ public partial class App : Application
         s.AddSingleton<IServerProcessService, ServerProcessService>();
         s.AddSingleton<IServerConfigService, ServerConfigService>();
         s.AddSingleton<IBackupService, BackupService>();
+        s.AddSingleton<IModService, ModService>();
+        s.AddSingleton<INexusClient, NexusClient>();
         s.AddSingleton<IMetricsService, MetricsService>();
         s.AddSingleton<IServerEventLog, ServerEventLog>();
 
@@ -99,6 +101,7 @@ public partial class App : Application
         s.AddSingleton<ServerControlViewModel>();
         s.AddSingleton<ConfigurationViewModel>();
         s.AddSingleton<BackupsViewModel>();
+        s.AddSingleton<ModsViewModel>();
         s.AddSingleton<SettingsViewModel>();
     }
 

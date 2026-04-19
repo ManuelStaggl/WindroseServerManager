@@ -17,6 +17,7 @@
     <sys:String x:Key="Window.Minimize">Minimize</sys:String>
     <sys:String x:Key="Window.Maximize">Maximize</sys:String>
     <sys:String x:Key="Window.Close">Close</sys:String>
+    <sys:String x:Key="Nav.MainMenu">Main menu</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
@@ -47,6 +48,19 @@
 
     <!-- Common -->
     <sys:String x:Key="Common.EmDash">—</sys:String>
+    <sys:String x:Key="Common.Yes">Yes</sys:String>
+    <sys:String x:Key="Common.No">No</sys:String>
+
+    <!-- Error messages (used by ErrorMessageHelper) -->
+    <sys:String x:Key="Error.AccessDenied">Access denied. Please run the app as Administrator.</sys:String>
+    <sys:String x:Key="Error.DirectoryNotFound">Folder not found.</sys:String>
+    <sys:String x:Key="Error.DirectoryNotFoundFormat">Folder not found: {0}</sys:String>
+    <sys:String x:Key="Error.FileNotFound">File not found.</sys:String>
+    <sys:String x:Key="Error.FileNotFoundFormat">File not found: {0}</sys:String>
+    <sys:String x:Key="Error.ConfigCorrupt">Configuration file is corrupt. Please restart the server so it regenerates.</sys:String>
+    <sys:String x:Key="Error.NoInternet">No internet connection.</sys:String>
+    <sys:String x:Key="Error.Canceled">Operation canceled.</sys:String>
+    <sys:String x:Key="Error.IoErrorFormat">File access error: {0}</sys:String>
 
     <!-- Dialogs -->
     <sys:String x:Key="Dialog.Confirm.Title">Confirm</sys:String>
@@ -256,6 +270,8 @@
     <sys:String x:Key="Settings.AppUpdate.Title">App updates</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Hint">Checks GitHub for a newer version of Windrose Server Manager. Automatic every 6 hours.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.CheckNow">Check for update now</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.Download">Start download</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.OpenReleasePage">Open release page</sys:String>
     <sys:String x:Key="Settings.About.Title">About</sys:String>
     <sys:String x:Key="Settings.About.VersionFormat">Version {0}</sys:String>
     <sys:String x:Key="Settings.About.License">MIT License · © 2026 Manuel Staggl</sys:String>
@@ -295,6 +311,8 @@
     <sys:String x:Key="Toast.WorldDeletedFormat">World deleted: {0}</sys:String>
     <sys:String x:Key="Toast.BackupDirUpdated">Backup folder updated.</sys:String>
     <sys:String x:Key="Toast.BackupCreatedFormat">Backup created: {0}</sys:String>
+    <sys:String x:Key="Toast.BackupBeforeStart">Creating backup before starting server...</sys:String>
+    <sys:String x:Key="Dashboard.Start.WithBackup">Create backup, then start</sys:String>
     <sys:String x:Key="Toast.BackupDeletedFormat">Deleted: {0}</sys:String>
     <sys:String x:Key="Toast.BackupRestoredFormat">Restored: {0}</sys:String>
     <sys:String x:Key="Toast.SavesFolderMissing">Saves folder not found.</sys:String>
@@ -375,4 +393,87 @@
     <sys:String x:Key="Event.AutoRestartUptime">Auto-restart (uptime)</sys:String>
     <sys:String x:Key="Event.SessionDurationHm">Session duration: {0}h {1}m</sys:String>
     <sys:String x:Key="Event.SessionDurationMs">Session duration: {0}m {1}s</sys:String>
+
+    <!-- Mods -->
+    <sys:String x:Key="Nav.Mods">Mods</sys:String>
+    <sys:String x:Key="Mods.Title">Mod management</sys:String>
+    <sys:String x:Key="Mods.Subtitle">Install, toggle and export mods for your Windrose server. Every player must install the same mods client-side — otherwise they get kicked or experience desyncs.</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.Header">Status</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.Ready">Ready</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.NotReady">Locked</sys:String>
+    <sys:String x:Key="Mods.DirWatermark">~mods directory (created automatically)</sys:String>
+    <sys:String x:Key="Mods.Install">Install mod...</sys:String>
+    <sys:String x:Key="Mods.Install.Title">Select mod archive</sys:String>
+    <sys:String x:Key="Mods.Uninstall">Remove</sys:String>
+    <sys:String x:Key="Mods.ExportClient">Export client bundle...</sys:String>
+    <sys:String x:Key="Mods.ExportClient.Title">Save client bundle as</sys:String>
+    <sys:String x:Key="Mods.OpenModsDir">Open in Explorer</sys:String>
+    <sys:String x:Key="Mods.DropHint">Tip: drop .pak, .zip or .7z files here to install</sys:String>
+    <sys:String x:Key="Mods.Empty.Title">No mods installed</sys:String>
+    <sys:String x:Key="Mods.Empty.Body">Download .pak files from Nexus Mods and install them here via the button or drag &amp; drop.</sys:String>
+    <sys:String x:Key="Mods.Card.Enabled">Active</sys:String>
+    <sys:String x:Key="Mods.Card.Disabled">Disabled</sys:String>
+    <sys:String x:Key="Mods.Card.Companions">companion file(s)</sys:String>
+    <sys:String x:Key="Mods.Action.Enable">Enable</sys:String>
+    <sys:String x:Key="Mods.Action.Disable">Disable</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.Title">Remove mod?</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.MessageFormat">Permanently remove mod &quot;{0}&quot;? The files will be deleted.</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.Label">Remove</sys:String>
+    <sys:String x:Key="Toast.ModInstalledFormat">Mod installed: {0}</sys:String>
+    <sys:String x:Key="Toast.ModUninstalledFormat">Mod removed: {0}</sys:String>
+    <sys:String x:Key="Toast.ModEnabledFormat">Mod enabled: {0}</sys:String>
+    <sys:String x:Key="Toast.ModDisabledFormat">Mod disabled: {0}</sys:String>
+    <sys:String x:Key="Toast.ModExportedFormat">Exported {0} mod(s) to {1}</sys:String>
+    <sys:String x:Key="Toast.ModExportNothing">No active mods to export.</sys:String>
+    <sys:String x:Key="Mods.Error.Title">Mod action failed</sys:String>
+    <sys:String x:Key="Mods.Error.ArchiveFormat">{0}: {1}</sys:String>
+    <sys:String x:Key="Mods.Bulk.SelectAll">Select all</sys:String>
+    <sys:String x:Key="Mods.Bulk.SelectedSuffix">selected</sys:String>
+    <sys:String x:Key="Mods.Bulk.Clear">Clear selection</sys:String>
+    <sys:String x:Key="Mods.Bulk.UninstallSelected">Remove selected</sys:String>
+    <sys:String x:Key="Confirm.ModBulkUninstall.Title">Remove multiple mods?</sys:String>
+    <sys:String x:Key="Confirm.ModBulkUninstall.MessageFormat">Permanently remove {0} mod(s)? The files will be deleted.</sys:String>
+    <sys:String x:Key="Toast.ModBulkUninstalledFormat">{0} mod(s) removed</sys:String>
+    <sys:String x:Key="Toast.ModBulkUninstalledPartialFormat">{0} removed, {1} failed</sys:String>
+
+    <!-- Nexus integration -->
+    <sys:String x:Key="Settings.Nexus.Title">Nexus Mods (optional)</sys:String>
+    <sys:String x:Key="Settings.Nexus.Hint">With a free Nexus API key this app can link installed mods to their Nexus page and check for updates. Downloads stay manual (Premium-only via the Nexus API, not supported here).</sys:String>
+    <sys:String x:Key="Settings.Nexus.ApiKey">Personal API key</sys:String>
+    <sys:String x:Key="Settings.Nexus.ApiKey.Placeholder">Empty = Nexus features disabled</sys:String>
+    <sys:String x:Key="Settings.Nexus.OpenApiPage">Create API key on nexusmods.com</sys:String>
+
+    <sys:String x:Key="Mods.Nexus.CheckUpdates">Check updates</sys:String>
+    <sys:String x:Key="Mods.Nexus.Linked">Nexus</sys:String>
+    <sys:String x:Key="Mods.Nexus.UpdateAvailable">Update!</sys:String>
+    <sys:String x:Key="Mods.Nexus.Link.Tooltip">Link to Nexus page</sys:String>
+    <sys:String x:Key="Mods.Nexus.Unlink.Tooltip">Remove Nexus link</sys:String>
+    <sys:String x:Key="Mods.Nexus.OpenOnNexus">Open on Nexus</sys:String>
+
+    <sys:String x:Key="Dialog.LinkNexus.Title">Link mod to Nexus</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Body">Paste the mod's nexusmods.com URL. The app will remember the page so you can check updates and open the link.</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.ForModFormat">Linking: {0}</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.UrlLabel">Nexus URL or mod ID</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Fetch">Check</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Confirm">Link</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Fetching">Loading metadata…</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.InvalidUrl">Invalid URL</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.NotFound">Mod not found on Nexus</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.FetchFailed">Nexus request failed</sys:String>
+
+    <sys:String x:Key="Toast.NexusNoApiKey">No Nexus API key configured. Settings → Nexus Mods.</sys:String>
+    <sys:String x:Key="Toast.NexusNoLinkedMods">No mods linked to Nexus.</sys:String>
+    <sys:String x:Key="Toast.NexusLinkedFormat">Linked to Nexus: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusUnlinkedFormat">Nexus link removed: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusUpdatesFoundFormat">{0} mod(s) have updates available</sys:String>
+    <sys:String x:Key="Toast.NexusUpToDate">All linked mods are up-to-date</sys:String>
+    <sys:String x:Key="Toast.NexusChecksFailedFormat">{0} Nexus request(s) failed</sys:String>
+    <sys:String x:Key="Toast.NexusAutoLinkedFormat">Auto-linked to Nexus: {0}</sys:String>
+    <sys:String x:Key="Mods.Group.PakSuffix">file(s)</sys:String>
+    <sys:String x:Key="Mods.Group.ActiveSuffix">active</sys:String>
+    <sys:String x:Key="Mods.Group.EnableAll">Enable all</sys:String>
+    <sys:String x:Key="Mods.Group.DisableAll">Disable all</sys:String>
+    <sys:String x:Key="Toast.GroupEnabledFormat">Group enabled: {0}</sys:String>
+    <sys:String x:Key="Toast.GroupDisabledFormat">Group disabled: {0}</sys:String>
+    <sys:String x:Key="Toast.ModInstalledCountFormat">Installed {0} mod file(s)</sys:String>
 </ResourceDictionary>

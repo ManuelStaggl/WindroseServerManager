@@ -18,6 +18,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private readonly IMetricsService _metrics;
     private readonly IAppSettingsService _settings;
     private readonly IServerConfigService _config;
+    private readonly IBackupService _backup;
     private readonly IToastService _toasts;
     private readonly INavigationService _nav;
     private readonly System.Timers.Timer _timer;
@@ -29,6 +30,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private double _hostRamPercent;
     [ObservableProperty] private string _hostRamText = "—";
     [ObservableProperty] private string _diskText = "—";
+    [ObservableProperty] private double _diskUsedPercent;
     [ObservableProperty] private double _procCpu;
     [ObservableProperty] private string _procCpuText = "—";
     [ObservableProperty] private string _procRamText = "—";
@@ -135,6 +137,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         IMetricsService metrics,
         IAppSettingsService settings,
         IServerConfigService config,
+        IBackupService backup,
         INavigationService nav,
         IToastService toasts,
         ILocalizationService localization)
@@ -144,6 +147,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _metrics = metrics;
         _settings = settings;
         _config = config;
+        _backup = backup;
         _nav = nav;
         _toasts = toasts;
         _proc.StatusChanged += OnServerStatusChanged;
@@ -231,6 +235,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             HostRamPercent = host.RamTotalBytes > 0 ? host.RamUsedBytes * 100.0 / host.RamTotalBytes : 0;
             HostRamText = $"{FormatGb(host.RamUsedBytes)} / {FormatGb(host.RamTotalBytes)}";
             DiskText = $"{FormatGb(host.DiskFreeBytes)} frei / {FormatGb(host.DiskTotalBytes)}";
+            DiskUsedPercent = host.DiskTotalBytes > 0
+                ? (host.DiskTotalBytes - host.DiskFreeBytes) * 100.0 / host.DiskTotalBytes
+                : 0;
 
             var p = _metrics.GetServerProcessMetrics();
             if (p is not null)
@@ -324,6 +331,35 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
         try { await _proc.StartAsync(); _toasts.Success(Loc.Get("Toast.ServerStarting")); }
         catch (Exception ex) { var msg = ErrorMessageHelper.FriendlyMessage(ex); ErrorMessage = msg; _toasts.Error(msg); }
+    }
+
+    [RelayCommand]
+    private async Task StartWithBackupAsync()
+    {
+        ErrorMessage = _proc.ValidateCanStart();
+        if (ErrorMessage is not null) { _toasts.Warning(ErrorMessage); return; }
+
+        try
+        {
+            IsBusy = true;
+            _toasts.Info(Loc.Get("Toast.BackupBeforeStart"));
+            var info = await _backup.CreateBackupAsync(isAutomatic: false);
+            if (info is not null)
+                _toasts.Success(Loc.Format("Toast.BackupCreatedFormat", info.FileName));
+
+            await _proc.StartAsync();
+            _toasts.Success(Loc.Get("Toast.ServerStarting"));
+        }
+        catch (Exception ex)
+        {
+            var msg = ErrorMessageHelper.FriendlyMessage(ex);
+            ErrorMessage = msg;
+            _toasts.Error(msg);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]

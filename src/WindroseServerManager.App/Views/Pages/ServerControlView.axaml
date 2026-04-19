@@ -7,11 +7,12 @@
     <UserControl.KeyBindings>
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveRestartScheduleCommand}" />
     </UserControl.KeyBindings>
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-        <TextBlock Grid.Row="0" Classes="page-title" Text="{DynamicResource ServerControl.Title}" />
-        <TextBlock Grid.Row="1" Classes="caption" Text="{DynamicResource ServerControl.Subtitle}" Margin="0,4,0,20" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="0">
+        <TextBlock Classes="page-title" Text="{DynamicResource ServerControl.Title}" />
+        <TextBlock Classes="caption" Text="{DynamicResource ServerControl.Subtitle}" Margin="0,4,0,20" />
 
-        <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
+        <Border Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="16">
                 <TextBlock Classes="section-header" Text="{DynamicResource ServerControl.ScheduledRestarts}" />
                 <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
@@ -24,14 +25,14 @@
                 </StackPanel>
                 <StackPanel Spacing="6">
                     <TextBlock Classes="caption" Text="{DynamicResource ServerControl.Weekdays}" />
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox Content="{DynamicResource Weekday.Mon}" IsChecked="{Binding RestartMon}" />
-                        <CheckBox Content="{DynamicResource Weekday.Tue}" IsChecked="{Binding RestartTue}" />
-                        <CheckBox Content="{DynamicResource Weekday.Wed}" IsChecked="{Binding RestartWed}" />
-                        <CheckBox Content="{DynamicResource Weekday.Thu}" IsChecked="{Binding RestartThu}" />
-                        <CheckBox Content="{DynamicResource Weekday.Fri}" IsChecked="{Binding RestartFri}" />
-                        <CheckBox Content="{DynamicResource Weekday.Sat}" IsChecked="{Binding RestartSat}" />
-                        <CheckBox Content="{DynamicResource Weekday.Sun}" IsChecked="{Binding RestartSun}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Mon}" IsChecked="{Binding RestartMon}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Tue}" IsChecked="{Binding RestartTue}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Wed}" IsChecked="{Binding RestartWed}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Thu}" IsChecked="{Binding RestartThu}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Fri}" IsChecked="{Binding RestartFri}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Sat}" IsChecked="{Binding RestartSat}" />
+                        <ToggleButton Classes="weekday-pill" Content="{DynamicResource Weekday.Sun}" IsChecked="{Binding RestartSun}" />
                     </StackPanel>
                 </StackPanel>
 
@@ -59,7 +60,7 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
+        <Border Classes="card" Margin="0,0,0,16">
             <Grid RowDefinitions="Auto,*" MaxHeight="260">
                 <TextBlock Grid.Row="0" Classes="section-header" Text="{DynamicResource ServerControl.SessionHistory}" Margin="0,0,0,12" />
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -92,7 +93,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="4" Classes="card">
+        <Border Classes="card" MinHeight="420">
             <Grid RowDefinitions="Auto,Auto,Auto,*">
                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
                     <TextBlock Grid.Column="0" Classes="section-header" Text="{DynamicResource ServerControl.LiveLog}" VerticalAlignment="Center" />
@@ -120,12 +121,15 @@
                     <ItemsControl ItemsSource="{Binding FilteredLog}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}" FontFamily="Consolas,Courier New" FontSize="12" />
+                                <TextBlock Classes="log-line"
+                                           Text="{Binding}"
+                                           Foreground="{Binding ., Converter={x:Static vm:LogLineToBrushConverter.Instance}}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
             </Grid>
         </Border>
-    </Grid>
+    </StackPanel>
+    </ScrollViewer>
 </UserControl>

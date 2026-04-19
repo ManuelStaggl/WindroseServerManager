@@ -85,6 +85,12 @@ public partial class MainWindow : Window
     private void OnDragZoneDoubleTapped(object? sender, TappedEventArgs e)
         => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
+    private void OnToastTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Control { DataContext: Services.ToastItem item })
+            item.Dismiss();
+    }
+
     private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;

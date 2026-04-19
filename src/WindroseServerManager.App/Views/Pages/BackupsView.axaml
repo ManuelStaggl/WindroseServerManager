@@ -55,8 +55,17 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{DynamicResource Backups.Col.File}" Binding="{Binding FileName}" Width="*" />
                         <DataGridTextColumn Header="{DynamicResource Backups.Col.Created}" Binding="{Binding CreatedUtc, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="180" />
-                        <DataGridTextColumn Header="{DynamicResource Backups.Col.SizeMb}" Binding="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}}" Width="120" />
-                        <DataGridTextColumn Header="{DynamicResource Backups.Col.Automatic}" Binding="{Binding IsAutomatic}" Width="140" />
+                        <DataGridTextColumn Header="{DynamicResource Backups.Col.SizeMb}" Binding="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}}" Width="140" />
+                        <DataGridTemplateColumn Header="{DynamicResource Backups.Col.Automatic}" Width="130">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               FontWeight="SemiBold"
+                                               Text="{Binding IsAutomatic, Converter={x:Static vm:BoolToCheckGlyphConverter.Instance}}"
+                                               Foreground="{Binding IsAutomatic, Converter={x:Static vm:BoolToAutomaticBrushConverter.Instance}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
                 <TextBlock Text="{DynamicResource Backups.None}"

@@ -12,17 +12,17 @@ public static class ErrorMessageHelper
 {
     public static string FriendlyMessage(Exception ex) => ex switch
     {
-        UnauthorizedAccessException => "Zugriff verweigert. Bitte App als Administrator ausführen.",
+        UnauthorizedAccessException => Loc.Get("Error.AccessDenied"),
         DirectoryNotFoundException dnf => string.IsNullOrWhiteSpace(dnf.Message)
-            ? "Ordner nicht gefunden."
-            : $"Ordner nicht gefunden: {dnf.Message}",
+            ? Loc.Get("Error.DirectoryNotFound")
+            : Loc.Format("Error.DirectoryNotFoundFormat", dnf.Message),
         FileNotFoundException fnf => string.IsNullOrWhiteSpace(fnf.FileName)
-            ? "Datei nicht gefunden."
-            : $"Datei nicht gefunden: {fnf.FileName}",
-        JsonException => "Konfigurationsdatei ist beschädigt. Bitte Server neu starten, damit sie regeneriert wird.",
-        HttpRequestException => "Keine Internet-Verbindung.",
-        OperationCanceledException => "Vorgang abgebrochen.",
-        IOException io => $"Datei-Zugriffsfehler: {io.Message}",
+            ? Loc.Get("Error.FileNotFound")
+            : Loc.Format("Error.FileNotFoundFormat", fnf.FileName),
+        JsonException => Loc.Get("Error.ConfigCorrupt"),
+        HttpRequestException => Loc.Get("Error.NoInternet"),
+        OperationCanceledException => Loc.Get("Error.Canceled"),
+        IOException io => Loc.Format("Error.IoErrorFormat", io.Message),
         _ => ex.Message,
     };
 }

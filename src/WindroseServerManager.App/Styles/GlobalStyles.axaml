@@ -43,6 +43,15 @@
 
     <!-- ==================== BUTTONS ==================== -->
 
+    <!-- Action-Buttons: einheitliche Mindestbreite für Button-Gruppen (Start/Stop/…) -->
+    <Style Selector="Button.action-btn">
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+
+
+
     <!-- Primary: Amber filled -->
     <Style Selector="Button.primary">
         <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
@@ -174,6 +183,50 @@
     </Style>
     <Style Selector="RadioButton.nav-item:checked /template/ Border#RootBorder">
         <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+
+    <!-- Weekday-Pill ToggleButton: kompakte Mo/Di/Mi-Chips -->
+    <Style Selector="ToggleButton.weekday-pill">
+        <Setter Property="MinWidth" Value="44" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="ToggleButton.weekday-pill /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+    </Style>
+    <Style Selector="ToggleButton.weekday-pill:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberHoverBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.weekday-pill:checked /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="ToggleButton.weekday-pill:checked:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberHoverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberHoverBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <!-- Log-Line: Monospace + per-line color via Binding -->
+    <Style Selector="TextBlock.log-line">
+        <Setter Property="FontFamily" Value="Consolas,Courier New" />
+        <Setter Property="FontSize" Value="12" />
     </Style>
 
     <!-- ==================== INPUTS ==================== -->

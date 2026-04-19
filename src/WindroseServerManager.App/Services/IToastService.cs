@@ -23,6 +23,8 @@ public interface IToastService
 
 public sealed partial class ToastItem : ObservableObject
 {
+    private readonly Action<ToastItem>? _dismiss;
+
     public Guid Id { get; } = Guid.NewGuid();
     public string Message { get; }
     public ToastKind Kind { get; }
@@ -43,9 +45,12 @@ public sealed partial class ToastItem : ObservableObject
         _ => "i",
     };
 
-    public ToastItem(string message, ToastKind kind)
+    public ToastItem(string message, ToastKind kind, Action<ToastItem>? dismiss = null)
     {
         Message = message;
         Kind = kind;
+        _dismiss = dismiss;
     }
+
+    public void Dismiss() => _dismiss?.Invoke(this);
 }

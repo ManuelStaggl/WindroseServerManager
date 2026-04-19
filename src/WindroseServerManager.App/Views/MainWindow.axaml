@@ -12,8 +12,11 @@
         Width="1440" Height="960"
         MinWidth="1024" MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        SystemDecorations="None"
-        Background="{DynamicResource BrandNavyBrush}">
+        WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
+        Background="Transparent">
 
     <Window.Resources>
         <DataTemplate x:Key="NavItemTemplate" x:DataType="vm:NavItem">
@@ -50,11 +53,20 @@
         <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BrandAmberHoverBrush}" />
         </Style>
+        <!-- Footer-Nav: subtiler als Main-Nav -->
+        <Style Selector="ListBox.nav-footer ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        </Style>
+        <Style Selector="ListBox.nav-footer ListBoxItem:selected:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        </Style>
     </Window.Styles>
 
     <Border Name="RootBorder"
             CornerRadius="10"
-            Background="{DynamicResource BrandNavyBrush}"
+            Background="{DynamicResource BrandNavyMicaBrush}"
             BorderBrush="{DynamicResource BrandNavyBorderBrush}"
             BorderThickness="1"
             ClipToBounds="True">
@@ -106,11 +118,12 @@
                          Classes="nav"
                          ItemsSource="{Binding NavItems}"
                          SelectedItem="{Binding SelectedMainItem}"
-                         ItemTemplate="{StaticResource NavItemTemplate}" />
+                         ItemTemplate="{StaticResource NavItemTemplate}"
+                         AutomationProperties.Name="{DynamicResource Nav.MainMenu}" />
 
                 <StackPanel Grid.Row="2" Margin="0,0,0,8">
                     <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" Margin="8,8" />
-                    <ListBox Classes="nav"
+                    <ListBox Classes="nav nav-footer"
                              ItemsSource="{Binding FooterItems}"
                              SelectedItem="{Binding SelectedFooterItem}"
                              ItemTemplate="{StaticResource NavItemTemplate}" />
@@ -126,14 +139,14 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
                     <StackPanel.Styles>
                         <Style Selector="Button.window-btn">
-                            <Setter Property="Width" Value="44" />
+                            <Setter Property="Width" Value="46" />
                             <Setter Property="Height" Value="38" />
                             <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
                             <Setter Property="BorderThickness" Value="0" />
                             <Setter Property="CornerRadius" Value="0" />
                             <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
-                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="FontSize" Value="13" />
                             <Setter Property="Padding" Value="0" />
                         </Style>
                         <Style Selector="Button.window-btn /template/ ContentPresenter">
@@ -149,9 +162,15 @@
                             <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
                         </Style>
                     </StackPanel.Styles>
-                    <Button Classes="window-btn" Content="&#xE921;" Click="OnMinimize" ToolTip.Tip="{DynamicResource Window.Minimize}" />
-                    <Button Classes="window-btn" Content="&#xE922;" Click="OnToggleMaximize" ToolTip.Tip="{DynamicResource Window.Maximize}" />
-                    <Button Classes="window-btn close" Content="&#xE8BB;" Click="OnClose" ToolTip.Tip="{DynamicResource Window.Close}" />
+                    <Button Classes="window-btn" Content="&#xE921;" Click="OnMinimize"
+                            ToolTip.Tip="{DynamicResource Window.Minimize}"
+                            AutomationProperties.Name="{DynamicResource Window.Minimize}" />
+                    <Button Classes="window-btn" Content="&#xE922;" Click="OnToggleMaximize"
+                            ToolTip.Tip="{DynamicResource Window.Maximize}"
+                            AutomationProperties.Name="{DynamicResource Window.Maximize}" />
+                    <Button Classes="window-btn close" Content="&#xE8BB;" Click="OnClose"
+                            ToolTip.Tip="{DynamicResource Window.Close}"
+                            AutomationProperties.Name="{DynamicResource Window.Close}" />
                 </StackPanel>
             </Grid>
             <!-- App-Update-Banner: erscheint wenn neuere Version auf GitHub gefunden wurde -->
@@ -182,25 +201,27 @@
                                    TextWrapping="Wrap" />
                     </StackPanel>
                     <Button Grid.Column="2"
-                            Content="{DynamicResource Action.Download}"
                             Command="{Binding DownloadUpdateCommand}"
                             Background="#FFFFFF"
-                            Foreground="{DynamicResource BrandAmberBrush}"
-                            FontWeight="SemiBold"
                             Padding="14,6"
                             CornerRadius="6"
                             Margin="12,0,8,0"
-                            Cursor="Hand" />
+                            Cursor="Hand">
+                        <TextBlock Text="{DynamicResource Action.Download}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandAmberBrush}" />
+                    </Button>
                     <Button Grid.Column="3"
-                            Content="{DynamicResource Action.Later}"
                             Command="{Binding DismissUpdateCommand}"
                             Background="Transparent"
-                            Foreground="#FFFFFF"
                             BorderBrush="#FFFFFF"
                             BorderThickness="1"
                             Padding="14,6"
                             CornerRadius="6"
-                            Cursor="Hand" />
+                            Cursor="Hand">
+                        <TextBlock Text="{DynamicResource Action.Later}"
+                                   Foreground="#FFFFFF" />
+                    </Button>
                 </Grid>
             </Border>
 
@@ -211,7 +232,7 @@
 
         <ItemsControl ItemsSource="{Binding Toasts.Toasts}"
                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                      Margin="0,0,20,20" MaxWidth="400" IsHitTestVisible="False">
+                      Margin="0,0,20,20" MaxWidth="400">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Vertical" Spacing="8" />
@@ -224,6 +245,9 @@
                             BorderThickness="1"
                             CornerRadius="6"
                             MinWidth="320" MaxWidth="400"
+                            Cursor="Hand"
+                            Tapped="OnToastTapped"
+                            ToolTip.Tip="Zum Schließen klicken"
                             BoxShadow="0 4 16 0 #40000000">
                         <Grid ColumnDefinitions="4,Auto,*">
                             <Border Grid.Column="0"

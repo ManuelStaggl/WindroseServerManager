@@ -12,7 +12,7 @@ public sealed partial class ToastService : ObservableObject, IToastService
     {
         if (string.IsNullOrWhiteSpace(message)) return;
 
-        var item = new ToastItem(message, kind);
+        var item = new ToastItem(message, kind, Dismiss);
 
         void AddOnUi()
         {
@@ -29,8 +29,14 @@ public sealed partial class ToastService : ObservableObject, IToastService
             Dispatcher.UIThread.Post(AddOnUi);
     }
 
-    public void Success(string message) => Show(message, ToastKind.Success);
-    public void Warning(string message) => Show(message, ToastKind.Warning);
-    public void Error(string message) => Show(message, ToastKind.Error);
-    public void Info(string message) => Show(message, ToastKind.Info);
+    private void Dismiss(ToastItem item)
+    {
+        if (Dispatcher.UIThread.CheckAccess()) Toasts.Remove(item);
+        else Dispatcher.UIThread.Post(() => Toasts.Remove(item));
+    }
+
+    public void Success(string message) => Show(message, ToastKind.Success, 3000);
+    public void Warning(string message) => Show(message, ToastKind.Warning, 6000);
+    public void Error(string message) => Show(message, ToastKind.Error, 15000);
+    public void Info(string message) => Show(message, ToastKind.Info, 3000);
 }

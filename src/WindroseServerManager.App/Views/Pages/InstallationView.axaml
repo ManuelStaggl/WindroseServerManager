@@ -21,9 +21,9 @@
                     <Button Classes="primary" Content="{DynamicResource Installation.InstallOrUpdate}"
                             Command="{Binding InstallCommand}"
                             IsEnabled="{Binding !IsInstalling}" />
-                    <Button Content="{DynamicResource Action.Cancel}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsInstalling}" />
-                    <Button Content="{DynamicResource Action.Recheck}" Command="{Binding RefreshCommand}" />
-                    <Button Content="{DynamicResource Action.OpenInExplorer}" Command="{Binding OpenInstallDirCommand}"
+                    <Button Classes="action-btn" Content="{DynamicResource Action.Cancel}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsInstalling}" />
+                    <Button Classes="action-btn" Content="{DynamicResource Action.Recheck}" Command="{Binding RefreshCommand}" />
+                    <Button Classes="subtle" Content="{DynamicResource Action.OpenInExplorer}" Command="{Binding OpenInstallDirCommand}"
                             IsEnabled="{Binding CanOpenInstallDir}" />
                 </StackPanel>
                 <TextBlock Classes="body muted" Text="{Binding CurrentPhase}" IsVisible="{Binding IsInstalling}" />
@@ -33,29 +33,31 @@
 
         <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="12">
-                <TextBlock Classes="section-header" Text="{DynamicResource Installation.Status}" />
-                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <Panel Width="12" Height="12">
-                        <Ellipse Width="12" Height="12"
-                                 Fill="{DynamicResource BrandSuccessBrush}"
-                                 IsVisible="{Binding InstallInfo.IsInstalled, FallbackValue=False}" />
-                        <Ellipse Width="12" Height="12"
-                                 Fill="{DynamicResource BrandTextMutedBrush}"
-                                 IsVisible="{Binding !InstallInfo.IsInstalled, FallbackValue=True}" />
-                    </Panel>
-                    <TextBlock Classes="body"
-                               Text="{Binding InstalledStatusText}" />
-                </StackPanel>
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Classes="caption" Text="{DynamicResource Installation.Status}" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <Panel Width="12" Height="12">
+                                <Ellipse Width="12" Height="12"
+                                         Fill="{DynamicResource BrandSuccessBrush}"
+                                         IsVisible="{Binding InstallInfo.IsInstalled, FallbackValue=False}" />
+                                <Ellipse Width="12" Height="12"
+                                         Fill="{DynamicResource BrandTextMutedBrush}"
+                                         IsVisible="{Binding !InstallInfo.IsInstalled, FallbackValue=True}" />
+                            </Panel>
+                            <TextBlock Classes="section-header"
+                                       Text="{Binding InstalledStatusText}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Grid.Column="1" VerticalAlignment="Center"
+                            Content="{DynamicResource Installation.CheckUpdate}" Command="{Binding CheckUpdateCommand}"
+                            IsEnabled="{Binding !IsCheckingUpdate}" />
+                </Grid>
                 <TextBlock Classes="body muted" Text="{Binding BuildIdDisplay}" />
                 <TextBlock Classes="body muted" Text="{Binding BinaryDisplay}" TextWrapping="Wrap" />
                 <TextBlock Classes="body muted" Text="{Binding LastUpdatedDisplay}" />
-                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="0,8,0,0">
-                    <TextBlock Classes="body" Text="{Binding UpdateMessageDisplay}" TextWrapping="Wrap" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Content="{DynamicResource Installation.CheckUpdate}" Command="{Binding CheckUpdateCommand}"
-                            IsEnabled="{Binding !IsCheckingUpdate}" />
-                </StackPanel>
+                <TextBlock Classes="body" Text="{Binding UpdateMessageDisplay}" TextWrapping="Wrap"
+                           IsVisible="{Binding UpdateMessageDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             </StackPanel>
         </Border>
 

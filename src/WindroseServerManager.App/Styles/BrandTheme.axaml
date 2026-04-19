@@ -22,6 +22,8 @@
             <SolidColorBrush x:Key="BrandAmberHoverBrush" Color="{StaticResource BrandAmberHoverColor}" />
             <SolidColorBrush x:Key="BrandAmberPressBrush" Color="{StaticResource BrandAmberPressColor}" />
             <SolidColorBrush x:Key="BrandNavyBrush" Color="{StaticResource BrandNavyColor}" />
+            <!-- Mica-freundliche Variante: leicht transparent, damit Mica/Acrylic durchscheint -->
+            <SolidColorBrush x:Key="BrandNavyMicaBrush" Color="{StaticResource BrandNavyColor}" Opacity="0.82" />
             <SolidColorBrush x:Key="BrandNavySurfaceBrush" Color="{StaticResource BrandNavySurfaceColor}" />
             <SolidColorBrush x:Key="BrandNavySurfaceAltBrush" Color="{StaticResource BrandNavySurfaceAltColor}" />
             <SolidColorBrush x:Key="BrandNavyBorderBrush" Color="{StaticResource BrandNavyBorderColor}" />

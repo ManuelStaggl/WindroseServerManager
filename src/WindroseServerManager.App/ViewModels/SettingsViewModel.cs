@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,6 +35,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string _steamAppId = "4129620";
     [ObservableProperty] private string _steamLogin = string.Empty;
 
+    // Nexus Mods (optional, nur Metadaten)
+    [ObservableProperty] private string _nexusApiKey = string.Empty;
+
     [ObservableProperty] private string? _statusMessage;
 
     // Firewall
@@ -46,6 +50,9 @@ public partial class SettingsViewModel : ViewModelBase
     // App-Update-Check
     [ObservableProperty] private bool _isUpdateCheckBusy;
     [ObservableProperty] private string? _updateCheckStatus;
+    [ObservableProperty] private bool _hasUpdateAvailable;
+    [ObservableProperty] private string? _pendingReleaseUrl;
+    [ObservableProperty] private string? _pendingDownloadUrl;
 
     // Language
     public ObservableCollection<LanguageOption> LanguageOptions { get; } = new();
@@ -78,6 +85,8 @@ public partial class SettingsViewModel : ViewModelBase
 
         _steamAppId = c.SteamAppId;
         _steamLogin = c.SteamLogin;
+
+        _nexusApiKey = c.NexusApiKey;
 
         _suppressAutoStartWrite = true;
         _autoStartEnabled = _autoStart.IsEnabled();
@@ -251,6 +260,8 @@ public partial class SettingsViewModel : ViewModelBase
 
             s.SteamAppId = string.IsNullOrWhiteSpace(SteamAppId) ? "4129620" : SteamAppId.Trim();
             s.SteamLogin = SteamLogin?.Trim() ?? string.Empty;
+
+            s.NexusApiKey = NexusApiKey?.Trim() ?? string.Empty;
         });
         StatusMessage = Loc.Get("Toast.SettingsSaved");
         _toasts.Success(Loc.Get("Toast.SettingsSaved"));
@@ -260,6 +271,20 @@ public partial class SettingsViewModel : ViewModelBase
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
 
     [RelayCommand]
+    private void OpenNexusApiPage()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://www.nexusmods.com/users/myaccount?tab=api",
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex) { _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex)); }
+    }
+
+    [RelayCommand]
     private async Task CheckAppUpdateAsync()
     {
         if (IsUpdateCheckBusy) return;
@@ -267,8 +292,16 @@ public partial class SettingsViewModel : ViewModelBase
         {
             IsUpdateCheckBusy = true;
             UpdateCheckStatus = Loc.Get("Toast.UpdateChecking");
+            HasUpdateAvailable = false;
+            PendingReleaseUrl = null;
+            PendingDownloadUrl = null;
+
             var result = await _appUpdate.CheckAsync();
             UpdateCheckStatus = result.Message;
+            HasUpdateAvailable = result.HasUpdate;
+            PendingReleaseUrl = result.ReleaseUrl;
+            PendingDownloadUrl = result.DownloadUrl;
+
             if (result.HasUpdate) _toasts.Info(result.Message);
             else _toasts.Success(result.Message);
         }
@@ -280,6 +313,35 @@ public partial class SettingsViewModel : ViewModelBase
         finally
         {
             IsUpdateCheckBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void DownloadAppUpdate()
+    {
+        var url = PendingDownloadUrl ?? PendingReleaseUrl;
+        if (string.IsNullOrWhiteSpace(url)) return;
+        TryOpenUrl(url);
+    }
+
+    [RelayCommand]
+    private void OpenReleasePage()
+    {
+        var url = PendingReleaseUrl ?? PendingDownloadUrl;
+        if (string.IsNullOrWhiteSpace(url)) return;
+        TryOpenUrl(url);
+    }
+
+    private void TryOpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            _toasts.Error(Loc.Get("Toast.ReleasePageFailed"));
+            System.Diagnostics.Debug.WriteLine($"Failed to open URL {url}: {ex.Message}");
         }
     }
 

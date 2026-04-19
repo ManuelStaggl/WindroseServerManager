@@ -156,6 +156,8 @@ public partial class InstallationViewModel : ViewModelBase
         Log.Clear();
         IsInstalling = true;
         _cts = new CancellationTokenSource();
+        var completeToastShown = false;
+        var failedToastShown = false;
         try
         {
             await foreach (var p in _install.InstallOrUpdateAsync(InstallDir, _cts.Token))
@@ -168,8 +170,17 @@ public partial class InstallationViewModel : ViewModelBase
                         Log.Add(p.LogLine);
                         if (Log.Count > 500) Log.RemoveAt(0);
                     });
-                if (p.Phase == InstallPhase.Failed) { ErrorMessage = p.Message; _toasts.Error(p.Message); }
-                else if (p.Phase == InstallPhase.Complete) _toasts.Success(Loc.Get("Installation.Complete"));
+                if (p.Phase == InstallPhase.Failed && !failedToastShown)
+                {
+                    ErrorMessage = p.Message;
+                    _toasts.Error(p.Message);
+                    failedToastShown = true;
+                }
+                else if (p.Phase == InstallPhase.Complete && !completeToastShown)
+                {
+                    _toasts.Success(Loc.Get("Installation.Complete"));
+                    completeToastShown = true;
+                }
             }
             await RefreshAsync();
         }

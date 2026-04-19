@@ -64,6 +64,7 @@ public partial class MainWindowViewModel : ViewModelBase
             new() { TitleKey = "Nav.Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
             new() { TitleKey = "Nav.ServerControl", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
             new() { TitleKey = "Nav.Configuration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
+            new() { TitleKey = "Nav.Mods", Icon = "\uEA86", VmType = typeof(ModsViewModel) },
             new() { TitleKey = "Nav.Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },
         };
         FooterItems = new ObservableCollection<NavItem>

@@ -17,6 +17,7 @@
     <sys:String x:Key="Window.Minimize">Minimieren</sys:String>
     <sys:String x:Key="Window.Maximize">Maximieren</sys:String>
     <sys:String x:Key="Window.Close">Schließen</sys:String>
+    <sys:String x:Key="Nav.MainMenu">Hauptmenü</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
@@ -47,6 +48,19 @@
 
     <!-- Common -->
     <sys:String x:Key="Common.EmDash">—</sys:String>
+    <sys:String x:Key="Common.Yes">Ja</sys:String>
+    <sys:String x:Key="Common.No">Nein</sys:String>
+
+    <!-- Error-Messages (werden vom ErrorMessageHelper verwendet) -->
+    <sys:String x:Key="Error.AccessDenied">Zugriff verweigert. Bitte App als Administrator ausführen.</sys:String>
+    <sys:String x:Key="Error.DirectoryNotFound">Ordner nicht gefunden.</sys:String>
+    <sys:String x:Key="Error.DirectoryNotFoundFormat">Ordner nicht gefunden: {0}</sys:String>
+    <sys:String x:Key="Error.FileNotFound">Datei nicht gefunden.</sys:String>
+    <sys:String x:Key="Error.FileNotFoundFormat">Datei nicht gefunden: {0}</sys:String>
+    <sys:String x:Key="Error.ConfigCorrupt">Konfigurationsdatei ist beschädigt. Bitte Server neu starten, damit sie regeneriert wird.</sys:String>
+    <sys:String x:Key="Error.NoInternet">Keine Internet-Verbindung.</sys:String>
+    <sys:String x:Key="Error.Canceled">Vorgang abgebrochen.</sys:String>
+    <sys:String x:Key="Error.IoErrorFormat">Datei-Zugriffsfehler: {0}</sys:String>
 
     <!-- Dialogs -->
     <sys:String x:Key="Dialog.Confirm.Title">Bestätigen</sys:String>
@@ -256,6 +270,8 @@
     <sys:String x:Key="Settings.AppUpdate.Title">App-Updates</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Hint">Prüft auf GitHub nach einer neueren Version des Windrose Server Managers. Automatisch alle 6 Stunden.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.CheckNow">Jetzt auf Update prüfen</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.Download">Download starten</sys:String>
+    <sys:String x:Key="Settings.AppUpdate.OpenReleasePage">Release-Seite öffnen</sys:String>
     <sys:String x:Key="Settings.About.Title">Über</sys:String>
     <sys:String x:Key="Settings.About.VersionFormat">Version {0}</sys:String>
     <sys:String x:Key="Settings.About.License">MIT Lizenz · © 2026 Manuel Staggl</sys:String>
@@ -295,6 +311,8 @@
     <sys:String x:Key="Toast.WorldDeletedFormat">Welt gelöscht: {0}</sys:String>
     <sys:String x:Key="Toast.BackupDirUpdated">Backup-Ordner aktualisiert.</sys:String>
     <sys:String x:Key="Toast.BackupCreatedFormat">Backup erstellt: {0}</sys:String>
+    <sys:String x:Key="Toast.BackupBeforeStart">Backup wird erstellt, bevor der Server startet...</sys:String>
+    <sys:String x:Key="Dashboard.Start.WithBackup">Backup erstellen, dann starten</sys:String>
     <sys:String x:Key="Toast.BackupDeletedFormat">Gelöscht: {0}</sys:String>
     <sys:String x:Key="Toast.BackupRestoredFormat">Wiederhergestellt: {0}</sys:String>
     <sys:String x:Key="Toast.SavesFolderMissing">Saves-Ordner nicht gefunden.</sys:String>
@@ -375,4 +393,87 @@
     <sys:String x:Key="Event.AutoRestartUptime">Auto-Restart (Uptime)</sys:String>
     <sys:String x:Key="Event.SessionDurationHm">Session-Dauer: {0}h {1}m</sys:String>
     <sys:String x:Key="Event.SessionDurationMs">Session-Dauer: {0}m {1}s</sys:String>
+
+    <!-- Mods -->
+    <sys:String x:Key="Nav.Mods">Mods</sys:String>
+    <sys:String x:Key="Mods.Title">Mod-Verwaltung</sys:String>
+    <sys:String x:Key="Mods.Subtitle">Installiere, aktiviere und exportiere Mods für deinen Windrose-Server. Mods müssen auch auf jedem Spieler-Client installiert sein, sonst gibt es Kicks oder Desyncs.</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.Header">Status</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.Ready">Bereit</sys:String>
+    <sys:String x:Key="Mods.SafetyCard.NotReady">Gesperrt</sys:String>
+    <sys:String x:Key="Mods.DirWatermark">~mods-Verzeichnis (wird automatisch angelegt)</sys:String>
+    <sys:String x:Key="Mods.Install">Mod installieren...</sys:String>
+    <sys:String x:Key="Mods.Install.Title">Mod-Archiv auswählen</sys:String>
+    <sys:String x:Key="Mods.Uninstall">Entfernen</sys:String>
+    <sys:String x:Key="Mods.ExportClient">Client-Paket exportieren...</sys:String>
+    <sys:String x:Key="Mods.ExportClient.Title">Client-Paket speichern unter</sys:String>
+    <sys:String x:Key="Mods.OpenModsDir">Im Explorer öffnen</sys:String>
+    <sys:String x:Key="Mods.DropHint">Tipp: .pak, .zip oder .7z einfach hier hineinziehen</sys:String>
+    <sys:String x:Key="Mods.Empty.Title">Keine Mods installiert</sys:String>
+    <sys:String x:Key="Mods.Empty.Body">Lade .pak-Dateien von Nexus Mods herunter und installiere sie hier per Button oder Drag &amp; Drop.</sys:String>
+    <sys:String x:Key="Mods.Card.Enabled">Aktiv</sys:String>
+    <sys:String x:Key="Mods.Card.Disabled">Deaktiviert</sys:String>
+    <sys:String x:Key="Mods.Card.Companions">Zusatzdateien</sys:String>
+    <sys:String x:Key="Mods.Action.Enable">Aktivieren</sys:String>
+    <sys:String x:Key="Mods.Action.Disable">Deaktivieren</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.Title">Mod entfernen?</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.MessageFormat">Möchtest du den Mod &quot;{0}&quot; dauerhaft entfernen? Die Dateien werden gelöscht.</sys:String>
+    <sys:String x:Key="Confirm.ModUninstall.Label">Entfernen</sys:String>
+    <sys:String x:Key="Toast.ModInstalledFormat">Mod installiert: {0}</sys:String>
+    <sys:String x:Key="Toast.ModUninstalledFormat">Mod entfernt: {0}</sys:String>
+    <sys:String x:Key="Toast.ModEnabledFormat">Mod aktiviert: {0}</sys:String>
+    <sys:String x:Key="Toast.ModDisabledFormat">Mod deaktiviert: {0}</sys:String>
+    <sys:String x:Key="Toast.ModExportedFormat">{0} Mod(s) exportiert nach {1}</sys:String>
+    <sys:String x:Key="Toast.ModExportNothing">Keine aktiven Mods zum Exportieren.</sys:String>
+    <sys:String x:Key="Mods.Error.Title">Fehler bei letzter Mod-Aktion</sys:String>
+    <sys:String x:Key="Mods.Error.ArchiveFormat">{0}: {1}</sys:String>
+    <sys:String x:Key="Mods.Bulk.SelectAll">Alle auswählen</sys:String>
+    <sys:String x:Key="Mods.Bulk.SelectedSuffix">ausgewählt</sys:String>
+    <sys:String x:Key="Mods.Bulk.Clear">Auswahl aufheben</sys:String>
+    <sys:String x:Key="Mods.Bulk.UninstallSelected">Ausgewählte entfernen</sys:String>
+    <sys:String x:Key="Confirm.ModBulkUninstall.Title">Mehrere Mods entfernen?</sys:String>
+    <sys:String x:Key="Confirm.ModBulkUninstall.MessageFormat">Möchtest du {0} Mod(s) dauerhaft entfernen? Die Dateien werden gelöscht.</sys:String>
+    <sys:String x:Key="Toast.ModBulkUninstalledFormat">{0} Mod(s) entfernt</sys:String>
+    <sys:String x:Key="Toast.ModBulkUninstalledPartialFormat">{0} entfernt, {1} fehlgeschlagen</sys:String>
+
+    <!-- Nexus-Integration -->
+    <sys:String x:Key="Settings.Nexus.Title">Nexus Mods (optional)</sys:String>
+    <sys:String x:Key="Settings.Nexus.Hint">Mit einem kostenlosen Nexus-API-Key kann diese App installierte Mods mit ihrer Nexus-Seite verknüpfen und nach Updates suchen. Downloads bleiben manuell (Premium-Feature der Nexus-API, nicht unterstützt).</sys:String>
+    <sys:String x:Key="Settings.Nexus.ApiKey">Persönlicher API-Key</sys:String>
+    <sys:String x:Key="Settings.Nexus.ApiKey.Placeholder">Leer = Nexus-Features deaktiviert</sys:String>
+    <sys:String x:Key="Settings.Nexus.OpenApiPage">API-Key auf nexusmods.com erstellen</sys:String>
+
+    <sys:String x:Key="Mods.Nexus.CheckUpdates">Updates suchen</sys:String>
+    <sys:String x:Key="Mods.Nexus.Linked">Nexus</sys:String>
+    <sys:String x:Key="Mods.Nexus.UpdateAvailable">Update!</sys:String>
+    <sys:String x:Key="Mods.Nexus.Link.Tooltip">Mit Nexus-Seite verknüpfen</sys:String>
+    <sys:String x:Key="Mods.Nexus.Unlink.Tooltip">Nexus-Verknüpfung entfernen</sys:String>
+    <sys:String x:Key="Mods.Nexus.OpenOnNexus">Auf Nexus öffnen</sys:String>
+
+    <sys:String x:Key="Dialog.LinkNexus.Title">Mod mit Nexus verknüpfen</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Body">Füge den Link zur Mod auf nexusmods.com ein. Die App merkt sich dann die Mod-Seite, um Updates zu prüfen und den Link öffnen zu können.</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.ForModFormat">Verlinkt wird: {0}</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.UrlLabel">Nexus-URL oder Mod-ID</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Fetch">Prüfen</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Confirm">Verknüpfen</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Fetching">Metadaten werden geladen…</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.InvalidUrl">Ungültige URL</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.NotFound">Mod auf Nexus nicht gefunden</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.FetchFailed">Nexus-Anfrage fehlgeschlagen</sys:String>
+
+    <sys:String x:Key="Toast.NexusNoApiKey">Kein Nexus-API-Key hinterlegt. Einstellungen → Nexus Mods.</sys:String>
+    <sys:String x:Key="Toast.NexusNoLinkedMods">Keine Mods mit Nexus verknüpft.</sys:String>
+    <sys:String x:Key="Toast.NexusLinkedFormat">Mit Nexus verknüpft: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusUnlinkedFormat">Nexus-Verknüpfung entfernt: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusUpdatesFoundFormat">{0} Mod(s) haben ein Update verfügbar</sys:String>
+    <sys:String x:Key="Toast.NexusUpToDate">Alle verknüpften Mods sind aktuell</sys:String>
+    <sys:String x:Key="Toast.NexusChecksFailedFormat">{0} Nexus-Anfrage(n) fehlgeschlagen</sys:String>
+    <sys:String x:Key="Toast.NexusAutoLinkedFormat">Automatisch mit Nexus verknüpft: {0}</sys:String>
+    <sys:String x:Key="Mods.Group.PakSuffix">Datei(en)</sys:String>
+    <sys:String x:Key="Mods.Group.ActiveSuffix">aktiv</sys:String>
+    <sys:String x:Key="Mods.Group.EnableAll">Alle aktivieren</sys:String>
+    <sys:String x:Key="Mods.Group.DisableAll">Alle deaktivieren</sys:String>
+    <sys:String x:Key="Toast.GroupEnabledFormat">Gruppe aktiviert: {0}</sys:String>
+    <sys:String x:Key="Toast.GroupDisabledFormat">Gruppe deaktiviert: {0}</sys:String>
+    <sys:String x:Key="Toast.ModInstalledCountFormat">{0} Mod-Datei(en) installiert</sys:String>
 </ResourceDictionary>

@@ -37,9 +37,30 @@ public sealed partial class ServerInstallService : IServerInstallService
         if (string.IsNullOrWhiteSpace(installDir))
             return "Installationspfad darf nicht leer sein.";
 
+        // Trailing Whitespace/Punkt bricht Windows-Pfad-Normalisierung (Path.GetFullPath strippt das,
+        // aber der User hätte keine Chance zu sehen dass sein Eingabepfad tatsächlich ein anderer ist).
+        if (installDir.EndsWith(' ') || installDir.EndsWith('.'))
+            return "Pfad darf nicht mit Leerzeichen oder Punkt enden.";
+
+        // UNC-Pfade (\\Server\Share) sind für SteamCMD/Unreal nicht verlässlich.
+        if (installDir.StartsWith(@"\\", StringComparison.Ordinal))
+            return "Netzwerkpfade (UNC) werden nicht unterstützt. Bitte lokalen Pfad wählen.";
+
+        // Non-ASCII-Zeichen (Umlaute, etc.) sind ein historischer Bruchpunkt bei SteamCMD.
+        foreach (var ch in installDir)
+        {
+            if (ch > 127)
+                return "Pfad enthält Sonderzeichen (z.B. Umlaute). SteamCMD/Unreal-Server brauchen reine ASCII-Pfade.";
+        }
+
         try
         {
             var full = Path.GetFullPath(installDir);
+
+            // Pfadlänge > 260 kann mit älteren APIs Probleme machen.
+            if (full.Length > 240)
+                return "Pfad ist zu lang (max. 240 Zeichen). Bitte kürzeren Pfad wählen.";
+
             var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if (!string.IsNullOrEmpty(programFiles) &&
@@ -48,6 +69,12 @@ public sealed partial class ServerInstallService : IServerInstallService
             if (!string.IsNullOrEmpty(programFilesX86) &&
                 full.StartsWith(programFilesX86, StringComparison.OrdinalIgnoreCase))
                 return "Pfad darf nicht unter 'Program Files (x86)' liegen.";
+
+            // System-/Windows-Ordner ebenfalls blockieren.
+            var windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (!string.IsNullOrEmpty(windows) &&
+                full.StartsWith(windows, StringComparison.OrdinalIgnoreCase))
+                return "Pfad darf nicht im Windows-Systemordner liegen.";
         }
         catch (Exception ex)
         {

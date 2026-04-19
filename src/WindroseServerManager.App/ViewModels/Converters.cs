@@ -112,6 +112,163 @@ public sealed class SizeToMbConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public sealed class BoolToCheckGlyphConverter : IValueConverter
+{
+    public static readonly BoolToCheckGlyphConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? "\u2713" : "\u2014";
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToAutomaticBrushConverter : IValueConverter
+{
+    public static readonly BoolToAutomaticBrushConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = value is bool b && b ? "BrandSuccessBrush" : "BrandTextMutedBrush";
+        var app = Application.Current;
+        if (app is not null &&
+            app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) &&
+            res is IBrush brush) return brush;
+        return Brushes.Gray;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToEnabledBrushConverter : IValueConverter
+{
+    public static readonly BoolToEnabledBrushConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = value is bool b && b ? "BrandSuccessBrush" : "BrandTextMutedBrush";
+        var app = Application.Current;
+        if (app is not null &&
+            app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) &&
+            res is IBrush brush) return brush;
+        return Brushes.Gray;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class EnabledToLabelConverter : IValueConverter
+{
+    public static readonly EnabledToLabelConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? Loc.Get("Mods.Card.Enabled") : Loc.Get("Mods.Card.Disabled");
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class EnabledToToggleLabelConverter : IValueConverter
+{
+    public static readonly EnabledToToggleLabelConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? Loc.Get("Mods.Action.Disable") : Loc.Get("Mods.Action.Enable");
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToOpacityConverter : IValueConverter
+{
+    public static readonly BoolToOpacityConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? 1.0 : 0.45;
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class EnabledToEyeIconConverter : IValueConverter
+{
+    public static readonly EnabledToEyeIconConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? "\uE7B3" : "\uED1A";  // RedEye / Hide
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToChevronConverter : IValueConverter
+{
+    public static readonly BoolToChevronConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? "\uE70D" : "\uE76C";  // ChevronDown / ChevronRight
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BundleToIconConverter : IValueConverter
+{
+    public static readonly BundleToIconConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? "\uE8B7" : "\uE7B8";  // FolderOpen / Package
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class IntToBoolConverter : IValueConverter
+{
+    public static readonly IntToBoolConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is int n && n > 0;
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToYesNoConverter : IValueConverter
+{
+    public static readonly BoolToYesNoConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? Loc.Get("Common.Yes") : Loc.Get("Common.No");
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class LogLineToBrushConverter : IValueConverter
+{
+    public static readonly LogLineToBrushConverter Instance = new();
+
+    private static readonly System.Text.RegularExpressions.Regex ErrorRegex =
+        new(@"Log\w+:\s*Error:", System.Text.RegularExpressions.RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not string line) return ResolveBrush("BrandTextPrimaryBrush");
+        string key = ClassifyKey(line);
+        return ResolveBrush(key);
+    }
+
+    private static string ClassifyKey(string line)
+    {
+        if (string.IsNullOrEmpty(line)) return "BrandTextPrimaryBrush";
+        if (line.Contains("[FEHLER]", StringComparison.OrdinalIgnoreCase)
+            || line.Contains("!!!", StringComparison.Ordinal)
+            || line.Contains("Error!", StringComparison.Ordinal)
+            || ErrorRegex.IsMatch(line))
+            return "BrandErrorBrush";
+        if (line.Contains("Warning:", StringComparison.OrdinalIgnoreCase)
+            || line.Contains("[Warn]", StringComparison.OrdinalIgnoreCase))
+            return "BrandWarningBrush";
+        return "BrandTextPrimaryBrush";
+    }
+
+    private static IBrush ResolveBrush(string key)
+    {
+        var app = Application.Current;
+        if (app is not null &&
+            app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) &&
+            res is IBrush brush)
+        {
+            return brush;
+        }
+        return Brushes.White;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public sealed class ServerEventTypeToIconConverter : IValueConverter
 {
     public static readonly ServerEventTypeToIconConverter Instance = new();

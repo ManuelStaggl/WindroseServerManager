@@ -105,12 +105,15 @@
                         </StackPanel>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Classes="primary" Content="{DynamicResource Action.Start}" Command="{Binding StartCommand}" IsEnabled="{Binding !IsBusy}" />
-                        <Button Content="{DynamicResource Action.Stop}" Command="{Binding StopCommand}" IsEnabled="{Binding !IsBusy}" />
-                        <Button Content="{DynamicResource Action.Restart}" Command="{Binding RestartCommand}" IsEnabled="{Binding !IsBusy}" />
-                        <Button Classes="danger" Content="{DynamicResource Action.ForceKill}" Command="{Binding KillCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Classes="primary action-btn" Content="{DynamicResource Action.Start}" Command="{Binding StartCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Classes="action-btn" Content="{DynamicResource Action.Stop}" Command="{Binding StopCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Classes="action-btn" Content="{DynamicResource Action.Restart}" Command="{Binding RestartCommand}" IsEnabled="{Binding !IsBusy}" />
+                        <Button Classes="danger action-btn" Content="{DynamicResource Action.ForceKill}" Command="{Binding KillCommand}" IsEnabled="{Binding !IsBusy}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Classes="subtle" Content="{DynamicResource Dashboard.Start.WithBackup}"
+                                Command="{Binding StartWithBackupCommand}"
+                                IsEnabled="{Binding !IsBusy}" />
                         <Button Classes="subtle" Content="{DynamicResource Dashboard.OpenServerDir}"
                                 Command="{Binding OpenServerDirCommand}"
                                 IsEnabled="{Binding CanOpenServerDir}" />
@@ -154,7 +157,10 @@
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding HostRamPercent}" Height="6" Margin="0,4,0,0" />
                             </StackPanel>
                         </Grid>
-                        <TextBlock Classes="body muted" Text="{Binding DiskDisplay}" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="body muted" Text="{Binding DiskDisplay}" />
+                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding DiskUsedPercent}" Height="6" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
