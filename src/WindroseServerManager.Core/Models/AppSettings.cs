@@ -56,4 +56,10 @@ public sealed class AppSettings
     // Nexus Mods — nur noch zum Konstruieren von "Auf Nexus öffnen"-URLs. Kein API-Key, kein API-Call.
     /// <summary>Nexus-Domain-Name des Spiels (für URL-Konstruktion). Windrose = "windrose".</summary>
     public string NexusGameDomain { get; set; } = "windrose";
+
+    // WindrosePlus (v1.2)
+    /// <summary>Per-server opt-in for WindrosePlus. Key = server InstallDir (full path, normalized). Default: missing = opted out.</summary>
+    public Dictionary<string, bool> WindrosePlusActiveByServer { get; set; } = new();
+    /// <summary>Per-server WindrosePlus version tag most recently installed. Key = server InstallDir (full path, normalized).</summary>
+    public Dictionary<string, string> WindrosePlusVersionByServer { get; set; } = new();
 }

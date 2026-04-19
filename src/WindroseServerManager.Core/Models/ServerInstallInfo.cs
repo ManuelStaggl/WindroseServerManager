@@ -5,8 +5,10 @@ public sealed record ServerInstallInfo(
     string InstallDir,
     string? BuildId,
     long SizeBytes,
-    DateTime? LastUpdatedUtc)
+    DateTime? LastUpdatedUtc,
+    bool WindrosePlusActive = false,
+    string? WindrosePlusVersionTag = null)
 {
     public static ServerInstallInfo NotInstalled(string installDir) =>
-        new(false, installDir, null, 0, null);
+        new(false, installDir, null, 0, null, false, null);
 }

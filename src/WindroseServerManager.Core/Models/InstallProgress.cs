@@ -9,6 +9,13 @@ public enum InstallPhase
     Validating,
     Complete,
     Failed,
+    FetchingRelease,
+    DownloadingArchive,
+    VerifyingDigest,
+    Extracting,
+    Installing,
+    WritingMarker,
+    CleaningUp,
 }
 
 public sealed record InstallProgress(
