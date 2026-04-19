@@ -42,21 +42,21 @@ created: 2026-04-19
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
 | 08-01-T1 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build src/WindroseServerManager.Core` | ✅ | ✅ green |
 | 08-01-T2 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build tests/WindroseServerManager.Core.Tests` | ✅ | ✅ green |
-| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_ParsesTagAndDigest` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_AcceptsMissingDigest_WithWarning` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_UsesCache_WhenApiUnreachable_AndCacheExists` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_ThrowsOfflineInstallException_WhenNoCache` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_ThrowsShaMismatch_WhenArchiveModified` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_IsAtomic_TempDirFailure_DoesNotTouchServerDir` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_PreservesExistingUserConfig` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_OverwritesVendorBinaries` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_WritesVersionMarker` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-03 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_CopiesLicenseToServerDir` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_OptedOut_ReturnsExe` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_ReturnsBat` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_BatMissing_FallsBackWithWarning` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
+| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_ParsesTagAndDigest` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_AcceptsMissingDigest_WithWarning` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_UsesCache_WhenApiUnreachable_AndCacheExists` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_ThrowsOfflineInstallException_WhenNoCache` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_ThrowsShaMismatch_WhenArchiveModified` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_IsAtomic_TempDirFailure_DoesNotTouchServerDir` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_PreservesExistingUserConfig` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_OverwritesVendorBinaries` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-02 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_WritesVersionMarker` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-03 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_CopiesLicenseToServerDir` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_OptedOut_ReturnsExe` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_ReturnsBat` | ✅ | ✅ green |
+| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_BatMissing_FallsBackWithWarning` | ✅ | ✅ green |
 | 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~AppSettingsTests.WindrosePlusActive_RoundTrip` | ✅ | ✅ green |
-| 08-02-T1 | 08-02 | 1 | WPLUS-01..04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests` | ✅ | ⬜ pending (flips all 13 ⬜ above to ✅) |
+| 08-02-T1 | 08-02 | 1 | WPLUS-01..04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests` | ✅ | ✅ green (13/13 green, 0 skipped) |
 | 08-03-T1 | 08-03 | 2 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~ServerProcessServiceLauncherTests` | ❌ (created in Plan 03) | ⬜ pending |
 | 08-03-T2 | 08-03 | 2 | WPLUS-03 | compile | `dotnet build src/WindroseServerManager.App` | N/A (UI integration) | ⬜ pending |
 | 08-03-T3 | 08-03 | 2 | WPLUS-03 | manual | See 08-VALIDATION.md §Manual-Only Verifications | N/A | ⬜ pending (human gate) |

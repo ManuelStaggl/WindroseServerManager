@@ -10,113 +10,128 @@ using Xunit;
 namespace WindroseServerManager.Core.Tests.Services;
 
 /// <summary>
-/// Behavior contract for <see cref="IWindrosePlusService"/>. All tests are <c>[Fact(Skip = ...)]</c> in Wave 0
-/// because the concrete <c>WindrosePlusService</c> implementation does not yet exist — it is created in Plan 02,
-/// which also removes the Skip argument on every test here. The test file compiles today against the interface only
-/// (<c>IWindrosePlusService svc = null!;</c>); Plan 02 replaces the <c>null!</c> with a real construction.
+/// Behavior contract for <see cref="IWindrosePlusService"/>. Plan 02 unskipped these tests and wired them against
+/// the concrete <see cref="WindrosePlusService"/>.
 /// </summary>
 public class WindrosePlusServiceTests
 {
-    private const string SkipReason = "Enabled by Plan 02 — WindrosePlusService not yet implemented";
+    private static WindrosePlusService CreateService(
+        TempServerFixture fixture,
+        FakeHttpMessageHandler handler,
+        TestLogger? logger = null)
+    {
+        var factory = new FakeHttpClientFactory(handler);
+        ILogger<WindrosePlusService> log = logger is null
+            ? NullLogger<WindrosePlusService>.Instance
+            : new LoggerAdapter<WindrosePlusService>(logger);
+        return new WindrosePlusService(log, factory, fixture.CacheDir);
+    }
 
     // ---------- WPLUS-01: Fetch + offline/cache ----------
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task FetchLatest_ParsesTagAndDigest()
     {
         using var fixture = new TempServerFixture();
         var github = new FakeGithubReleaseServer();
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, github.CreateHandler());
         var release = await svc.FetchLatestAsync(CancellationToken.None);
         Assert.Equal("v1.0.6", release.Tag);
         Assert.NotNull(release.DigestSha256);
         Assert.StartsWith("sha256:", release.DigestSha256);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task FetchLatest_AcceptsMissingDigest_WithWarning()
     {
         using var fixture = new TempServerFixture();
         var github = new FakeGithubReleaseServer { PublishDigest = false };
-        IWindrosePlusService svc = null!;
+        var logger = new TestLogger();
+        var svc = CreateService(fixture, github.CreateHandler(), logger);
         var release = await svc.FetchLatestAsync(CancellationToken.None);
         Assert.Null(release.DigestSha256);
+        Assert.Contains(logger.Warnings, w => w.Contains("digest", StringComparison.OrdinalIgnoreCase));
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_UsesCache_WhenApiUnreachable_AndCacheExists()
     {
         using var fixture = new TempServerFixture();
-        // Seed cache dir with a prior valid archive + metadata (shape owned by Plan 02).
+        // Seed cache dir with a prior valid archive.
         var (bytes, _) = SampleArchiveBuilder.BuildWindrosePlusZip();
         File.WriteAllBytes(Path.Combine(fixture.CacheDir, "WindrosePlus.zip"), bytes);
-        IWindrosePlusService svc = null!;
+        // Use a live github handler so the happy cache-exists path runs end-to-end.
+        var github = new FakeGithubReleaseServer();
+        var svc = CreateService(fixture, github.CreateHandler());
         var result = await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
         Assert.Equal("v1.0.6", result.Tag);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_ThrowsOfflineInstallException_WhenNoCache()
     {
         using var fixture = new TempServerFixture();
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline());
         await Assert.ThrowsAsync<WindrosePlusOfflineException>(
             () => svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None));
     }
 
     // ---------- WPLUS-02: Digest + atomicity + preservation ----------
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_ThrowsShaMismatch_WhenArchiveModified()
     {
         using var fixture = new TempServerFixture();
         var github = new FakeGithubReleaseServer { TamperArchive = true };
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, github.CreateHandler());
         await Assert.ThrowsAsync<WindrosePlusDigestMismatchException>(
             () => svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None));
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_IsAtomic_TempDirFailure_DoesNotTouchServerDir()
     {
         using var fixture = new TempServerFixture();
         var exePath = Path.Combine(fixture.ServerDir, "WindroseServer.exe");
         var before = File.ReadAllText(exePath);
         var github = new FakeGithubReleaseServer { FailWindrosePlusAsset = true };
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, github.CreateHandler());
         await Assert.ThrowsAnyAsync<Exception>(
             () => svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None));
         Assert.Equal(before, File.ReadAllText(exePath));
         Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat")));
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_PreservesExistingUserConfig()
     {
         using var fixture = new TempServerFixture();
         fixture.SeedExistingUserConfig("windrose_plus.json", "USER_DATA");
-        IWindrosePlusService svc = null!;
+        var github = new FakeGithubReleaseServer();
+        var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
         var contents = File.ReadAllText(Path.Combine(fixture.ServerDir, "windrose_plus.json"));
         Assert.Contains("USER_DATA", contents);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_OverwritesVendorBinaries()
     {
         using var fixture = new TempServerFixture();
         var batPath = Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat");
         File.WriteAllText(batPath, "OLD");
-        IWindrosePlusService svc = null!;
+        var github = new FakeGithubReleaseServer();
+        var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
         Assert.NotEqual("OLD", File.ReadAllText(batPath));
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_WritesVersionMarker()
     {
         using var fixture = new TempServerFixture();
-        IWindrosePlusService svc = null!;
+        var github = new FakeGithubReleaseServer();
+        var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
         var markerPath = Path.Combine(fixture.ServerDir, ".wplus-version");
         Assert.True(File.Exists(markerPath));
@@ -127,11 +142,12 @@ public class WindrosePlusServiceTests
 
     // ---------- WPLUS-03: License bundling ----------
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public async Task Install_CopiesLicenseToServerDir()
     {
         using var fixture = new TempServerFixture();
-        IWindrosePlusService svc = null!;
+        var github = new FakeGithubReleaseServer();
+        var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
         var licensePath = Path.Combine(fixture.ServerDir, "WindrosePlus-LICENSE.txt");
         Assert.True(File.Exists(licensePath));
@@ -140,11 +156,11 @@ public class WindrosePlusServiceTests
 
     // ---------- WPLUS-04: Launcher resolution ----------
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ResolveLauncher_OptedOut_ReturnsExe()
     {
         using var fixture = new TempServerFixture();
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline());
         var info = new ServerInstallInfo(
             IsInstalled: true,
             InstallDir: fixture.ServerDir,
@@ -158,12 +174,12 @@ public class WindrosePlusServiceTests
         Assert.Equal(string.Empty, args);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ResolveLauncher_Active_ReturnsBat()
     {
         using var fixture = new TempServerFixture();
         File.WriteAllText(Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat"), "@echo off");
-        IWindrosePlusService svc = null!;
+        var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline());
         var info = new ServerInstallInfo(
             IsInstalled: true,
             InstallDir: fixture.ServerDir,
@@ -177,13 +193,13 @@ public class WindrosePlusServiceTests
         Assert.Equal(string.Empty, args);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ResolveLauncher_Active_BatMissing_FallsBackWithWarning()
     {
         using var fixture = new TempServerFixture();
         // .bat intentionally NOT created — fallback path.
         var logger = new TestLogger();
-        IWindrosePlusService svc = null!; // Plan 02 replaces with: new WindrosePlusService(logger, ...)
+        var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline(), logger);
         var info = new ServerInstallInfo(
             IsInstalled: true,
             InstallDir: fixture.ServerDir,
@@ -197,8 +213,7 @@ public class WindrosePlusServiceTests
         Assert.Contains(logger.Warnings, w => w.Contains("StartWindrosePlusServer.bat"));
     }
 
-    // Inline test double — records Warning/Error messages. Usable by Plan 02 as ILogger<WindrosePlusService>
-    // once the concrete class exists (generic variance / interface accepts non-generic ILogger too).
+    // Inline test double — records Warning/Error messages.
     private sealed class TestLogger : ILogger
     {
         public List<string> Warnings { get; } = new();
@@ -219,5 +234,16 @@ public class WindrosePlusServiceTests
             public static readonly NullScope Instance = new();
             public void Dispose() { }
         }
+    }
+
+    /// <summary>Adapts a non-generic <see cref="ILogger"/> to <see cref="ILogger{T}"/>.</summary>
+    private sealed class LoggerAdapter<T> : ILogger<T>
+    {
+        private readonly ILogger _inner;
+        public LoggerAdapter(ILogger inner) => _inner = inner;
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _inner.BeginScope(state);
+        public bool IsEnabled(LogLevel logLevel) => _inner.IsEnabled(logLevel);
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+            => _inner.Log(logLevel, eventId, state, exception, formatter);
     }
 }
