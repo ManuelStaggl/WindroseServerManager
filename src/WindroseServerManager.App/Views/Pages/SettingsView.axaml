@@ -119,6 +119,28 @@
                 </StackPanel>
             </Border>
 
+            <!-- ==================== WINDROSEPLUS ==================== -->
+            <Border Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.WindrosePlus.Title}" />
+                    <TextBlock Classes="caption"
+                               TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.WindrosePlus.Hint}" />
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Classes="body"
+                                   VerticalAlignment="Center"
+                                   Text="{DynamicResource Settings.WindrosePlus.StatusLabel}" />
+                        <TextBlock Classes="caption"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                                   Text="{Binding WindrosePlusStatusText}" />
+                    </StackPanel>
+                    <Button Content="{DynamicResource Settings.WindrosePlus.ManageButton}"
+                            Command="{Binding OpenWindrosePlusDialogCommand}"
+                            IsEnabled="{Binding HasServerConfigured}" />
+                </StackPanel>
+            </Border>
+
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button Classes="primary" Content="{DynamicResource Action.Save}" Command="{Binding SaveCommand}" />
             </StackPanel>

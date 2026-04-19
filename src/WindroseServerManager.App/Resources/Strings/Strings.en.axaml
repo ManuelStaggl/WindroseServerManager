@@ -267,6 +267,14 @@
     <sys:String x:Key="Settings.AutoStart.Title">Autostart</sys:String>
     <sys:String x:Key="Settings.AutoStart.Label">Run Windrose Server Manager at Windows startup</sys:String>
     <sys:String x:Key="Settings.AutoStart.Hint">Adds an entry to HKCU\Software\Microsoft\Windows\CurrentVersion\Run.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Title">WindrosePlus</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Hint">WindrosePlus extends your server with player list, kick &amp; ban, broadcast, and more.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.StatusLabel">Status:</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.StatusActive">Active</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.StatusOptedOut">Not installed (declined)</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.StatusNotInstalled">Not installed</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.StatusNoServer">No server configured</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.ManageButton">Install / manage WindrosePlus</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Title">App updates</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Hint">Checks GitHub for a newer version of Windrose Server Manager. Automatic every 6 hours.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.CheckNow">Check for update now</sys:String>

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.Views.Dialogs;
+using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
@@ -23,6 +24,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly IAutoStartService _autoStart;
     private readonly IAppUpdateService _appUpdate;
     private readonly ILocalizationService _localization;
+    private readonly IWindrosePlusService _wplus;
 
     [ObservableProperty] private bool _autoRestartOnCrash;
     [ObservableProperty] private int _gracefulShutdownSeconds;
@@ -64,7 +66,8 @@ public partial class SettingsViewModel : ViewModelBase
         IFirewallService firewall,
         IAutoStartService autoStart,
         IAppUpdateService appUpdate,
-        ILocalizationService localization)
+        ILocalizationService localization,
+        IWindrosePlusService wplus)
     {
         _settings = settings;
         _toasts = toasts;
@@ -72,6 +75,7 @@ public partial class SettingsViewModel : ViewModelBase
         _autoStart = autoStart;
         _appUpdate = appUpdate;
         _localization = localization;
+        _wplus = wplus;
 
         var c = settings.Current;
         _autoRestartOnCrash = c.AutoRestartOnCrash;
@@ -322,6 +326,42 @@ public partial class SettingsViewModel : ViewModelBase
             _toasts.Error(Loc.Get("Toast.ReleasePageFailed"));
             System.Diagnostics.Debug.WriteLine($"Failed to open URL {url}: {ex.Message}");
         }
+    }
+
+    // ── WindrosePlus ────────────────────────────────────────────
+    public bool HasServerConfigured =>
+        !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir);
+
+    public string WindrosePlusStatusText
+    {
+        get
+        {
+            var dir = _settings.Current.ServerInstallDir;
+            if (string.IsNullOrWhiteSpace(dir)) return Loc.Get("Settings.WindrosePlus.StatusNoServer");
+            var active = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(dir, false);
+            if (active) return Loc.Get("Settings.WindrosePlus.StatusActive");
+            var state = _settings.Current.WindrosePlusOptInStateByServer.GetValueOrDefault(dir, OptInState.NeverAsked);
+            return state == OptInState.OptedOut
+                ? Loc.Get("Settings.WindrosePlus.StatusOptedOut")
+                : Loc.Get("Settings.WindrosePlus.StatusNotInstalled");
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenWindrosePlusDialogAsync()
+    {
+        var dir = _settings.Current.ServerInstallDir;
+        if (string.IsNullOrWhiteSpace(dir)) return;
+
+        var top = Avalonia.Application.Current?.ApplicationLifetime
+            is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
+        if (top is null) return;
+
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _settings, _toasts);
+        var dialog = new RetrofitDialog { DataContext = bannerVm };
+        var confirmed = await dialog.ShowDialog<bool>(top);
+        if (confirmed)
+            OnPropertyChanged(nameof(WindrosePlusStatusText));
     }
 
     [RelayCommand]
