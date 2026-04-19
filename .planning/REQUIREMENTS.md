@@ -1,7 +1,7 @@
 # Requirements: Windrose Server Manager
 
 **Defined:** 2026-04-19
-**Last updated:** 2026-04-19 — v1.2 milestone scoped
+**Last updated:** 2026-04-19 — v1.2 milestone scoped, roadmap mapped
 **Milestone:** v1.2 — WindrosePlus Integration
 **Core Value:** One-click, end-to-end management of a Windrose dedicated server on Windows.
 
@@ -83,42 +83,40 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ## Traceability
 
-Populated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WPLUS-01 | TBD | Pending |
-| WPLUS-02 | TBD | Pending |
-| WPLUS-03 | TBD | Pending |
-| WPLUS-04 | TBD | Pending |
-| WIZARD-01 | TBD | Pending |
-| WIZARD-02 | TBD | Pending |
-| WIZARD-03 | TBD | Pending |
-| WIZARD-04 | TBD | Pending |
-| RETRO-01 | TBD | Pending |
-| RETRO-02 | TBD | Pending |
-| RETRO-03 | TBD | Pending |
-| HEALTH-01 | TBD | Pending |
-| HEALTH-02 | TBD | Pending |
-| PLAYER-01 | TBD | Pending |
-| PLAYER-02 | TBD | Pending |
-| PLAYER-03 | TBD | Pending |
-| PLAYER-04 | TBD | Pending |
-| EVENT-01 | TBD | Pending |
-| EVENT-02 | TBD | Pending |
-| EVENT-03 | TBD | Pending |
-| CHART-01 | TBD | Pending |
-| CHART-02 | TBD | Pending |
-| EDITOR-01 | TBD | Pending |
-| EDITOR-02 | TBD | Pending |
-| EDITOR-03 | TBD | Pending |
-| EMPTY-01 | TBD | Pending |
-| EMPTY-02 | TBD | Pending |
+| WPLUS-01 | 8 | Pending |
+| WPLUS-02 | 8 | Pending |
+| WPLUS-03 | 8 | Pending |
+| WPLUS-04 | 8 | Pending |
+| WIZARD-01 | 9 | Pending |
+| WIZARD-02 | 9 | Pending |
+| WIZARD-03 | 9 | Pending |
+| WIZARD-04 | 9 | Pending |
+| RETRO-01 | 9 | Pending |
+| RETRO-02 | 9 | Pending |
+| RETRO-03 | 9 | Pending |
+| HEALTH-01 | 10 | Pending |
+| HEALTH-02 | 10 | Pending |
+| PLAYER-01 | 11 | Pending |
+| PLAYER-02 | 11 | Pending |
+| PLAYER-03 | 11 | Pending |
+| PLAYER-04 | 11 | Pending |
+| EVENT-01 | 11 | Pending |
+| EVENT-02 | 11 | Pending |
+| EVENT-03 | 11 | Pending |
+| CHART-01 | 11 | Pending |
+| CHART-02 | 11 | Pending |
+| EDITOR-01 | 11 | Pending |
+| EDITOR-02 | 11 | Pending |
+| EDITOR-03 | 11 | Pending |
+| EMPTY-01 | 12 | Pending |
+| EMPTY-02 | 12 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 27 total
-- Mapped to phases: 0/27 (roadmapper pending)
+- Mapped to phases: 27/27 ✓ — no orphans, no duplicates
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 — v1.2 WindrosePlus Integration*
+*Last updated: 2026-04-19 — v1.2 WindrosePlus Integration, mapped to phases 8–12*
