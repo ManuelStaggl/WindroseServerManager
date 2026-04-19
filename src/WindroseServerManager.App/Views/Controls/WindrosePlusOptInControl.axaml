@@ -3,94 +3,106 @@
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
              x:Class="WindroseServerManager.App.Views.Controls.WindrosePlusOptInControl"
              x:DataType="vm:IWindrosePlusOptInContext">
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="10">
 
-        <!-- Feature grid: 2 columns × 3 rows = 6 tiles -->
-        <Grid RowDefinitions="Auto,Auto,Auto"
-              ColumnDefinitions="*,*"
-              RowSpacing="8"
-              ColumnSpacing="8">
+        <!-- Feature grid: 3 columns × 2 rows = 6 tiles (kompakter als 2×3) -->
+        <Grid RowDefinitions="Auto,Auto"
+              ColumnDefinitions="*,*,*"
+              RowSpacing="6"
+              ColumnSpacing="6">
 
             <!-- Tile: Players -->
             <Border Grid.Row="0" Grid.Column="0"
-                    CornerRadius="8"
-                    Padding="12"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F465;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.Players}" />
                 </StackPanel>
             </Border>
 
             <!-- Tile: Kick & Ban -->
             <Border Grid.Row="0" Grid.Column="1"
-                    CornerRadius="8"
-                    Padding="12"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F6AB;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.KickBan}" />
                 </StackPanel>
             </Border>
 
             <!-- Tile: Broadcast -->
-            <Border Grid.Row="1" Grid.Column="0"
-                    CornerRadius="8"
-                    Padding="12"
+            <Border Grid.Row="0" Grid.Column="2"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F4E2;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.Broadcast}" />
                 </StackPanel>
             </Border>
 
             <!-- Tile: Events -->
-            <Border Grid.Row="1" Grid.Column="1"
-                    CornerRadius="8"
-                    Padding="12"
+            <Border Grid.Row="1" Grid.Column="0"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F4DC;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.Events}" />
                 </StackPanel>
             </Border>
 
             <!-- Tile: Sea Chart -->
-            <Border Grid.Row="2" Grid.Column="0"
-                    CornerRadius="8"
-                    Padding="12"
+            <Border Grid.Row="1" Grid.Column="1"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F5FA;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.SeaChart}" />
                 </StackPanel>
             </Border>
 
             <!-- Tile: INI-Editor -->
-            <Border Grid.Row="2" Grid.Column="1"
-                    CornerRadius="8"
-                    Padding="12"
+            <Border Grid.Row="1" Grid.Column="2"
+                    CornerRadius="6"
+                    Padding="10 8"
                     Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                <StackPanel Spacing="6">
-                    <TextBlock FontSize="28"
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="18"
+                               VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x2699;" />
-                    <TextBlock Classes="body"
+                    <TextBlock Classes="caption"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Feature.IniEditor}" />
                 </StackPanel>
             </Border>
@@ -160,18 +172,23 @@
                 </Grid>
             </StackPanel>
 
-            <!-- Dashboard port row -->
-            <StackPanel Spacing="6">
-                <TextBlock Classes="body"
-                           Text="{DynamicResource Wizard.WindrosePlus.PortLabel}" />
-                <TextBlock Classes="body"
+            <!-- Dashboard port row (inline label + value) -->
+            <Grid ColumnDefinitions="Auto,*">
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Wizard.WindrosePlus.PortLabel}" />
+                    <TextBlock Classes="caption"
+                               Foreground="{DynamicResource BrandTextMutedBrush}"
+                               TextWrapping="Wrap"
+                               Text="{DynamicResource Wizard.WindrosePlus.PortHint}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1"
+                           Classes="body"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
                            Foreground="{DynamicResource BrandTextSecondaryBrush}"
                            Text="{Binding DashboardPort}" />
-                <TextBlock Classes="caption"
-                           Foreground="{DynamicResource BrandTextMutedBrush}"
-                           TextWrapping="Wrap"
-                           Text="{DynamicResource Wizard.WindrosePlus.PortHint}" />
-            </StackPanel>
+            </Grid>
 
             <!-- Admin Steam-ID row -->
             <StackPanel Spacing="6">
