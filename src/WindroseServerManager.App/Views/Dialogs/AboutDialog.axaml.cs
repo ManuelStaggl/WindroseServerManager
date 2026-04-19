@@ -50,24 +50,27 @@ public partial class AboutDialog : Window
 
     private async void OnShowWindrosePlusLicenseClick(object? sender, RoutedEventArgs e)
     {
+        var textBlock = this.FindControl<TextBlock>("WindrosePlusLicenseText");
+        var box = this.FindControl<Border>("WindrosePlusLicenseBox");
+        if (textBlock is null || box is null) return;
+
         try
         {
-            if (WindrosePlusLicenseText.Text is { Length: > 0 })
+            if (textBlock.Text is { Length: > 0 })
             {
-                WindrosePlusLicenseBox.IsVisible = !WindrosePlusLicenseBox.IsVisible;
+                box.IsVisible = !box.IsVisible;
                 return;
             }
             var uri = new Uri("avares://WindroseServerManager/Resources/Licenses/WindrosePlus-LICENSE.txt");
             await using var stream = AssetLoader.Open(uri);
             using var reader = new StreamReader(stream, System.Text.Encoding.UTF8);
-            WindrosePlusLicenseText.Text = await reader.ReadToEndAsync();
-            WindrosePlusLicenseBox.IsVisible = true;
+            textBlock.Text = await reader.ReadToEndAsync();
+            box.IsVisible = true;
         }
         catch (Exception ex)
         {
-            // Fallback: zeige Fehlermeldung statt den Dialog zu crashen.
-            WindrosePlusLicenseText.Text = "Failed to load license: " + ex.Message;
-            WindrosePlusLicenseBox.IsVisible = true;
+            textBlock.Text = "Failed to load license: " + ex.Message;
+            box.IsVisible = true;
         }
     }
 
