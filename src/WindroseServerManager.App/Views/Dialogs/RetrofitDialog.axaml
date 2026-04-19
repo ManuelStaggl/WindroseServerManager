@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WindroseServerManager.App.ViewModels"
+        xmlns:controls="using:WindroseServerManager.App.Views.Controls"
+        x:Class="WindroseServerManager.App.Views.Dialogs.RetrofitDialog"
+        x:DataType="vm:RetrofitBannerViewModel"
+        Width="540"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrandNavySurfaceBrush}"
+        Title="{DynamicResource Retrofit.Dialog.Title}">
+    <Border CornerRadius="8"
+            Background="{DynamicResource BrandNavySurfaceBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            Padding="24">
+        <StackPanel Spacing="20">
+
+            <TextBlock Classes="section-header" Text="{DynamicResource Retrofit.Dialog.Title}" />
+
+            <!-- Shared opt-in control (feature grid, toggle, secrets form) -->
+            <controls:WindrosePlusOptInControl />
+
+            <!-- Install progress (visible while IsInstalling) -->
+            <StackPanel IsVisible="{Binding IsInstalling}" Spacing="8">
+                <ProgressBar IsIndeterminate="True" />
+                <TextBlock Classes="caption"
+                           Text="{Binding CurrentPhase}"
+                           Foreground="{DynamicResource BrandTextMutedBrush}" />
+            </StackPanel>
+
+            <!-- Error message -->
+            <TextBlock Classes="body"
+                       Foreground="{DynamicResource BrandErrorBrush}"
+                       IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                       Text="{Binding ErrorMessage}"
+                       TextWrapping="Wrap" />
+
+            <!-- Footer buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        Margin="0,8,0,0">
+                <Button x:Name="CancelButton"
+                        Content="{DynamicResource Action.Cancel}"
+                        Click="OnCancelClick"
+                        IsEnabled="{Binding !IsInstalling}" />
+                <Button x:Name="ConfirmButton"
+                        Classes="primary"
+                        Content="{DynamicResource Retrofit.Banner.Action.Install}"
+                        Click="OnConfirmClick"
+                        IsEnabled="{Binding !IsInstalling}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
