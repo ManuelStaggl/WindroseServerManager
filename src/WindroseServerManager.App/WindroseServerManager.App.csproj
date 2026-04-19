@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Resources\Licenses\WindrosePlus-LICENSE.txt" />
   </ItemGroup>
 
   <ItemGroup>

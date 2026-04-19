@@ -459,4 +459,12 @@
     <sys:String x:Key="Toast.GroupEnabledFormat">Group enabled: {0}</sys:String>
     <sys:String x:Key="Toast.GroupDisabledFormat">Group disabled: {0}</sys:String>
     <sys:String x:Key="Toast.ModInstalledCountFormat">Installed {0} mod file(s)</sys:String>
+
+    <!-- WindrosePlus (Phase 8) -->
+    <sys:String x:Key="About.ThirdPartyLicenses.Heading">Third-Party Licenses</sys:String>
+    <sys:String x:Key="About.ThirdPartyLicenses.WindrosePlus.Intro">WindrosePlus (MIT License) — © HumanGenome. Bundles UE4SS and the WindrosePlus server mod.</sys:String>
+    <sys:String x:Key="About.WindrosePlus.RepoLink">WindrosePlus on GitHub</sys:String>
+    <sys:String x:Key="About.WindrosePlus.ShowLicense">Show license text</sys:String>
+    <sys:String x:Key="Warning.WindrosePlusBatMissing">WindrosePlus is active but StartWindrosePlusServer.bat is missing. Launching WindroseServer.exe instead.</sys:String>
+    <sys:String x:Key="Error.WindrosePlusOfflineFirstInstall">WindrosePlus cannot be installed: GitHub is unreachable and no cache is available. Please check your internet connection and try again.</sys:String>
 </ResourceDictionary>

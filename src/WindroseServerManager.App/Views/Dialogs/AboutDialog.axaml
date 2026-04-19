@@ -12,7 +12,7 @@
             BorderBrush="{DynamicResource BrandNavyBorderBrush}"
             BorderThickness="1"
             Padding="24">
-        <Grid RowDefinitions="Auto,*,Auto">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
             <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="16">
                 <Viewbox Width="48" Height="48">
                     <Canvas Width="64" Height="64">
@@ -60,7 +60,38 @@
                            Text="{DynamicResource About.Disclaimer}" />
             </StackPanel>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <StackPanel Grid.Row="2" Spacing="6" Margin="0,16,0,0">
+                <TextBlock Classes="section-header" Text="{DynamicResource About.ThirdPartyLicenses.Heading}" />
+                <TextBlock Classes="body" TextWrapping="Wrap"
+                           Text="{DynamicResource About.ThirdPartyLicenses.WindrosePlus.Intro}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Classes="subtle"
+                            Content="{DynamicResource About.WindrosePlus.RepoLink}"
+                            Tag="https://github.com/HumanGenome/WindrosePlus"
+                            Click="OnLinkClick" />
+                    <Button Classes="subtle"
+                            Content="{DynamicResource About.WindrosePlus.ShowLicense}"
+                            Click="OnShowWindrosePlusLicenseClick" />
+                </StackPanel>
+                <Border x:Name="WindrosePlusLicenseBox"
+                        IsVisible="False"
+                        CornerRadius="4"
+                        Padding="12"
+                        Margin="0,4,0,0"
+                        MaxHeight="220"
+                        Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                        BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                        BorderThickness="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="WindrosePlusLicenseText"
+                                   FontFamily="Consolas, 'Courier New', monospace"
+                                   FontSize="11"
+                                   TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                 <Button Classes="primary" Content="{DynamicResource Action.Close}" Click="OnCloseClick" />
             </StackPanel>
         </Grid>
