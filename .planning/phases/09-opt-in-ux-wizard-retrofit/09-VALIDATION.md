@@ -1,9 +1,9 @@
 ---
 phase: 9
 slug: opt-in-ux-wizard-retrofit
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: approved
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-19
 ---
 
@@ -78,4 +78,4 @@ created: 2026-04-19
 - [ ] Feedback latency < 30s
 - [ ] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-04-19 — Wave 0 test stubs integrated into Plan 09-01 (tdd=true tasks) rather than a separate wave.
