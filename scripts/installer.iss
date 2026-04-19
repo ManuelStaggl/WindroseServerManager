@@ -3,7 +3,9 @@
 ; Build: iscc.exe installer.iss
 
 #define MyAppName "Windrose Server Manager"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.1.0"
+#endif
 #define MyAppPublisher "Manuel Staggl"
 #define MyAppURL "https://github.com/ManuelStaggl/WindroseServerManager"
 #define MyAppExeName "WindroseServerManager.exe"

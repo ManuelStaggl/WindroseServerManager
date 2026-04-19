@@ -2,9 +2,9 @@
 
 **Dedicated Server Manager for [Windrose](https://store.steampowered.com/app/4129620/Windrose_Dedicated_Server/)** — a native Windows desktop app (Avalonia / .NET 9) bundling SteamCMD, server control, configuration, mods, backups, firewall rules, and update checks into a clean, modern UI.
 
-**Status: Stable · v1.0.0**
+**Status: Stable · v1.1.0**
 
-![Version](https://img.shields.io/badge/version-1.0.0-success)
+![Version](https://img.shields.io/badge/version-1.1.0-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
 ![.NET](https://img.shields.io/badge/.NET-9-512BD4)
@@ -48,10 +48,9 @@
 ### Mod Management
 - **Drag & drop** install from `.pak`, `.zip`, or `.7z` (7z via SharpCompress)
 - **Automatic grouping** — mods coming from a single archive appear as one expandable mod card
-- **Nexus Mods integration (free tier)** — add your API key once:
-  - The mod ID is extracted from the download filename and **auto-linked** during import
-  - Update check on demand: "Update!" badge when a newer version is available on Nexus
-  - "Open on Nexus" — direct browser jump
+- **Nexus page link** — the mod ID is extracted from the download filename and remembered;
+  one-click **"Open on Nexus"** jumps to the mod page in your browser. Update checks are manual
+  (visit the linked page) — the app makes no Nexus API calls.
 - **Enable / Disable** via rename (`.pak` ↔ `.pak.disabled`) — preserves side-car metadata
 - **Bulk operations**: select all, remove selected, toggle whole groups
 - **Client bundle export** — ZIP of all active mods to share with players (mods must also be installed on every client)
@@ -95,13 +94,13 @@
 ### Configuration — server and world parameters
 ![Configuration](Screenshots/04-configuration.png)
 
-### Mods — drag & drop + Nexus integration
+### Mods — drag & drop + "Open on Nexus" link
 ![Mods](Screenshots/05-mods.png)
 
 ### Backups — scheduled + safe restore
 ![Backups](Screenshots/06-backups.png)
 
-### Settings — language, firewall, autostart, Nexus API
+### Settings — language, firewall, autostart, app-update
 ![Settings](Screenshots/07-settings.png)
 
 ---
@@ -111,19 +110,19 @@
 - **Windows 10 (1809+)** or **Windows 11**
 - ~300 MB for the app + SteamCMD
 - 10–20 GB for the Windrose server itself
-- Internet access (SteamCMD downloads, optional Nexus API)
+- Internet access (for SteamCMD downloads and the app-update check)
 
 No separate .NET install required — the self-contained build ships everything.
 
 ## Install
 
 ### Option A: Installer (recommended)
-1. Download `WindroseServerManager-Setup-1.0.0.exe` from the [Releases page](https://github.com/ManuelStaggl/WindroseServerManager/releases)
+1. Download `WindroseServerManager-Setup-1.1.0.exe` from the [Releases page](https://github.com/ManuelStaggl/WindroseServerManager/releases)
 2. Run the installer, follow the prompts
 3. Launch from the Start Menu
 
 ### Option B: Portable ZIP
-1. Download `WindroseServerManager-1.0.0-portable.zip`
+1. Download `WindroseServerManager-1.1.0-portable.zip`
 2. Extract anywhere
 3. Run `WindroseServerManager.exe`
 
@@ -143,8 +142,7 @@ dotnet build src/WindroseServerManager.App
 3. **Configuration** → create a world, set a server name, roll an invite code
 4. **Server Control** → "Start"
 5. **Settings** → add firewall rule (accept admin prompt)
-6. Optional: **Settings** → enter Nexus API key for mod auto-linking
-7. Optional: **Mods** → drop `.pak` / `.zip` / `.7z` files onto the page
+6. Optional: **Mods** → drop `.pak` / `.zip` / `.7z` files onto the page
 
 ## Paths
 
@@ -158,15 +156,17 @@ dotnet build src/WindroseServerManager.App
 | Server install | user-chosen |
 | Mods | `<ServerInstallDir>\R5\Content\Paks\~mods\` |
 
-## Nexus Mods Integration
+## Nexus Mods — How linking works
 
-The app uses **only the free tier** of the Nexus API — metadata reads and update checks work with any free account. API-based mod downloads are a Nexus Premium-only feature and are **not** supported here. Admins continue to download mods manually from nexusmods.com.
+The app **does not talk to the Nexus API**. It does not store an API key, does not download mods for you, and does not poll Nexus for updates. Mods are always downloaded manually from nexusmods.com — that is the normal Nexus workflow.
 
-**Setup:**
-1. Log in at [nexusmods.com](https://www.nexusmods.com/)
-2. Open the [API Keys page](https://www.nexusmods.com/users/myaccount?tab=api) → generate a personal API key
-3. In the app, go to **Settings → Nexus Mods** and paste the key
-4. On the next ZIP import the mod ID is detected and linked automatically
+What the app *does* do:
+
+- When you drop a Nexus download archive onto the Mods page, the mod ID is extracted from the filename (Nexus's standard naming pattern: `Name-{modId}-{version}-{timestamp}.zip`) and remembered next to the installed `.pak` in a small side-car `.pak.meta.json` file.
+- A **"Open on Nexus"** button on each linked mod card jumps straight to `https://www.nexusmods.com/windrose/mods/{id}` in your browser. That's the single network touch — and it's just launching a URL.
+- You can also link any installed mod manually by pasting a Nexus URL or mod ID.
+
+To check whether a mod has an update: click "Open on Nexus" and look at the page. The app will not nag you.
 
 ## Project Layout
 
@@ -195,7 +195,7 @@ WindroseServerManager/
 
 ## Tests
 
-54 unit tests in `tests/WindroseServerManager.Core.Tests` (xUnit):
+Unit tests in `tests/WindroseServerManager.Core.Tests` (xUnit):
 
 ```powershell
 dotnet test
