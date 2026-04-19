@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
@@ -196,4 +197,21 @@ public partial class InstallationViewModel : ViewModelBase
 
     [RelayCommand]
     private void Cancel() => _cts?.Cancel();
+
+    [RelayCommand]
+    private async Task OpenNewServerWizardAsync()
+    {
+        var owner = (Avalonia.Application.Current?.ApplicationLifetime
+            as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (owner is null) return;
+
+        // Transient resolution — each wizard open gets a fresh password + fresh port probe.
+        var vm = App.Services.GetRequiredService<InstallWizardViewModel>();
+        var dialog = new Views.Dialogs.InstallWizardWindow { DataContext = vm };
+        await dialog.ShowDialog(owner);
+
+        // Refresh after close — if install succeeded, InstallInfo / BinaryPath need to update.
+        InstallDir = _settings.Current.ServerInstallDir;
+        await RefreshAsync();
+    }
 }

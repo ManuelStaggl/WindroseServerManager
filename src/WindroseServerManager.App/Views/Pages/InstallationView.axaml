@@ -18,6 +18,9 @@
                 <TextBlock Classes="caption" TextWrapping="Wrap"
                            Text="{DynamicResource Installation.PathHint}" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Classes="primary" Content="{DynamicResource Installation.NewServer}"
+                            Command="{Binding OpenNewServerWizardCommand}"
+                            IsEnabled="{Binding !IsInstalling}" />
                     <Button Classes="primary" Content="{DynamicResource Installation.InstallOrUpdate}"
                             Command="{Binding InstallCommand}"
                             IsEnabled="{Binding !IsInstalling}" />
