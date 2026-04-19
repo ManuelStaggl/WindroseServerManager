@@ -72,6 +72,7 @@ public partial class App : Application
         s.AddSingleton<IAppSettingsService, AppSettingsService>();
         s.AddSingleton<ILocalizationService, LocalizationService>();
         s.AddSingleton<ISteamCmdService, SteamCmdService>();
+        s.AddSingleton<IWindrosePlusService, WindrosePlusService>();
         s.AddSingleton<IServerInstallService, ServerInstallService>();
         s.AddSingleton<IServerProcessService, ServerProcessService>();
         s.AddSingleton<IServerConfigService, ServerConfigService>();

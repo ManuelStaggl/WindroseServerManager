@@ -12,17 +12,23 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
     private readonly ILogger<ServerProcessService> _logger;
     private readonly IAppSettingsService _settings;
     private readonly IServerEventLog _events;
+    private readonly IWindrosePlusService _windrosePlus;
     private readonly object _lock = new();
 
     private readonly ConcurrentQueue<ServerLogLine> _logBuffer = new();
     private Process? _process;
     private CancellationTokenSource? _monitorCts;
 
-    public ServerProcessService(ILogger<ServerProcessService> logger, IAppSettingsService settings, IServerEventLog events)
+    public ServerProcessService(
+        ILogger<ServerProcessService> logger,
+        IAppSettingsService settings,
+        IServerEventLog events,
+        IWindrosePlusService windrosePlus)
     {
         _logger = logger;
         _settings = settings;
         _events = events;
+        _windrosePlus = windrosePlus;
     }
 
     public ServerStatus Status { get; private set; } = ServerStatus.Stopped;
@@ -40,10 +46,16 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         var dir = _settings.Current.ServerInstallDir;
         if (string.IsNullOrWhiteSpace(dir))
             return "Server-Installationspfad ist nicht gesetzt. Erst auf der Installationsseite installieren.";
-        var exe = ServerInstallService.FindServerBinary(dir);
-        if (exe is null)
+        try
+        {
+            var info = BuildInstallInfo(dir);
+            var (_, _) = _windrosePlus.ResolveLauncher(dir, info);
+            return null;
+        }
+        catch (FileNotFoundException)
+        {
             return $"Server-Binary nicht gefunden in {dir}. Server zuerst installieren.";
-        return null;
+        }
     }
 
     public Task<bool> StartAsync(CancellationToken ct = default)
@@ -64,8 +76,9 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             }
 
             var dir = _settings.Current.ServerInstallDir;
-            var exe = ServerInstallService.FindServerBinary(dir)!;
-            var args = BuildLaunchArgs(_settings.Current);
+            var info = BuildInstallInfo(dir);
+            var (exe, wplusArgs) = _windrosePlus.ResolveLauncher(dir, info);
+            var args = CombineArgs(BuildLaunchArgs(_settings.Current), wplusArgs);
 
             var psi = new ProcessStartInfo
             {
@@ -361,6 +374,25 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         Status = next;
         try { StatusChanged?.Invoke(next); } catch (Exception ex) { _logger.LogDebug(ex, "StatusChanged handler threw"); }
     }
+
+    private ServerInstallInfo BuildInstallInfo(string dir)
+    {
+        var s = _settings.Current;
+        var key = string.IsNullOrWhiteSpace(dir) ? "" : Path.GetFullPath(dir);
+        var active = s.WindrosePlusActiveByServer.TryGetValue(key, out var a) && a;
+        var tag = s.WindrosePlusVersionByServer.TryGetValue(key, out var t) ? t : null;
+        return new ServerInstallInfo(
+            IsInstalled: !string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir),
+            InstallDir: dir,
+            BuildId: null,
+            SizeBytes: 0,
+            LastUpdatedUtc: null,
+            WindrosePlusActive: active,
+            WindrosePlusVersionTag: tag);
+    }
+
+    private static string CombineArgs(string a, string b) =>
+        string.IsNullOrWhiteSpace(b) ? a : (string.IsNullOrWhiteSpace(a) ? b : a + " " + b);
 
     private static string BuildLaunchArgs(AppSettings s)
     {
