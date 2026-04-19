@@ -1,85 +1,124 @@
 # Requirements: Windrose Server Manager
 
 **Defined:** 2026-04-19
-**Last updated:** 2026-04-19 — v1.1 scope pivot (API removal instead of SSO)
-**Milestone:** v1.1 — Nexus API Removal
+**Last updated:** 2026-04-19 — v1.2 milestone scoped
+**Milestone:** v1.2 — WindrosePlus Integration
 **Core Value:** One-click, end-to-end management of a Windrose dedicated server on Windows.
 
-## v1.1 Scope Rationale
+## v1.2 Scope Rationale
 
-v1.0 used personal Nexus API keys in the Mods feature, which violated Nexus's policy for third-party tools and caused mod #29 to be quarantined. Rather than migrating to Nexus SSO (which requires a formal app registration and introduces auth/token/migration complexity for a convenience-only feature), v1.1 **removes the Nexus API integration entirely**. Mod management continues to work fully offline; Nexus is referenced only via direct page links that the user can click.
+Windrose has no native admin features (no RCON, no A2S response, no admin console). HumanGenome/WindrosePlus (MIT, UE4SS-based) is the only path to kick/ban/broadcast, events, player positions, and config tuning. v1.2 bundles WindrosePlus as a default-on, opt-out-capable dependency and builds the native Windows client UX around it. Fetch-on-install via GitHub Releases API keeps us off a bundled-snapshot maintenance treadmill.
 
-## v1.1 Requirements
+## v1.2 Requirements
 
-### Nexus API Removal
+### Bootstrap (WindrosePlus packaging)
 
-- [ ] **API-RM-01**: `NexusClient` and all Nexus HTTP/API calls are removed from the codebase
-- [ ] **API-RM-02**: `NexusModInfo` and any API-response models are removed
-- [ ] **API-RM-03**: Personal API key field is removed from Settings UI and `AppSettings` model
-- [ ] **API-RM-04**: Update-check logic (compare local vs Nexus latest) is removed from `ModService` and all ViewModels — no "update available" badges remain
-- [ ] **API-RM-05**: Thumbnail download/display for mods is removed; UI falls back to a generic mod icon
-- [ ] **API-RM-06**: "Open on Nexus" button on each mod constructs `https://www.nexusmods.com/windrose/mods/{NexusModId}` and launches the system browser — no API call
-- [ ] **API-RM-07**: `LinkNexusDialog` is simplified to a ModId input only (no API fetch, no preview) — or removed if ModId is captured during mod-add instead
-- [ ] **API-RM-08**: `NexusUrlParser` is retained (static URL → ModId parsing, no network)
-- [ ] **API-RM-09**: On first v1.1 launch, any previously stored API key in settings is silently cleared from disk — no user-facing migration dialog
-- [ ] **API-RM-10**: README and in-app help text no longer mention API keys, Nexus account linking, or update checks
+- [ ] **WPLUS-01**: App fetches the latest WindrosePlus release from GitHub Releases API and caches the archive locally as offline-install fallback
+- [ ] **WPLUS-02**: WindrosePlus install extracts into the active server's game-binaries directory and produces a working UE4SS + WindrosePlus payload
+- [ ] **WPLUS-03**: WindrosePlus LICENSE (MIT, HumanGenome) is bundled with the install and shown in the About dialog; name "WindrosePlus" is never rebranded
+- [ ] **WPLUS-04**: On server launch, app uses `StartWindrosePlusServer.bat` when WindrosePlus is active and `WindroseServer.exe` when the server has opted out
 
-### Release
+### Install Wizard
 
-- [ ] **REL-01**: v1.1 binary is built and uploaded to Nexus mod #29 with an updated changelog
-- [ ] **REL-02**: README on GitHub and description on Nexus are updated — no API-key instructions, no update-check claims, new "Open on Nexus" workflow documented
-- [ ] **REL-03**: Nexus moderators confirm the quarantine is lifted and mod #29 is publicly visible and downloadable again
+- [ ] **WIZARD-01**: New-server wizard includes a WindrosePlus step listing features gained (Kick/Ban/Broadcast/Events/Chart/INI-Editor) with a link to the WindrosePlus GitHub
+- [ ] **WIZARD-02**: WindrosePlus is default-on in the wizard; user can opt-out with one click
+- [ ] **WIZARD-03**: Wizard sets a secure random RCON password and captures the admin Steam-ID on confirmation
+- [ ] **WIZARD-04**: Wizard picks a free local port for the WindrosePlus dashboard (no fixed port, supports multi-instance users)
 
-## v1.2 Requirements (deferred)
+### Retrofit (existing servers from v1.0/v1.1)
 
-### Player Management (blocked on HumanGenome/WindrosePlus response)
+- [ ] **RETRO-01**: First launch after upgrading to v1.2 detects per server whether WindrosePlus is installed
+- [ ] **RETRO-02**: For servers without WindrosePlus, a non-modal dialog offers installation with feature list + opt-out; the choice persists per server
+- [ ] **RETRO-03**: Retrofit never installs silently; user must explicitly confirm
 
-- **PLAYER-01**: WindrosePlus is offered as default-on in the server install wizard with clear opt-out
-- **PLAYER-02**: Fetch-on-install via GitHub Releases API with local cache fallback
-- **PLAYER-03**: Retrofit dialog detects v1.0 servers without WindrosePlus and offers installation
-- **PLAYER-04**: Live player list with name, Steam-ID, alive state, online time
-- **PLAYER-05**: Kick / Ban / Broadcast actions via WindrosePlus HTTP commands
-- **PLAYER-06**: Events history (join/leave) from `events.log` with FileSystemWatcher
-- **PLAYER-07**: Clean empty states for all WindrosePlus-dependent views when opt-out is active
-- **PLAYER-08**: Health-check banner when WindrosePlus is incompatible with current Windrose version
-- **PLAYER-09**: "Report to WindrosePlus" button routes bugs upstream with prefilled GitHub issue template
+### Health & Support
 
-## Out of Scope (v1.1)
+- [ ] **HEALTH-01**: App polls the WindrosePlus HTTP dashboard after server start and shows an inline banner if the endpoint does not respond
+- [ ] **HEALTH-02**: The incompat banner offers a "Report to WindrosePlus" button that opens a prefilled GitHub issue (Windrose version, WindrosePlus version, server log tail)
+
+### Player Management
+
+- [ ] **PLAYER-01**: Players view lists all currently connected players with name, Steam-ID, alive state, session duration; refreshes on a configurable interval
+- [ ] **PLAYER-02**: User can kick a selected player with a confirmation dialog
+- [ ] **PLAYER-03**: User can ban a selected player (permanent or timed) with a confirmation dialog
+- [ ] **PLAYER-04**: User can broadcast a chat message to all connected players via a single input field
+
+### Events History
+
+- [ ] **EVENT-01**: Events view streams join/leave records from WindrosePlus `events.log` live (FileSystemWatcher)
+- [ ] **EVENT-02**: Events can be searched and filtered by player name, Steam-ID, and event type
+- [ ] **EVENT-03**: Events view paginates or virtualizes for >1000 entries (no UI freeze)
+
+### Sea-Chart Viewer
+
+- [ ] **CHART-01**: Sea-chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`
+- [ ] **CHART-02**: Clicking a player marker opens a popover with name, Steam-ID, alive state, ship info (if available)
+
+### Multiplier / INI Editor
+
+- [ ] **EDITOR-01**: Editor lists all WindrosePlus-exposed settings (spawn multipliers, loot rates, etc.) grouped by category
+- [ ] **EDITOR-02**: Editor validates values against the WindrosePlus config schema before save; invalid values show inline errors
+- [ ] **EDITOR-03**: Save writes the WindrosePlus config file and, if the server is running, notifies the user that a restart is needed
+
+### Empty States (opt-out UX)
+
+- [ ] **EMPTY-01**: Players / Events / Chart / Editor views each render a dedicated empty state with explanation + "Install WindrosePlus" CTA when the current server has opted out
+- [ ] **EMPTY-02**: Empty-state CTA triggers the retrofit flow (RETRO-02) without requiring a restart
+
+## Future Requirements (v1.3+)
+
+- **UPGRADE-01**: Background check for new WindrosePlus upstream releases with user-confirmed upgrade
+- **MULTI-01**: Multi-server management in a single window
+
+## Out of Scope (v1.2)
 
 | Feature | Reason |
 |---------|--------|
-| Nexus SSO integration | API removed entirely — no auth needed |
-| App registration with Nexus | Not required without API usage |
-| Automatic mod update checks | Requires API — explicitly removed; user checks Nexus pages manually |
-| Mod thumbnails / metadata in-app | Requires API — explicitly removed |
+| Automatic WindrosePlus version bumps | User-triggered only in v1.2; background upgrade UX is v1.3 |
+| SteamCMD-based WindrosePlus install | Upstream distributes via GitHub Releases only |
+| Rebranding WindrosePlus in UI | MIT attribution preserves upstream name |
+| Reporting WindrosePlus bugs through our GitHub | Routed directly to HumanGenome via HEALTH-02 button |
+| Linux/macOS support | Windrose server is Windows-only |
 | Web/remote UI | Native desktop positioning |
-| Linux/macOS | Windrose server is Windows-only |
-| Multi-server management | Single-server focus in v1.x |
-| Custom mod hosting | Nexus remains the ecosystem; we just link to it |
-| Sea chart / multiplier editor / INI editor | v1.3+ |
 
 ## Traceability
 
+Populated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-RM-01 | Phase 6 | Pending |
-| API-RM-02 | Phase 6 | Pending |
-| API-RM-03 | Phase 6 | Pending |
-| API-RM-04 | Phase 6 | Pending |
-| API-RM-05 | Phase 6 | Pending |
-| API-RM-06 | Phase 6 | Pending |
-| API-RM-07 | Phase 6 | Pending |
-| API-RM-08 | Phase 6 | Pending |
-| API-RM-09 | Phase 6 | Pending |
-| API-RM-10 | Phase 6 | Pending |
-| REL-01 | Phase 7 | Pending |
-| REL-02 | Phase 7 | Pending |
-| REL-03 | Phase 7 | Pending |
+| WPLUS-01 | TBD | Pending |
+| WPLUS-02 | TBD | Pending |
+| WPLUS-03 | TBD | Pending |
+| WPLUS-04 | TBD | Pending |
+| WIZARD-01 | TBD | Pending |
+| WIZARD-02 | TBD | Pending |
+| WIZARD-03 | TBD | Pending |
+| WIZARD-04 | TBD | Pending |
+| RETRO-01 | TBD | Pending |
+| RETRO-02 | TBD | Pending |
+| RETRO-03 | TBD | Pending |
+| HEALTH-01 | TBD | Pending |
+| HEALTH-02 | TBD | Pending |
+| PLAYER-01 | TBD | Pending |
+| PLAYER-02 | TBD | Pending |
+| PLAYER-03 | TBD | Pending |
+| PLAYER-04 | TBD | Pending |
+| EVENT-01 | TBD | Pending |
+| EVENT-02 | TBD | Pending |
+| EVENT-03 | TBD | Pending |
+| CHART-01 | TBD | Pending |
+| CHART-02 | TBD | Pending |
+| EDITOR-01 | TBD | Pending |
+| EDITOR-02 | TBD | Pending |
+| EDITOR-03 | TBD | Pending |
+| EMPTY-01 | TBD | Pending |
+| EMPTY-02 | TBD | Pending |
 
 **Coverage:**
-- v1.1 requirements: 13 total
-- Mapped to phases: 13/13 ✓
+- v1.2 requirements: 27 total
+- Mapped to phases: 0/27 (roadmapper pending)
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 — scope pivot from SSO to API removal*
+*Last updated: 2026-04-19 — v1.2 WindrosePlus Integration*
