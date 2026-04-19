@@ -28,8 +28,8 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 ### Retrofit (existing servers from v1.0/v1.1)
 
 - [x] **RETRO-01**: First launch after upgrading to v1.2 detects per server whether WindrosePlus is installed
-- [ ] **RETRO-02**: For servers without WindrosePlus, a non-modal dialog offers installation with feature list + opt-out; the choice persists per server
-- [ ] **RETRO-03**: Retrofit never installs silently; user must explicitly confirm
+- [x] **RETRO-02**: For servers without WindrosePlus, a non-modal dialog offers installation with feature list + opt-out; the choice persists per server
+- [x] **RETRO-03**: Retrofit never installs silently; user must explicitly confirm
 
 ### Health & Support
 

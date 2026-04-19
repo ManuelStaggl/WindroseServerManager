@@ -14,7 +14,8 @@ Unlock player-management, events, sea-chart, and config-editor features by bundl
 
 - [x] **Phase 8: WindrosePlus Bootstrap** — Fetch, install, license-bundle, and launcher-switch infrastructure (shared `WindrosePlusService`)
  (completed 2026-04-19)
-- [ ] **Phase 9: Opt-in UX (Wizard + Retrofit)** — New-server wizard step and retrofit dialog for v1.0/v1.1 servers
+- [x] **Phase 9: Opt-in UX (Wizard + Retrofit)** — New-server wizard step and retrofit dialog for v1.0/v1.1 servers
+ (completed 2026-04-19)
 - [ ] **Phase 10: Health & Support** — Dashboard health-check banner + "Report to WindrosePlus" issue helper
 - [ ] **Phase 11: Feature Views** — Players, Events, Sea-Chart, and INI/Multiplier editor built on the WindrosePlus HTTP/log surface
 - [ ] **Phase 12: Empty States (Opt-out UX)** — Dedicated empty states with install CTAs in every WindrosePlus-dependent view
@@ -46,12 +47,12 @@ Plans:
   2. On wizard confirmation, the app generates a secure random RCON password, captures the admin Steam-ID, and picks a free local port for the WindrosePlus dashboard (no hardcoded port)
   3. First launch of v1.2 detects per existing server whether WindrosePlus is installed; servers without it are offered a non-modal retrofit dialog with the same feature list and opt-out
   4. The retrofit choice persists per server across restarts; no server is ever upgraded silently — explicit confirmation is required every time
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 09-01-PLAN.md — Wave 1: foundation — OptInState enum, AppSettings + ServerInstallInfo extensions, RCON/SteamID/FreePort helpers, opt-in migration + Wave-0 xUnit tests
 - [x] 09-02-PLAN.md — Wave 2: InstallWizardWindow (3-step) + shared WindrosePlusOptInControl + InstallWizardViewModel + "New server" entry point + bilingual strings
-- [ ] 09-03-PLAN.md — Wave 3: Retrofit banner on DashboardView + RetrofitDialog reusing WindrosePlusOptInControl (RETRO-02/03)
+- [x] 09-03-PLAN.md — Wave 3: Retrofit banner on DashboardView + RetrofitDialog reusing WindrosePlusOptInControl (RETRO-02/03)
 
 ### Phase 10: Health & Support
 **Goal:** When WindrosePlus is active but misbehaves (e.g. after a Windrose upstream update breaks the UE4SS hook), the user sees what's wrong and can report it upstream in one click.
@@ -87,7 +88,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
-| 9. Opt-in UX (Wizard + Retrofit) | 2/3 | In Progress|  |
+| 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
 | 10. Health & Support | 0/0 | Not started | — |
 | 11. Feature Views | 0/0 | Not started | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |

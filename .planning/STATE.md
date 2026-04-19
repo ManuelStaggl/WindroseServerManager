@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-04-19T19:00:00Z"
-last_activity: 2026-04-19 — Plan 09-02 executed (2 feat + 5 fix commits, wizard smoke-tested, WIZARD-01/02 complete)
+last_updated: "2026-04-19T21:00:00Z"
+last_activity: 2026-04-19 — Plan 09-03 executed (3 feat commits, retrofit banner + dialog smoke-tested, RETRO-02/03 complete)
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 9 — Opt-in UX (Wizard + Retrofit)
-Plan: 03 — next (retrofit dialog); Plans 01 + 02 complete
-Status: Phase 9 wizard complete — InstallWizardWindow + WindrosePlusOptInControl + IWindrosePlusOptInContext shipped
-Last activity: 2026-04-19 — Plan 09-02 executed (2 feat + 5 fix commits, wizard smoke-tested, WIZARD-01/02 complete)
+Plan: 03 — COMPLETE; all 3 plans done
+Status: Phase 9 complete — retrofit banner + dialog shipped (RetrofitBannerViewModel, RetrofitDialog, DashboardView integration, Settings WP card). RETRO-02/03 + all WIZARD-01..04 + RETRO-01 satisfied.
+Last activity: 2026-04-19 — Plan 09-03 executed (3 feat commits, retrofit banner + dialog smoke-tested, RETRO-02/03 complete)
 
 ## Project Reference
 
@@ -35,7 +35,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 | Phase | Status |
 |-------|--------|
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
-| 9. Opt-in UX (Wizard + Retrofit) | 🟦 In progress — Plan 01 complete (foundation: data model + helpers + migration). Plans 02 (wizard) + 03 (retrofit) pending. WIZARD-03/04 + RETRO-01 satisfied. |
+| 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
 | 10. Health & Support | Not started |
 | 11. Feature Views | Not started |
 | 12. Empty States (Opt-out UX) | Not started |
@@ -97,10 +97,18 @@ v1.2 scope decisions:
 - Retrofit.* string keys (`Retrofit.Banner.Title`, `Retrofit.Banner.Body`, `Retrofit.Banner.Action.Install/Later`, `Retrofit.Dialog.Title`) ship in Plan 02 — Plan 03 reuses without adding new string keys
 - `AddTransient<InstallWizardViewModel>` in DI — each wizard open resolves fresh instance with new RCON password + port probe; Singleton would share stale state across opens
 
+## Decisions (Plan 09-03)
+
+- `RetrofitBannerViewModel` is NOT registered in DI — takes `string serverInstallDir` at construction time; DashboardViewModel creates it via `new` using its own injected services (IWindrosePlusService, IAppSettingsService, IToastService)
+- `StateChanged` C# event on RetrofitBannerViewModel triggers `DashboardViewModel.RefreshAsync` on dismiss/install-complete — avoids timer-lag between user action and banner disappearance; no MediatR needed (local scope, single subscriber)
+- Dialog cancel leaves `OptInState=NeverAsked` (banner reappears next refresh); only `ShowDialog<bool>(true)` result proceeds to InstallAsync — no silent persist on cancel (RETRO-03)
+- No close-X on banner (RETRO-03 compliance): only explicit "Jetzt installieren" or "Nicht jetzt" exits are provided
+- WindrosePlus Settings card added (extra, Rule 2 deviation): users who dismissed "Nicht jetzt" need a stable re-entry point to install/manage WP without JSON editing
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 9 Plan 02 (wizard UI) complete. Next: Plan 09-03 — Retrofit dialog (RetrofitDialogViewModel implementing IWindrosePlusOptInContext, retrofit banner on DashboardView, reusing WindrosePlusOptInControl).
+Phase 9 complete. Next: Phase 10 — Health & Support (WindrosePlus HTTP dashboard polling, inline health-check banner, "Report to WindrosePlus" GitHub issue button).
