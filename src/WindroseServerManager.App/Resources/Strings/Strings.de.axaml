@@ -467,4 +467,49 @@
     <sys:String x:Key="About.WindrosePlus.ShowLicense">Lizenztext anzeigen</sys:String>
     <sys:String x:Key="Warning.WindrosePlusBatMissing">WindrosePlus ist aktiviert, aber StartWindrosePlusServer.bat fehlt. Starte stattdessen WindroseServer.exe.</sys:String>
     <sys:String x:Key="Error.WindrosePlusOfflineFirstInstall">WindrosePlus kann nicht installiert werden: GitHub nicht erreichbar und kein Cache vorhanden. Bitte Internetverbindung prüfen und erneut versuchen.</sys:String>
+
+    <!-- Phase 9 — Opt-in UX (Wizard + Retrofit) -->
+    <sys:String x:Key="Wizard.Title">Neuen Server einrichten</sys:String>
+    <sys:String x:Key="Wizard.Step1.Label">Installationspfad</sys:String>
+    <sys:String x:Key="Wizard.Step2.Label">WindrosePlus</sys:String>
+    <sys:String x:Key="Wizard.Step3.Label">Bestätigung</sys:String>
+    <sys:String x:Key="Wizard.Action.Install">Installieren</sys:String>
+    <sys:String x:Key="Wizard.Action.Next">Weiter</sys:String>
+
+    <sys:String x:Key="Wizard.WindrosePlus.OptIn">WindrosePlus installieren</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.OptOut">Ohne WindrosePlus fortfahren</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Disclaimer">WindrosePlus ist ein separates MIT-Mod. Es wird in die Server-Dateien installiert und kann jederzeit in den Einstellungen deaktiviert werden.</sys:String>
+
+    <sys:String x:Key="Wizard.WindrosePlus.RconLabel">RCON-Passwort</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.RconTooltip">Wird für WindrosePlus-Admin-HTTP-Befehle verwendet</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.PortLabel">Dashboard-Port</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.PortHint">Wird automatisch gewählt (18080–18099). In den Einstellungen änderbar.</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.SteamIdLabel">Admin Steam-ID</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.SteamIdPlaceholder">SteamID64 oder steamcommunity.com/profiles/...</sys:String>
+
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Downloading">WindrosePlus wird heruntergeladen...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Extracting">WindrosePlus wird entpackt...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Installing">WindrosePlus wird installiert...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.InstallSuccess">WindrosePlus erfolgreich installiert.</sys:String>
+
+    <sys:String x:Key="Feature.Players">Spieler-Liste</sys:String>
+    <sys:String x:Key="Feature.KickBan">Kick &amp; Ban</sys:String>
+    <sys:String x:Key="Feature.Broadcast">Broadcast</sys:String>
+    <sys:String x:Key="Feature.Events">Ereignis-Log</sys:String>
+    <sys:String x:Key="Feature.SeaChart">Seekarte</sys:String>
+    <sys:String x:Key="Feature.IniEditor">INI-Editor</sys:String>
+    <sys:String x:Key="Feature.GitHubLink">WindrosePlus von HumanGenome · MIT · Mehr erfahren ↗</sys:String>
+
+    <sys:String x:Key="Error.WindrosePlus.SteamIdInvalid">Ungültiges Format. Bitte numerische URL (steamcommunity.com/profiles/...) oder SteamID64 (17 Ziffern) angeben.</sys:String>
+    <sys:String x:Key="Error.WindrosePlus.InstallFailed">WindrosePlus-Installation fehlgeschlagen. Bitte erneut versuchen.</sys:String>
+    <sys:String x:Key="Error.WindrosePlus.NoInternet">Kein Internetzugang. WindrosePlus kann nicht heruntergeladen werden.</sys:String>
+
+    <sys:String x:Key="Retrofit.Banner.Title">WindrosePlus verfügbar</sys:String>
+    <sys:String x:Key="Retrofit.Banner.Body">Schalte Spieler-Management, Events, Seekarte und Konfigurations-Editor frei.</sys:String>
+    <sys:String x:Key="Retrofit.Banner.Action.Install">Jetzt installieren</sys:String>
+    <sys:String x:Key="Retrofit.Banner.Action.Later">Nicht jetzt</sys:String>
+    <sys:String x:Key="Retrofit.Dialog.Title">WindrosePlus installieren</sys:String>
+
+    <sys:String x:Key="Installation.NewServer">Neuen Server einrichten</sys:String>
+    <sys:String x:Key="Action.Back">Zurück</sys:String>
 </ResourceDictionary>

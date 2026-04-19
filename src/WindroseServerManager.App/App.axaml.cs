@@ -98,6 +98,7 @@ public partial class App : Application
         // (Tray icon handlers below.)
         s.AddSingleton<DashboardViewModel>();
         s.AddSingleton<InstallationViewModel>();
+        s.AddTransient<InstallWizardViewModel>();
         s.AddSingleton<ServerControlViewModel>();
         s.AddSingleton<ConfigurationViewModel>();
         s.AddSingleton<BackupsViewModel>();

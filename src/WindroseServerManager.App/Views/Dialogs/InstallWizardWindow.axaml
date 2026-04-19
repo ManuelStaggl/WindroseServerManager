@@ -1,0 +1,186 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WindroseServerManager.App.Views.Controls"
+        xmlns:vm="using:WindroseServerManager.App.ViewModels"
+        x:Class="WindroseServerManager.App.Views.Dialogs.InstallWizardWindow"
+        x:DataType="vm:InstallWizardViewModel"
+        Width="560"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrandNavySurfaceBrush}"
+        Title="{DynamicResource Wizard.Title}">
+    <Window.Resources>
+        <vm:IntEqualsConverter x:Key="IntEquals" />
+        <vm:IntGreaterThanConverter x:Key="IntGreater" />
+        <vm:IntLessThanConverter x:Key="IntLess" />
+        <vm:BoolToYesNoConverter x:Key="YesNo" />
+    </Window.Resources>
+
+    <Border CornerRadius="8"
+            Background="{DynamicResource BrandNavySurfaceBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            Padding="24">
+        <StackPanel Spacing="24">
+
+            <!-- Stepper header: 3 circles with labels -->
+            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto">
+                <!-- Step 1 -->
+                <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <Border x:Name="Step1Circle"
+                            Width="24" Height="24"
+                            CornerRadius="12"
+                            Background="{DynamicResource BrandAmberBrush}">
+                        <TextBlock x:Name="Step1Glyph"
+                                   Text="1"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption"
+                               HorizontalAlignment="Center"
+                               Text="{DynamicResource Wizard.Step1.Label}" />
+                </StackPanel>
+
+                <Border Grid.Column="1" Height="1" VerticalAlignment="Top" Margin="4,11,4,0"
+                        Background="{DynamicResource BrandNavyBorderBrush}" />
+
+                <!-- Step 2 -->
+                <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <Border x:Name="Step2Circle"
+                            Width="24" Height="24"
+                            CornerRadius="12"
+                            Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                        <TextBlock x:Name="Step2Glyph"
+                                   Text="2"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption"
+                               HorizontalAlignment="Center"
+                               Text="{DynamicResource Wizard.Step2.Label}" />
+                </StackPanel>
+
+                <Border Grid.Column="3" Height="1" VerticalAlignment="Top" Margin="4,11,4,0"
+                        Background="{DynamicResource BrandNavyBorderBrush}" />
+
+                <!-- Step 3 -->
+                <StackPanel Grid.Column="4" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <Border x:Name="Step3Circle"
+                            Width="24" Height="24"
+                            CornerRadius="12"
+                            Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                        <TextBlock x:Name="Step3Glyph"
+                                   Text="3"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption"
+                               HorizontalAlignment="Center"
+                               Text="{DynamicResource Wizard.Step3.Label}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Step 1: Install Path -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=1}">
+                <TextBlock Classes="section-header"
+                           Text="{DynamicResource Wizard.Step1.Label}" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding InstallDir, Mode=TwoWay}"
+                             Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
+                    <Button Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Content="{DynamicResource Action.Browse}"
+                            Click="OnBrowseClick" />
+                </Grid>
+                <TextBlock Classes="caption"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           TextWrapping="Wrap"
+                           Text="{DynamicResource Installation.PathHint}" />
+            </StackPanel>
+
+            <!-- Step 2: WindrosePlus opt-in -->
+            <ContentControl IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=2}">
+                <controls:WindrosePlusOptInControl />
+            </ContentControl>
+
+            <!-- Step 3: Confirmation -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=3}">
+                <TextBlock Classes="section-header"
+                           Text="{DynamicResource Wizard.Step3.Label}" />
+
+                <StackPanel Spacing="6">
+                    <TextBlock Classes="caption"
+                               Foreground="{DynamicResource BrandTextMutedBrush}"
+                               Text="{DynamicResource Wizard.Step1.Label}" />
+                    <TextBlock Classes="body" Text="{Binding InstallDir}" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Classes="caption"
+                               Foreground="{DynamicResource BrandTextMutedBrush}"
+                               Text="WindrosePlus" />
+                    <TextBlock Classes="body"
+                               Text="{Binding IsOptingIn, Converter={StaticResource YesNo}}" />
+                </StackPanel>
+
+                <StackPanel Spacing="6" IsVisible="{Binding IsOptingIn}">
+                    <TextBlock Classes="caption"
+                               Foreground="{DynamicResource BrandTextMutedBrush}"
+                               Text="{DynamicResource Wizard.WindrosePlus.PortLabel}" />
+                    <TextBlock Classes="body" Text="{Binding DashboardPort}" />
+                </StackPanel>
+
+                <!-- Progress while installing -->
+                <StackPanel Spacing="6" IsVisible="{Binding IsInstalling}">
+                    <ProgressBar IsIndeterminate="True" Height="4" />
+                    <TextBlock Classes="caption"
+                               Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                               Text="{Binding CurrentPhase}" />
+                </StackPanel>
+
+                <TextBlock Classes="body"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource BrandErrorBrush}"
+                           IsVisible="{Binding HasError}"
+                           Text="{Binding ErrorMessage}" />
+            </StackPanel>
+
+            <!-- Footer -->
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <Button Grid.Column="1"
+                        Classes="subtle"
+                        Content="{DynamicResource Action.Cancel}"
+                        Click="OnCancelClick"
+                        Margin="0,0,8,0" />
+                <Button Grid.Column="2"
+                        Classes="subtle"
+                        Content="{DynamicResource Action.Back}"
+                        Command="{Binding GoBackCommand}"
+                        Margin="0,0,8,0"
+                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntGreater}, ConverterParameter=1}" />
+                <Button Grid.Column="3"
+                        Classes="primary"
+                        Content="{DynamicResource Wizard.Action.Next}"
+                        Command="{Binding GoNextCommand}"
+                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntLess}, ConverterParameter=3}" />
+                <Button Grid.Column="3"
+                        Classes="primary"
+                        Content="{DynamicResource Wizard.Action.Install}"
+                        Command="{Binding InstallCommand}"
+                        IsEnabled="{Binding !IsInstalling}"
+                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=3}" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

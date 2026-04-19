@@ -216,6 +216,63 @@ public sealed class IntToBoolConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public sealed class IntEqualsConverter : IValueConverter
+{
+    public static readonly IntEqualsConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not int actual) return false;
+        int expected;
+        switch (parameter)
+        {
+            case int i: expected = i; break;
+            case string s when int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed): expected = parsed; break;
+            default: return false;
+        }
+        return actual == expected;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class IntGreaterThanConverter : IValueConverter
+{
+    public static readonly IntGreaterThanConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not int actual) return false;
+        int threshold;
+        switch (parameter)
+        {
+            case int i: threshold = i; break;
+            case string s when int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed): threshold = parsed; break;
+            default: return false;
+        }
+        return actual > threshold;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class IntLessThanConverter : IValueConverter
+{
+    public static readonly IntLessThanConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not int actual) return false;
+        int threshold;
+        switch (parameter)
+        {
+            case int i: threshold = i; break;
+            case string s when int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed): threshold = parsed; break;
+            default: return false;
+        }
+        return actual < threshold;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public sealed class BoolToYesNoConverter : IValueConverter
 {
     public static readonly BoolToYesNoConverter Instance = new();

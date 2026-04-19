@@ -1,0 +1,186 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             x:Class="WindroseServerManager.App.Views.Controls.WindrosePlusOptInControl"
+             x:DataType="vm:IWindrosePlusOptInContext">
+    <StackPanel Spacing="16">
+
+        <!-- Feature grid: 2 columns × 3 rows = 6 tiles -->
+        <Grid RowDefinitions="Auto,Auto,Auto"
+              ColumnDefinitions="*,*"
+              RowSpacing="8"
+              ColumnSpacing="8">
+
+            <!-- Tile: Players -->
+            <Border Grid.Row="0" Grid.Column="0"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x1F465;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.Players}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Tile: Kick & Ban -->
+            <Border Grid.Row="0" Grid.Column="1"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x1F6AB;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.KickBan}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Tile: Broadcast -->
+            <Border Grid.Row="1" Grid.Column="0"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x1F4E2;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.Broadcast}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Tile: Events -->
+            <Border Grid.Row="1" Grid.Column="1"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x1F4DC;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.Events}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Tile: Sea Chart -->
+            <Border Grid.Row="2" Grid.Column="0"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x1F5FA;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.SeaChart}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Tile: INI-Editor -->
+            <Border Grid.Row="2" Grid.Column="1"
+                    CornerRadius="8"
+                    Padding="12"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontSize="28"
+                               Foreground="{DynamicResource BrandAmberBrush}"
+                               Text="&#x2699;" />
+                    <TextBlock Classes="body"
+                               Text="{DynamicResource Feature.IniEditor}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- GitHub link -->
+        <Button Classes="subtle"
+                HorizontalAlignment="Left"
+                Content="{DynamicResource Feature.GitHubLink}"
+                Click="OnGitHubLinkClick" />
+
+        <!-- Disclaimer -->
+        <TextBlock Classes="caption"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                   Text="{DynamicResource Wizard.WindrosePlus.Disclaimer}" />
+
+        <!-- Opt-in toggle -->
+        <CheckBox x:Name="OptInCheckBox"
+                  Content="{DynamicResource Wizard.WindrosePlus.OptIn}"
+                  IsChecked="{Binding IsOptingIn, Mode=TwoWay}" />
+
+        <!-- Secrets form (only visible when opting in) -->
+        <StackPanel Spacing="12"
+                    IsVisible="{Binding IsOptingIn}">
+
+            <!-- RCON password row -->
+            <StackPanel Spacing="6">
+                <TextBlock Classes="body"
+                           Text="{DynamicResource Wizard.WindrosePlus.RconLabel}"
+                           ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconTooltip}" />
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                      ColumnSpacing="4">
+                    <TextBox Grid.Column="0"
+                             x:Name="RconPasswordBox"
+                             PasswordChar="•"
+                             FontFamily="Consolas,Courier New"
+                             Text="{Binding RconPassword, Mode=TwoWay}" />
+                    <Button Grid.Column="1"
+                            Classes="subtle"
+                            Width="32" Height="32"
+                            Padding="0"
+                            Click="OnTogglePasswordVisibility"
+                            ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconLabel}">
+                        <TextBlock FontSize="14" Text="&#xE7B3;" />
+                    </Button>
+                    <Button Grid.Column="2"
+                            Classes="subtle"
+                            Width="32" Height="32"
+                            Padding="0"
+                            Click="OnCopyPassword">
+                        <TextBlock FontSize="14" Text="&#xE8C8;" />
+                    </Button>
+                    <Button Grid.Column="3"
+                            Classes="subtle"
+                            Width="32" Height="32"
+                            Padding="0"
+                            Click="OnRegeneratePassword">
+                        <TextBlock FontSize="14" Text="&#xE72C;" />
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- Dashboard port row -->
+            <StackPanel Spacing="6">
+                <TextBlock Classes="body"
+                           Text="{DynamicResource Wizard.WindrosePlus.PortLabel}" />
+                <TextBlock Classes="body"
+                           Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                           Text="{Binding DashboardPort}" />
+                <TextBlock Classes="caption"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           TextWrapping="Wrap"
+                           Text="{DynamicResource Wizard.WindrosePlus.PortHint}" />
+            </StackPanel>
+
+            <!-- Admin Steam-ID row -->
+            <StackPanel Spacing="6">
+                <TextBlock Classes="body"
+                           Text="{DynamicResource Wizard.WindrosePlus.SteamIdLabel}" />
+                <TextBox x:Name="SteamIdBox"
+                         Text="{Binding AdminSteamId, Mode=TwoWay}"
+                         Watermark="{DynamicResource Wizard.WindrosePlus.SteamIdPlaceholder}"
+                         LostFocus="OnSteamIdLostFocus" />
+                <TextBlock Classes="caption"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource BrandErrorBrush}"
+                           IsVisible="{Binding HasSteamIdError}"
+                           Text="{DynamicResource Error.WindrosePlus.SteamIdInvalid}" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
