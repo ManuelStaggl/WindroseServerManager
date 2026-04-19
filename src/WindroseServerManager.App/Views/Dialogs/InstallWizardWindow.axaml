@@ -5,7 +5,7 @@
         x:Class="WindroseServerManager.App.Views.Dialogs.InstallWizardWindow"
         x:DataType="vm:InstallWizardViewModel"
         Width="560"
-        SizeToContent="Height"
+        Height="720"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
@@ -23,10 +23,10 @@
             BorderBrush="{DynamicResource BrandNavyBorderBrush}"
             BorderThickness="1"
             Padding="24">
-        <StackPanel Spacing="24">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="24">
 
             <!-- Stepper header: 3 circles with labels -->
-            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,*,Auto">
                 <!-- Step 1 -->
                 <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
                     <Border x:Name="Step1Circle"
@@ -87,6 +87,12 @@
                                Text="{DynamicResource Wizard.Step3.Label}" />
                 </StackPanel>
             </Grid>
+
+            <!-- Scrollable content zone -->
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24">
 
             <!-- Step 1: Install Path -->
             <StackPanel Spacing="12"
@@ -156,8 +162,11 @@
                            Text="{Binding ErrorMessage}" />
             </StackPanel>
 
+            </StackPanel>
+            </ScrollViewer>
+
             <!-- Footer -->
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto,Auto">
                 <Button Grid.Column="1"
                         Classes="subtle"
                         Content="{DynamicResource Action.Cancel}"
@@ -181,6 +190,6 @@
                         IsEnabled="{Binding !IsInstalling}"
                         IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=3}" />
             </Grid>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>
