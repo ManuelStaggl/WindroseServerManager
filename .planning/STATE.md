@@ -3,9 +3,9 @@
 ## Current Position
 
 Phase: 8 — WindrosePlus Bootstrap
-Plan: 03 (next — Wave 2 integration)
-Status: Plan 08-02 complete — WindrosePlusService implemented, 13 behavior tests green
-Last activity: 2026-04-19 — Plan 08-02 executed (1 task, 68 passed / 0 failed / 0 skipped)
+Plan: COMPLETE (all 3 plans done)
+Status: Phase 8 complete — ready for phase verification / Phase 9 planning
+Last activity: 2026-04-19 — Plan 08-03 executed (2 feat commits + 1 checkpoint approval + 1 NRE fix)
 
 ## Project Reference
 
@@ -20,8 +20,8 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 
 | Phase | Status |
 |-------|--------|
-| 8. WindrosePlus Bootstrap | In progress — Plans 01+02 complete (contract + service impl, 13 behavior tests green); Plan 03 next |
-| 9. Opt-in UX (Wizard + Retrofit) | Not started |
+| 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
+| 9. Opt-in UX (Wizard + Retrofit) | Not started — next up |
 | 10. Health & Support | Not started |
 | 11. Feature Views | Not started |
 | 12. Empty States (Opt-out UX) | Not started |
@@ -56,10 +56,19 @@ v1.2 scope decisions:
 - Synthetic "cached" `WindrosePlusRelease` (Tag="cached", DownloadUrl="") activates only when API offline AND archive cache exists AND metadata cache absent — safety net for partial-cache seed scenarios.
 - `LoggerAdapter<T> : ILogger<T>` bridges Plan 01's non-generic `TestLogger` into the concrete service's `ILogger<WindrosePlusService>` dependency.
 
+## Decisions (Plan 08-03)
+
+- DI registration lives at App.axaml.cs line 75, directly below `AddSingleton<ISteamCmdService, …>` — keeps Core-service block cohesive
+- ServerProcessService reads AppSettings per-server maps via new `BuildInstallInfo(dir)` helper — single read-through point, no double-persistence
+- About dialog: reused existing `BrandNavySurfaceAltBrush` / `BrandNavyBorderBrush` (no new brush introduced); license box is monospace 11px with MaxHeight 220 + ScrollViewer
+- Strings live under `Resources/Strings/` (plan path `Resources/` was outdated — kept actual project convention)
+- `OnShowWindrosePlusLicenseClick` uses `FindControl<T>("name")` instead of x:Name field access — Avalonia source generator did not emit fields for the new elements; FindControl matches the pre-existing `VersionText` pattern in the same dialog constructor
+- Localization namespace established for WindrosePlus: `About.ThirdPartyLicenses.*`, `About.WindrosePlus.*`, `Warning.WindrosePlus*`, `Error.WindrosePlus*` — Phases 9-12 extend this
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Run `/gsd:execute-plan 8 3` to execute Plan 08-03 (Wave 2: DI registration + `ServerProcessService` launcher integration + About-dialog Third-Party Licenses section).
+Phase 8 is complete. Next: Phase 9 — Opt-in UX (Wizard + Retrofit). Run `/gsd:plan-phase 9` to start planning.
