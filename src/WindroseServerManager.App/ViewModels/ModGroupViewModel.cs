@@ -37,7 +37,6 @@ public partial class ModGroupViewModel : ObservableObject
         }
     }
 
-    public bool HasUpdateAvailable => Items.Any(i => i.HasUpdateAvailable);
     public long TotalBytes => Items.Sum(i => i.SizeBytes);
     public int ActiveCount => Items.Count(i => i.IsEnabled);
     public int DisabledCount => Items.Count(i => !i.IsEnabled);
@@ -61,14 +60,12 @@ public partial class ModGroupViewModel : ObservableObject
     {
         // Aggregate neu auswerten bei relevanten Änderungen
         if (e.PropertyName is nameof(ModItemViewModel.IsSelected)
-            or nameof(ModItemViewModel.IsEnabled)
-            or nameof(ModItemViewModel.HasUpdateAvailable))
+            or nameof(ModItemViewModel.IsEnabled))
             RaiseAggregates();
     }
 
     public void RaiseAggregates()
     {
-        OnPropertyChanged(nameof(HasUpdateAvailable));
         OnPropertyChanged(nameof(TotalBytes));
         OnPropertyChanged(nameof(ActiveCount));
         OnPropertyChanged(nameof(DisabledCount));

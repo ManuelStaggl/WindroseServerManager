@@ -25,21 +25,18 @@
                          KeyDown="OnUrlKeyDown" />
             </StackPanel>
 
-            <Border x:Name="StatusPanel" IsVisible="False"
-                    Padding="12,10" CornerRadius="6">
-                <StackPanel Spacing="4">
-                    <TextBlock x:Name="StatusHeadline" FontWeight="SemiBold" TextWrapping="Wrap" />
-                    <TextBlock x:Name="StatusDetail" Classes="caption" TextWrapping="Wrap" />
-                </StackPanel>
+            <Border x:Name="ErrorPanel" IsVisible="False"
+                    Padding="12,10" CornerRadius="6"
+                    Background="{DynamicResource BrandErrorBrush}">
+                <TextBlock x:Name="ErrorText" TextWrapping="Wrap"
+                           Foreground="#FFFFFF" />
             </Border>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
                 <Button Content="{DynamicResource Action.Cancel}" Click="OnCancelClick" />
-                <Button x:Name="FetchButton" Content="{DynamicResource Dialog.LinkNexus.Fetch}"
-                        Click="OnFetchClick" />
                 <Button x:Name="ConfirmButton" Classes="primary"
                         Content="{DynamicResource Dialog.LinkNexus.Confirm}"
-                        Click="OnConfirmClick" IsEnabled="False" />
+                        Click="OnConfirmClick" />
             </StackPanel>
         </StackPanel>
     </Border>

@@ -68,22 +68,6 @@
             </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Nexus.Title}" />
-                    <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="{DynamicResource Settings.Nexus.Hint}" />
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Settings.Nexus.ApiKey}" />
-                        <TextBox Text="{Binding NexusApiKey}" PasswordChar="•"
-                                 Watermark="{DynamicResource Settings.Nexus.ApiKey.Placeholder}" />
-                    </StackPanel>
-                    <Button Classes="subtle" Content="{DynamicResource Settings.Nexus.OpenApiPage}"
-                            Command="{Binding OpenNexusApiPageCommand}"
-                            HorizontalAlignment="Left" />
-                </StackPanel>
-            </Border>
-
-            <Border Classes="card" Margin="0,0,0,16">
                 <StackPanel Spacing="8">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.Network.Title}" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"

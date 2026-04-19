@@ -77,17 +77,6 @@
                             </MultiBinding>
                         </Button.IsVisible>
                     </Button>
-                    <Button Classes="subtle"
-                            Content="{DynamicResource Mods.Nexus.CheckUpdates}"
-                            Command="{Binding CheckUpdatesCommand}"
-                            IsEnabled="{Binding !IsCheckingUpdates}">
-                        <Button.IsVisible>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="NexusConfigured" />
-                                <Binding Path="!HasSelection" />
-                            </MultiBinding>
-                        </Button.IsVisible>
-                    </Button>
                     <TextBlock VerticalAlignment="Center"
                                Margin="16,0,0,0"
                                TextTrimming="CharacterEllipsis"
@@ -220,17 +209,6 @@
                                                 <TextBlock Text="{Binding Header}"
                                                            FontWeight="SemiBold" FontSize="14"
                                                            Foreground="{DynamicResource BrandTextPrimaryBrush}" />
-                                                <!-- Update-Badge (#8: mit Icon) -->
-                                                <Border IsVisible="{Binding HasUpdateAvailable}"
-                                                        Background="{DynamicResource BrandAmberBrush}"
-                                                        CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
-                                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                                        <TextBlock Text="&#xE896;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                                   FontSize="10" Foreground="#FFFFFF" VerticalAlignment="Center" />
-                                                        <TextBlock Text="{DynamicResource Mods.Nexus.UpdateAvailable}"
-                                                                   FontSize="11" FontWeight="SemiBold" Foreground="#FFFFFF" />
-                                                    </StackPanel>
-                                                </Border>
                                                 <!-- Nexus-Badge (#8: mit Globe-Icon) -->
                                                 <Border IsVisible="{Binding HasNexusLink}"
                                                         Background="{DynamicResource BrandNavySurfaceAltBrush}"

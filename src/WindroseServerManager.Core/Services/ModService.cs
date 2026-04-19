@@ -84,7 +84,7 @@ public sealed class ModService : IModService
             yield return new ModInfo(
                 FileName: name,
                 FullPath: fi.FullName,
-                DisplayName: meta?.LinkedDisplayName ?? display,
+                DisplayName: display,
                 SizeBytes: fi.Length + companions.Sum(c => new FileInfo(Path.Combine(dir, c)).Length),
                 InstalledUtc: fi.CreationTimeUtc,
                 IsEnabled: enabled,
@@ -112,8 +112,8 @@ public sealed class ModService : IModService
 
         var metaPath = primary + MetaSuffix;
         File.WriteAllText(metaPath, JsonSerializer.Serialize(meta, MetaJsonOpts));
-        _logger.LogInformation("Nexus-Verknüpfung für {File} gespeichert (Mod #{ModId}, Version {Version}).",
-            fileName, meta.NexusModId, meta.LinkedVersion);
+        _logger.LogInformation("Nexus-Verknüpfung für {File} gespeichert (Mod #{ModId}).",
+            fileName, meta.NexusModId);
     }
 
     public void ClearMeta(string fileName)

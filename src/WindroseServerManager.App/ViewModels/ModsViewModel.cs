@@ -13,7 +13,6 @@ using WindroseServerManager.App.Services;
 using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
-// Note: Nexus-Commands nutzen ModMeta / NexusModInfo / NexusUrlParser.
 
 namespace WindroseServerManager.App.ViewModels;
 
@@ -22,7 +21,6 @@ public partial class ModsViewModel : ViewModelBase
     private readonly IModService _mods;
     private readonly IServerProcessService _proc;
     private readonly IToastService _toasts;
-    private readonly INexusClient _nexus;
     private readonly IAppSettingsService _settings;
 
     public ObservableCollection<ModItemViewModel> Mods { get; } = new();
@@ -39,26 +37,18 @@ public partial class ModsViewModel : ViewModelBase
     public bool HasSelection => SelectedCount > 0;
     public bool AllSelected => Mods.Count > 0 && Mods.All(m => m.IsSelected);
 
-    [ObservableProperty] private bool _isCheckingUpdates;
-
-    public bool NexusConfigured => _nexus.IsConfigured;
-
     public ModsViewModel(
         IModService mods,
         IServerProcessService proc,
         IToastService toasts,
-        INexusClient nexus,
         IAppSettingsService settings)
     {
         _mods = mods;
         _proc = proc;
         _toasts = toasts;
-        _nexus = nexus;
         _settings = settings;
 
         _proc.StatusChanged += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshReadiness);
-        _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(
-            () => OnPropertyChanged(nameof(NexusConfigured)));
         Mods.CollectionChanged += OnModsCollectionChanged;
 
         Refresh();
@@ -137,7 +127,7 @@ public partial class ModsViewModel : ViewModelBase
             .GroupBy(i => i.NexusMeta!.NexusModId)
             .Select(g =>
             {
-                var header = g.First().NexusMeta!.LinkedDisplayName;
+                var header = g.First().DisplayName;
                 var key = $"nexus:{g.Key}";
                 var grp = new ModGroupViewModel(header, key, g.Key, g);
                 if (prevExpanded.TryGetValue(key, out var wasExp))
@@ -213,8 +203,9 @@ public partial class ModsViewModel : ViewModelBase
                 ? Loc.Format("Toast.ModInstalledFormat", mods[0].DisplayName)
                 : Loc.Format("Toast.ModInstalledCountFormat", mods.Count));
 
-            // Auto-Link: alle neu installierten .paks mit derselben Nexus-ID verknüpfen
-            await TryAutoLinkAllAsync(mods.Select(m => m.FileName).ToList(), Path.GetFileName(path));
+            // Auto-Link: wenn der Archivname eine Nexus-Mod-ID enthält, alle
+            // neu installierten .paks damit verknüpfen (pure Filename-Analyse, kein Netzwerk).
+            TryAutoLinkAll(mods.Select(m => m.FileName).ToList(), Path.GetFileName(path));
 
             Refresh();
         }
@@ -230,27 +221,24 @@ public partial class ModsViewModel : ViewModelBase
         }
     }
 
-    private async Task TryAutoLinkAllAsync(IReadOnlyList<string> installedPakFileNames, string originalArchiveFileName)
+    private void TryAutoLinkAll(IReadOnlyList<string> installedPakFileNames, string originalArchiveFileName)
     {
-        if (!_nexus.IsConfigured || installedPakFileNames.Count == 0) return;
+        if (installedPakFileNames.Count == 0) return;
 
         var modId = NexusUrlParser.TryExtractModIdFromArchiveName(originalArchiveFileName);
         if (modId <= 0) return;
 
         try
         {
-            var info = await _nexus.GetModAsync(modId);
-            if (info is null) return;
-
-            var meta = new ModMeta(info.ModId, info.Version, info.Name, DateTime.UtcNow);
+            var meta = new ModMeta(modId, DateTime.UtcNow);
             foreach (var file in installedPakFileNames)
                 _mods.SetMeta(file, meta);
 
-            _toasts.Info(Loc.Format("Toast.NexusAutoLinkedFormat", info.Name));
+            _toasts.Info(Loc.Format("Toast.NexusAutoLinkedFormat", modId));
         }
         catch
         {
-            // Auto-Link ist best-effort — bei Fehlern still weitermachen, Admin kann manuell verlinken.
+            // Auto-Link ist best-effort — Fehler ignorieren, User kann manuell verlinken.
         }
     }
 
@@ -400,24 +388,18 @@ public partial class ModsViewModel : ViewModelBase
     private async Task LinkNexusAsync(ModItemViewModel? mod)
     {
         if (mod is null) return;
-        if (!_nexus.IsConfigured)
-        {
-            _toasts.Warning(Loc.Get("Toast.NexusNoApiKey"));
-            return;
-        }
 
         var owner = GetOwnerWindow();
         if (owner is null) return;
 
-        var info = await LinkNexusDialog.ShowAsync(
-            owner, _nexus, _settings.Current.NexusGameDomain, mod.DisplayName);
-        if (info is null) return;
+        var modId = await LinkNexusDialog.ShowAsync(
+            owner, _settings.Current.NexusGameDomain, mod.DisplayName);
+        if (modId is null) return;
 
         try
         {
-            _mods.SetMeta(mod.FileName,
-                new ModMeta(info.ModId, info.Version, info.Name, DateTime.UtcNow));
-            _toasts.Success(Loc.Format("Toast.NexusLinkedFormat", info.Name));
+            _mods.SetMeta(mod.FileName, new ModMeta(modId.Value, DateTime.UtcNow));
+            _toasts.Success(Loc.Format("Toast.NexusLinkedFormat", modId.Value));
             Refresh();
         }
         catch (Exception ex) { ReportError(ex); }
@@ -446,46 +428,6 @@ public partial class ModsViewModel : ViewModelBase
             Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
         }
         catch (Exception ex) { ReportError(ex); }
-    }
-
-    [RelayCommand]
-    private async Task CheckUpdatesAsync()
-    {
-        if (IsCheckingUpdates) return;
-        if (!_nexus.IsConfigured) { _toasts.Warning(Loc.Get("Toast.NexusNoApiKey")); return; }
-
-        var linked = Mods.Where(m => m.HasNexusLink).ToList();
-        if (linked.Count == 0) { _toasts.Info(Loc.Get("Toast.NexusNoLinkedMods")); return; }
-
-        IsCheckingUpdates = true;
-        var updates = 0;
-        var failed = 0;
-        try
-        {
-            foreach (var mod in linked)
-            {
-                if (mod.NexusMeta is not { } meta) continue;
-                try
-                {
-                    var info = await _nexus.GetModAsync(meta.NexusModId);
-                    if (info is null) { failed++; continue; }
-                    mod.LatestNexusVersion = info.Version;
-                    if (mod.HasUpdateAvailable) updates++;
-                }
-                catch { failed++; }
-            }
-
-            if (updates > 0)
-                _toasts.Info(Loc.Format("Toast.NexusUpdatesFoundFormat", updates));
-            else if (failed == 0)
-                _toasts.Success(Loc.Get("Toast.NexusUpToDate"));
-            else
-                _toasts.Warning(Loc.Format("Toast.NexusChecksFailedFormat", failed));
-        }
-        finally
-        {
-            IsCheckingUpdates = false;
-        }
     }
 
     [RelayCommand]

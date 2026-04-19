@@ -53,10 +53,7 @@ public sealed class AppSettings
     /// <summary>Tag-Name (z.B. "v1.0.1"), den der User via "Später" verworfen hat. Bei neueren Versionen wieder anzeigen.</summary>
     public string DismissedUpdateVersion { get; set; } = "";
 
-    // Nexus Mods — optional, rein für Metadaten/Update-Checks (Free-Tier, keine Downloads).
-    /// <summary>Persönlicher Nexus-API-Key. Leer = Nexus-Features deaktiviert.</summary>
-    public string NexusApiKey { get; set; } = "";
-
-    /// <summary>Windrose hat den Nexus-Domain-Namen "windrose" — speichern wir trotzdem als Setting, falls sich das je ändert.</summary>
+    // Nexus Mods — nur noch zum Konstruieren von "Auf Nexus öffnen"-URLs. Kein API-Key, kein API-Call.
+    /// <summary>Nexus-Domain-Name des Spiels (für URL-Konstruktion). Windrose = "windrose".</summary>
     public string NexusGameDomain { get; set; } = "windrose";
 }

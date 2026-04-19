@@ -35,9 +35,6 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string _steamAppId = "4129620";
     [ObservableProperty] private string _steamLogin = string.Empty;
 
-    // Nexus Mods (optional, nur Metadaten)
-    [ObservableProperty] private string _nexusApiKey = string.Empty;
-
     [ObservableProperty] private string? _statusMessage;
 
     // Firewall
@@ -85,8 +82,6 @@ public partial class SettingsViewModel : ViewModelBase
 
         _steamAppId = c.SteamAppId;
         _steamLogin = c.SteamLogin;
-
-        _nexusApiKey = c.NexusApiKey;
 
         _suppressAutoStartWrite = true;
         _autoStartEnabled = _autoStart.IsEnabled();
@@ -260,8 +255,6 @@ public partial class SettingsViewModel : ViewModelBase
 
             s.SteamAppId = string.IsNullOrWhiteSpace(SteamAppId) ? "4129620" : SteamAppId.Trim();
             s.SteamLogin = SteamLogin?.Trim() ?? string.Empty;
-
-            s.NexusApiKey = NexusApiKey?.Trim() ?? string.Empty;
         });
         StatusMessage = Loc.Get("Toast.SettingsSaved");
         _toasts.Success(Loc.Get("Toast.SettingsSaved"));
@@ -269,20 +262,6 @@ public partial class SettingsViewModel : ViewModelBase
 
     public string AppVersion =>
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
-
-    [RelayCommand]
-    private void OpenNexusApiPage()
-    {
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://www.nexusmods.com/users/myaccount?tab=api",
-                UseShellExecute = true,
-            });
-        }
-        catch (Exception ex) { _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex)); }
-    }
 
     [RelayCommand]
     private async Task CheckAppUpdateAsync()

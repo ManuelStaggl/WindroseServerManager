@@ -436,39 +436,22 @@
     <sys:String x:Key="Toast.ModBulkUninstalledFormat">{0} mod(s) removed</sys:String>
     <sys:String x:Key="Toast.ModBulkUninstalledPartialFormat">{0} removed, {1} failed</sys:String>
 
-    <!-- Nexus integration -->
-    <sys:String x:Key="Settings.Nexus.Title">Nexus Mods (optional)</sys:String>
-    <sys:String x:Key="Settings.Nexus.Hint">With a free Nexus API key this app can link installed mods to their Nexus page and check for updates. Downloads stay manual (Premium-only via the Nexus API, not supported here).</sys:String>
-    <sys:String x:Key="Settings.Nexus.ApiKey">Personal API key</sys:String>
-    <sys:String x:Key="Settings.Nexus.ApiKey.Placeholder">Empty = Nexus features disabled</sys:String>
-    <sys:String x:Key="Settings.Nexus.OpenApiPage">Create API key on nexusmods.com</sys:String>
-
-    <sys:String x:Key="Mods.Nexus.CheckUpdates">Check updates</sys:String>
+    <!-- Nexus linking (page links only, no API) -->
     <sys:String x:Key="Mods.Nexus.Linked">Nexus</sys:String>
-    <sys:String x:Key="Mods.Nexus.UpdateAvailable">Update!</sys:String>
     <sys:String x:Key="Mods.Nexus.Link.Tooltip">Link to Nexus page</sys:String>
     <sys:String x:Key="Mods.Nexus.Unlink.Tooltip">Remove Nexus link</sys:String>
     <sys:String x:Key="Mods.Nexus.OpenOnNexus">Open on Nexus</sys:String>
 
     <sys:String x:Key="Dialog.LinkNexus.Title">Link mod to Nexus</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.Body">Paste the mod's nexusmods.com URL. The app will remember the page so you can check updates and open the link.</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.Body">Paste the mod's nexusmods.com URL or enter the mod ID. The app will remember the page so you can jump there with one click.</sys:String>
     <sys:String x:Key="Dialog.LinkNexus.ForModFormat">Linking: {0}</sys:String>
     <sys:String x:Key="Dialog.LinkNexus.UrlLabel">Nexus URL or mod ID</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.Fetch">Check</sys:String>
     <sys:String x:Key="Dialog.LinkNexus.Confirm">Link</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.Fetching">Loading metadata…</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.InvalidUrl">Invalid URL</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.NotFound">Mod not found on Nexus</sys:String>
-    <sys:String x:Key="Dialog.LinkNexus.FetchFailed">Nexus request failed</sys:String>
+    <sys:String x:Key="Dialog.LinkNexus.InvalidUrl">Invalid URL or mod ID</sys:String>
 
-    <sys:String x:Key="Toast.NexusNoApiKey">No Nexus API key configured. Settings → Nexus Mods.</sys:String>
-    <sys:String x:Key="Toast.NexusNoLinkedMods">No mods linked to Nexus.</sys:String>
-    <sys:String x:Key="Toast.NexusLinkedFormat">Linked to Nexus: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusLinkedFormat">Linked to Nexus mod #{0}</sys:String>
     <sys:String x:Key="Toast.NexusUnlinkedFormat">Nexus link removed: {0}</sys:String>
-    <sys:String x:Key="Toast.NexusUpdatesFoundFormat">{0} mod(s) have updates available</sys:String>
-    <sys:String x:Key="Toast.NexusUpToDate">All linked mods are up-to-date</sys:String>
-    <sys:String x:Key="Toast.NexusChecksFailedFormat">{0} Nexus request(s) failed</sys:String>
-    <sys:String x:Key="Toast.NexusAutoLinkedFormat">Auto-linked to Nexus: {0}</sys:String>
+    <sys:String x:Key="Toast.NexusAutoLinkedFormat">Auto-linked to Nexus mod #{0}</sys:String>
     <sys:String x:Key="Mods.Group.PakSuffix">file(s)</sys:String>
     <sys:String x:Key="Mods.Group.ActiveSuffix">active</sys:String>
     <sys:String x:Key="Mods.Group.EnableAll">Enable all</sys:String>

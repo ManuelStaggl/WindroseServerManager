@@ -195,34 +195,32 @@ public class ModServiceTests : IDisposable
     public async Task SetMeta_WritesSideCar_GetMeta_Reads()
     {
         await _sut.InstallFromArchiveAsync(CreateFakePak("Linked.pak"));
-        var meta = new ModMeta(42, "1.2.3", "My Linked Mod", DateTime.UtcNow);
+        var meta = new ModMeta(42, DateTime.UtcNow);
         _sut.SetMeta("Linked.pak", meta);
 
         var read = _sut.GetMeta("Linked.pak");
         Assert.NotNull(read);
         Assert.Equal(42, read!.NexusModId);
-        Assert.Equal("1.2.3", read.LinkedVersion);
-        Assert.Equal("My Linked Mod", read.LinkedDisplayName);
     }
 
     [Fact]
     public async Task ListMods_PopulatesMeta_WhenSideCarExists()
     {
         await _sut.InstallFromArchiveAsync(CreateFakePak("Linked.pak"));
-        _sut.SetMeta("Linked.pak", new ModMeta(7, "2.0.0", "Display", DateTime.UtcNow));
+        _sut.SetMeta("Linked.pak", new ModMeta(7, DateTime.UtcNow));
 
         var mod = _sut.ListMods().Single();
         Assert.NotNull(mod.NexusMeta);
         Assert.Equal(7, mod.NexusMeta!.NexusModId);
-        // Display-Name kommt aus Meta wenn vorhanden
-        Assert.Equal("Display", mod.DisplayName);
+        // Display-Name kommt immer aus dem Dateinamen (kein API-Metadata mehr)
+        Assert.Equal("Linked", mod.DisplayName);
     }
 
     [Fact]
     public async Task SetEnabled_PreservesMeta()
     {
         await _sut.InstallFromArchiveAsync(CreateFakePak("Toggle.pak"));
-        _sut.SetMeta("Toggle.pak", new ModMeta(99, "1.0", "Toggle Mod", DateTime.UtcNow));
+        _sut.SetMeta("Toggle.pak", new ModMeta(99, DateTime.UtcNow));
 
         _sut.SetEnabled("Toggle.pak", enabled: false);
 
@@ -235,7 +233,7 @@ public class ModServiceTests : IDisposable
     public async Task Uninstall_RemovesMeta()
     {
         await _sut.InstallFromArchiveAsync(CreateFakePak("Doomed.pak"));
-        _sut.SetMeta("Doomed.pak", new ModMeta(1, "1.0", "Doomed", DateTime.UtcNow));
+        _sut.SetMeta("Doomed.pak", new ModMeta(1, DateTime.UtcNow));
 
         _sut.UninstallMod("Doomed.pak");
 
@@ -247,7 +245,7 @@ public class ModServiceTests : IDisposable
     public void ClearMeta_RemovesSideCar()
     {
         _sut.InstallFromArchiveAsync(CreateFakePak("A.pak")).GetAwaiter().GetResult();
-        _sut.SetMeta("A.pak", new ModMeta(1, "1.0", "A", DateTime.UtcNow));
+        _sut.SetMeta("A.pak", new ModMeta(1, DateTime.UtcNow));
 
         _sut.ClearMeta("A.pak");
         Assert.Null(_sut.GetMeta("A.pak"));
