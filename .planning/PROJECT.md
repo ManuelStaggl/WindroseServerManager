@@ -12,7 +12,7 @@ One-click, end-to-end management of a Windrose dedicated server on Windows — f
 
 ### Validated
 
-<!-- Shipped in v1.0.0, confirmed valuable via Nexus/Reddit release 2026-04-19. -->
+<!-- Shipped in v1.0.0 and v1.1.0. -->
 
 - ✓ SteamCMD-based server installation with live progress — v1.0
 - ✓ Server start/stop/restart + auto-restart on crash — v1.0
@@ -21,7 +21,6 @@ One-click, end-to-end management of a Windrose dedicated server on Windows — f
 - ✓ Form-based editor for ServerDescription.json and WorldDescription.json — v1.0
 - ✓ Multi-world management (create, activate, delete) — v1.0
 - ✓ Mod installation via drag-and-drop (pak/zip/7z), grouping, enable/disable — v1.0
-- ✓ Nexus Mods integration (metadata, update check, auto-linking from filename) — v1.0
 - ✓ Mod bundle export (ZIP of active mods for clients) — v1.0
 - ✓ Backup system (manual + scheduled, retention, safe restore) — v1.0
 - ✓ Firewall rule automation (UDP 7777/7778) — v1.0
@@ -29,22 +28,27 @@ One-click, end-to-end management of a Windrose dedicated server on Windows — f
 - ✓ App self-update check via GitHub releases — v1.0
 - ✓ Bilingual UI (DE/EN) with auto-detection — v1.0
 - ✓ Dashboard with host metrics, process metrics, uptime, invite code — v1.0
+- ✓ Nexus API-free mod integration — "Open on Nexus" via URL construction only — v1.1
 
 ### Active
 
-<!-- v1.1 — Nexus Compliance (blocking). -->
+<!-- v1.2 — WindrosePlus Integration. -->
 
-## Current Milestone: v1.1 Nexus Compliance
+## Current Milestone: v1.2 WindrosePlus Integration
 
-**Goal:** Unblock Nexus distribution by migrating from user-supplied personal API keys to a registered-application SSO flow, as required by the Nexus API Acceptable Use Policy.
+**Goal:** Unlock player-management, events, sea-chart, and config-editor features by bundling HumanGenome/WindrosePlus (MIT) as the default-on mod, with transparent opt-out and clean empty states.
 
 **Target features:**
-- Register Windrose Server Manager as an official Nexus application (email sent 2026-04-19, slug pending)
-- Replace manual API-key entry with SSO flow (nexusmods.com SSO → deep-link / loopback callback → token)
-- Clean migration path for v1.0 users (existing personal keys keep working OR prompted re-auth via SSO)
-- Rebuild + resubmit release to Nexus for quarantine lift
-
-**Explicitly deferred to v1.2:** Player management + WindrosePlus integration (blocked on upstream response, not on our side)
+- WindrosePlus fetch-on-install via GitHub Releases API + local cache fallback + MIT compliance
+- Install wizard step with opt-out, explicit feature list, link to WindrosePlus source
+- Retrofit dialog for existing servers from v1.0/v1.1 (no silent install)
+- Health-check banner + "Report to WindrosePlus" GitHub-issue helper
+- Player management UI (live list, kick, ban, broadcast) via WindrosePlus HTTP API
+- Events history (join/leave) from `events.log` with FileSystemWatcher, searchable
+- Sea-chart viewer showing live player positions from WindrosePlus `/query`
+- Multiplier / INI editor for WindrosePlus config
+- Launcher switch to `StartWindrosePlusServer.bat` when WindrosePlus is active (PAK auto-rebuild)
+- Clean empty states in every WindrosePlus-dependent view when opt-out is active
 
 ### Out of Scope
 
@@ -75,9 +79,11 @@ One-click, end-to-end management of a Windrose dedicated server on Windows — f
 |----------|-----------|---------|
 | Avalonia instead of WPF | Cross-platform UI framework with better modern Fluent styling, though we only ship Windows builds | ✓ Good — smooth UX, Mica works |
 | Nexus integration via user API key (v1.0) | Fastest path to shipping mod metadata/updates | ⚠️ Revisit — Nexus quarantined the mod, must migrate to registered-app SSO for v1.1 |
-| WindrosePlus as player-management dependency (v1.1 plan) | Only viable path to kick/ban/broadcast without reimplementing UE5 hooks | — Pending upstream response |
-| Fetch-on-install for WindrosePlus via GitHub Releases API | Always latest, no bundled snapshot to maintain | — Pending |
+| Nexus API removed (v1.1 pivot) | SSO migration cost outweighed the convenience-only feature | ✓ Good — quarantine cause eliminated |
+| WindrosePlus as player-management dependency (v1.2) | Only viable path to kick/ban/broadcast/position queries without reimplementing UE5 hooks; MIT license allows bundling | — Pending v1.2 delivery |
+| Fetch-on-install for WindrosePlus via GitHub Releases API | Always latest, no bundled snapshot to maintain, parallels existing Nexus-style flow | — Pending v1.2 delivery |
+| WindrosePlus default-on with explicit opt-out | DLL-injection must be transparent, not silent; feature set collapses to empty states when disabled | — Pending v1.2 delivery |
 | DE/EN only, DE as default | Core audience is DACH; EN needed for international reach | ✓ Good |
 
 ---
-*Last updated: 2026-04-19 after v1.0 release and GSD bootstrap for v1.1*
+*Last updated: 2026-04-19 after v1.1.0 release — milestone v1.2 WindrosePlus Integration started*

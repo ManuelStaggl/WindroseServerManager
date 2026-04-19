@@ -20,3 +20,22 @@
 - Nexus "suspicious files" virus-scan FP (false positive for unsigned .NET binaries)
 
 **Last phase number:** 5 → v1.1 starts at phase 6
+
+## v1.1.0 — Nexus API Removal (shipped 2026-04-19)
+
+**Goal:** Lift the Nexus Mods quarantine by removing all API usage, keeping mod management fully functional offline with URL-only "Open on Nexus" links.
+
+| # | Phase | Scope |
+|---|-------|-------|
+| 6 | Nexus API Removal | Delete NexusClient, remove API key from Settings, drop update-check + thumbnails, keep "Open on Nexus" as pure URL launch |
+| 7 | Release & Quarantine Lift | Rebuild, update docs, upload to Nexus mod #29, submit for moderation |
+
+**Released on:** GitHub v1.1.0 and Nexus mod #29 (awaiting moderator approval for quarantine lift) 2026-04-19
+
+**Last phase number:** 7 → v1.2 starts at phase 8
+
+## v1.2.0 — WindrosePlus Integration (in planning)
+
+**Goal:** Ship player-management, events, sea-chart, and config-editor features by bundling HumanGenome/WindrosePlus as the opt-in-by-default mod, with clean empty states when disabled.
+
+**Phases:** TBD (roadmap in progress)
