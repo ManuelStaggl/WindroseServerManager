@@ -29,7 +29,12 @@ Unlock player-management, events, sea-chart, and config-editor features by bundl
   2. Running the install against a server produces a working UE4SS + WindrosePlus payload in the server's game-binaries directory and does not break the existing `WindroseServer.exe` launch path
   3. The WindrosePlus MIT LICENSE (HumanGenome) is present in the install output and visible in the app's About dialog; the product name "WindrosePlus" appears verbatim and is not rebranded
   4. When a server has WindrosePlus active, the launcher starts `StartWindrosePlusServer.bat`; when opted out, it starts `WindroseServer.exe` — the switch is automatic based on per-server state
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0: contracts, models, test fixtures, failing test stubs
+- [ ] 08-02-PLAN.md — Wave 1: WindrosePlusService implementation (GitHub fetch + atomic install + SHA verify + launcher resolution)
+- [ ] 08-03-PLAN.md — Wave 2: DI wiring, ServerProcessService integration, About dialog Third-Party Licenses section, bilingual strings
 
 ### Phase 9: Opt-in UX (Wizard + Retrofit)
 **Goal:** Users can enable WindrosePlus transparently — both during new-server creation and on existing servers carried over from v1.0/v1.1 — with one-click opt-out and a clear explanation of what they gain.
@@ -75,7 +80,7 @@ Unlock player-management, events, sea-chart, and config-editor features by bundl
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. WindrosePlus Bootstrap | 0/0 | Not started | — |
+| 8. WindrosePlus Bootstrap | 0/3 | Planned | — |
 | 9. Opt-in UX (Wizard + Retrofit) | 0/0 | Not started | — |
 | 10. Health & Support | 0/0 | Not started | — |
 | 11. Feature Views | 0/0 | Not started | — |
