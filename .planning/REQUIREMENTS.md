@@ -22,12 +22,12 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 - [ ] **WIZARD-01**: New-server wizard includes a WindrosePlus step listing features gained (Kick/Ban/Broadcast/Events/Chart/INI-Editor) with a link to the WindrosePlus GitHub
 - [ ] **WIZARD-02**: WindrosePlus is default-on in the wizard; user can opt-out with one click
-- [ ] **WIZARD-03**: Wizard sets a secure random RCON password and captures the admin Steam-ID on confirmation
-- [ ] **WIZARD-04**: Wizard picks a free local port for the WindrosePlus dashboard (no fixed port, supports multi-instance users)
+- [x] **WIZARD-03**: Wizard sets a secure random RCON password and captures the admin Steam-ID on confirmation
+- [x] **WIZARD-04**: Wizard picks a free local port for the WindrosePlus dashboard (no fixed port, supports multi-instance users)
 
 ### Retrofit (existing servers from v1.0/v1.1)
 
-- [ ] **RETRO-01**: First launch after upgrading to v1.2 detects per server whether WindrosePlus is installed
+- [x] **RETRO-01**: First launch after upgrading to v1.2 detects per server whether WindrosePlus is installed
 - [ ] **RETRO-02**: For servers without WindrosePlus, a non-modal dialog offers installation with feature list + opt-out; the choice persists per server
 - [ ] **RETRO-03**: Retrofit never installs silently; user must explicitly confirm
 
@@ -91,9 +91,9 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 | WPLUS-04 | 8 | Complete |
 | WIZARD-01 | 9 | Pending |
 | WIZARD-02 | 9 | Pending |
-| WIZARD-03 | 9 | Pending |
-| WIZARD-04 | 9 | Pending |
-| RETRO-01 | 9 | Pending |
+| WIZARD-03 | 9 | Complete |
+| WIZARD-04 | 9 | Complete |
+| RETRO-01 | 9 | Complete |
 | RETRO-02 | 9 | Pending |
 | RETRO-03 | 9 | Pending |
 | HEALTH-01 | 10 | Pending |

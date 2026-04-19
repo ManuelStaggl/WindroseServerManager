@@ -2,24 +2,24 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: planning
-last_updated: "2026-04-19T16:17:26.900Z"
-last_activity: 2026-04-19 — Plan 08-03 executed (2 feat commits + 1 checkpoint approval + 1 NRE fix)
+status: in-progress
+last_updated: "2026-04-19T18:10:18Z"
+last_activity: 2026-04-19 — Plan 09-01 executed (3 feat commits, 34 Phase9 tests green, full suite 105/105)
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # State
 
 ## Current Position
 
-Phase: 8 — WindrosePlus Bootstrap
-Plan: COMPLETE (all 3 plans done)
-Status: Phase 8 complete — ready for phase verification / Phase 9 planning
-Last activity: 2026-04-19 — Plan 08-03 executed (2 feat commits + 1 checkpoint approval + 1 NRE fix)
+Phase: 9 — Opt-in UX (Wizard + Retrofit)
+Plan: 02 — next (wizard UI); Plan 01 (foundation) complete
+Status: Phase 9 foundation shipped — data contract + helpers + migration in place
+Last activity: 2026-04-19 — Plan 09-01 executed (3 feat commits, 34 Phase9 tests green, full suite 105/105)
 
 ## Project Reference
 
@@ -35,7 +35,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 | Phase | Status |
 |-------|--------|
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
-| 9. Opt-in UX (Wizard + Retrofit) | Not started — next up |
+| 9. Opt-in UX (Wizard + Retrofit) | 🟦 In progress — Plan 01 complete (foundation: data model + helpers + migration). Plans 02 (wizard) + 03 (retrofit) pending. WIZARD-03/04 + RETRO-01 satisfied. |
 | 10. Health & Support | Not started |
 | 11. Feature Views | Not started |
 | 12. Empty States (Opt-out UX) | Not started |
@@ -70,6 +70,15 @@ v1.2 scope decisions:
 - Synthetic "cached" `WindrosePlusRelease` (Tag="cached", DownloadUrl="") activates only when API offline AND archive cache exists AND metadata cache absent — safety net for partial-cache seed scenarios.
 - `LoggerAdapter<T> : ILogger<T>` bridges Plan 01's non-generic `TestLogger` into the concrete service's `ILogger<WindrosePlusService>` dependency.
 
+## Decisions (Plan 09-01)
+
+- `OptInState` enum serialized as string via `[JsonConverter(typeof(JsonStringEnumConverter))]` at the enum declaration (not per-property) — survives round-trip without repeating attributes on every `Dictionary<,>` using it
+- Added second public `AppSettingsService(ILogger, string settingsPath)` ctor — `IAppSettingsService` interface unchanged; production DI still uses single-arg ctor; the new one is for tests and future portable-mode callers
+- `MigrateToV12` retains orphan `OptInState` keys (server removed from `WindrosePlusActiveByServer` but decision persists) — strictly non-destructive, guarantees restored InstallDirs resurface the user's previous decision
+- `ServerInstallInfo.NotInstalled` factory body untouched — all 4 new positional parameters have defaults so the 5-arg call still compiles
+- Phase 9 test slice lives under `tests/WindroseServerManager.Core.Tests/Phase9/` and is selected via `--filter "FullyQualifiedName~Phase9"` — runs in ~100ms, 34 tests
+- `FreePortProbe` fallback uses `TcpListener(IPAddress.Loopback, 0)` then `Stop()` before return — caller must bind immediately (documented in XML-doc)
+
 ## Decisions (Plan 08-03)
 
 - DI registration lives at App.axaml.cs line 75, directly below `AddSingleton<ISteamCmdService, …>` — keeps Core-service block cohesive
@@ -85,4 +94,4 @@ None.
 
 ## Next Step
 
-Phase 8 is complete. Next: Phase 9 — Opt-in UX (Wizard + Retrofit). Run `/gsd:plan-phase 9` to start planning.
+Phase 9 Plan 01 (foundation) complete. Next: Plan 09-02 — Wizard UI (Avalonia ContentDialog consuming `RconPasswordGenerator.Generate()`, `FreePortProbe.FindFreePort()`, `SteamIdParser.ExtractSteamId64()` and persisting via `AppSettingsService.UpdateAsync`).
