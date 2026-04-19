@@ -21,6 +21,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private readonly IBackupService _backup;
     private readonly IToastService _toasts;
     private readonly INavigationService _nav;
+    private readonly IWindrosePlusService _wplus;
     private readonly System.Timers.Timer _timer;
 
     [ObservableProperty] private ServerInstallInfo? _installInfo;
@@ -43,6 +44,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string? _lastCrashPath;
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string? _errorMessage;
+    [ObservableProperty] private bool _retrofitBannerVisible;
+    [ObservableProperty] private RetrofitBannerViewModel? _retrofitBanner;
 
     public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
                                     && Directory.Exists(_settings.Current.ServerInstallDir);
@@ -140,7 +143,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         IBackupService backup,
         INavigationService nav,
         IToastService toasts,
-        ILocalizationService localization)
+        ILocalizationService localization,
+        IWindrosePlusService wplus)
     {
         _install = install;
         _proc = proc;
@@ -150,6 +154,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _backup = backup;
         _nav = nav;
         _toasts = toasts;
+        _wplus = wplus;
         _proc.StatusChanged += OnServerStatusChanged;
         _status = _proc.Status;
 
@@ -287,9 +292,46 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
 
             OnPropertyChanged(nameof(CanOpenServerDir));
             OnPropertyChanged(nameof(CanOpenServerDescription));
+
+            // Retrofit banner: show when active server has OptInState=NeverAsked and no WP active
+            var serverDir = _settings.Current.ServerInstallDir;
+            if (!string.IsNullOrWhiteSpace(serverDir))
+            {
+                var optState = _settings.Current.WindrosePlusOptInStateByServer
+                    .GetValueOrDefault(serverDir, OptInState.NeverAsked);
+                var wpActive = _settings.Current.WindrosePlusActiveByServer
+                    .GetValueOrDefault(serverDir, false);
+                var shouldShow = optState == OptInState.NeverAsked && !wpActive;
+
+                // Hide while an install is in progress (Pitfall 7: banner hidden during active install)
+                if (shouldShow && RetrofitBanner is { IsInstalling: true })
+                    shouldShow = false;
+
+                if (shouldShow)
+                {
+                    if (RetrofitBanner is null || RetrofitBanner.ServerInstallDir != serverDir)
+                    {
+                        if (RetrofitBanner is not null)
+                            RetrofitBanner.StateChanged -= OnRetrofitStateChanged;
+                        RetrofitBanner = new RetrofitBannerViewModel(serverDir, _wplus, _settings, _toasts);
+                        RetrofitBanner.StateChanged += OnRetrofitStateChanged;
+                    }
+                    RetrofitBannerVisible = true;
+                }
+                else
+                {
+                    RetrofitBannerVisible = false;
+                }
+            }
+            else
+            {
+                RetrofitBannerVisible = false;
+            }
         }
         catch { }
     }
+
+    private void OnRetrofitStateChanged() => _ = RefreshAsync(CancellationToken.None);
 
     [RelayCommand]
     private async Task CopyInviteCodeAsync()
@@ -473,5 +515,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _timer.Stop();
         _timer.Dispose();
         _proc.StatusChanged -= OnServerStatusChanged;
+        if (RetrofitBanner is not null)
+            RetrofitBanner.StateChanged -= OnRetrofitStateChanged;
     }
 }

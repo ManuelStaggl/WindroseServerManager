@@ -9,6 +9,30 @@
             <TextBlock Classes="page-title" Text="{DynamicResource Dashboard.Title}" />
             <TextBlock Classes="caption" Text="{DynamicResource Dashboard.Subtitle}" Margin="0,4,0,20" />
 
+            <!-- Retrofit Banner (WindrosePlus available for existing v1.1 servers) -->
+            <Border Classes="card" Margin="0,0,0,16"
+                    IsVisible="{Binding RetrofitBannerVisible}"
+                    BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Classes="section-header" Text="{DynamicResource Retrofit.Banner.Title}" />
+                        <TextBlock Classes="body"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="{DynamicResource Retrofit.Banner.Body}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                                VerticalAlignment="Center">
+                        <Button Classes="primary"
+                                Content="{DynamicResource Retrofit.Banner.Action.Install}"
+                                Command="{Binding RetrofitBanner.OpenRetrofitDialogCommand}" />
+                        <Button Classes="subtle"
+                                Content="{DynamicResource Retrofit.Banner.Action.Later}"
+                                Command="{Binding RetrofitBanner.DismissOptOutCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!-- Crash Warning -->
             <Border Classes="card" Margin="0,0,0,16" IsVisible="{Binding HasRecentCrash}"
                     BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
