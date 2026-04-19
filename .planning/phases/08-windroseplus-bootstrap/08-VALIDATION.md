@@ -2,8 +2,8 @@
 phase: 8
 slug: windroseplus-bootstrap
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-19
 ---
 
@@ -40,8 +40,8 @@ created: 2026-04-19
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 08-01-T1 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build src/WindroseServerManager.Core` | N/A (scaffolding) | ⬜ pending |
-| 08-01-T2 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build tests/WindroseServerManager.Core.Tests` | N/A (scaffolding) | ⬜ pending |
+| 08-01-T1 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build src/WindroseServerManager.Core` | ✅ | ✅ green |
+| 08-01-T2 | 08-01 | 0 | WPLUS-01..04 | compile | `dotnet build tests/WindroseServerManager.Core.Tests` | ✅ | ✅ green |
 | 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_ParsesTagAndDigest` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
 | 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.FetchLatest_AcceptsMissingDigest_WithWarning` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
 | 08-01-T3 | 08-01 | 0 | WPLUS-01 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.Install_UsesCache_WhenApiUnreachable_AndCacheExists` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
@@ -55,7 +55,7 @@ created: 2026-04-19
 | 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_OptedOut_ReturnsExe` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
 | 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_ReturnsBat` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
 | 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests.ResolveLauncher_Active_BatMissing_FallsBackWithWarning` | ✅ (skipped) | ⬜ pending (Plan 02 unskips) |
-| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~AppSettingsTests.WindrosePlusActive_RoundTrip` | ✅ | ⬜ pending (runs green at Plan 01 close) |
+| 08-01-T3 | 08-01 | 0 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~AppSettingsTests.WindrosePlusActive_RoundTrip` | ✅ | ✅ green |
 | 08-02-T1 | 08-02 | 1 | WPLUS-01..04 | unit | `dotnet test --filter FullyQualifiedName~WindrosePlusServiceTests` | ✅ | ⬜ pending (flips all 13 ⬜ above to ✅) |
 | 08-03-T1 | 08-03 | 2 | WPLUS-04 | unit | `dotnet test --filter FullyQualifiedName~ServerProcessServiceLauncherTests` | ❌ (created in Plan 03) | ⬜ pending |
 | 08-03-T2 | 08-03 | 2 | WPLUS-03 | compile | `dotnet build src/WindroseServerManager.App` | N/A (UI integration) | ⬜ pending |
@@ -67,10 +67,10 @@ created: 2026-04-19
 
 ## Wave 0 Requirements
 
-- [ ] `tests/WindroseServerManager.Core.Tests/Services/WindrosePlusServiceTests.cs` — stubs for WPLUS-01..04
-- [ ] `tests/WindroseServerManager.Core.Tests/Fixtures/FakeGithubReleaseServer.cs` — in-process HTTP stub returning pinned release JSON + archive bytes + digest
-- [ ] `tests/WindroseServerManager.Core.Tests/Fixtures/TempServerFixture.cs` — creates a minimal fake server dir on the test temp volume for install/launcher tests
-- [ ] `tests/WindroseServerManager.Core.Tests/Fixtures/SampleArchives/` — tiny handcrafted WindrosePlus-shaped + UE4SS-shaped zips for extract/atomic-move tests
+- [x] `tests/WindroseServerManager.Core.Tests/Services/WindrosePlusServiceTests.cs` — stubs for WPLUS-01..04 (13 skipped tests in place)
+- [x] `tests/WindroseServerManager.Core.Tests/Fixtures/FakeGithubReleaseServer.cs` — in-process HTTP stub returning pinned release JSON + archive bytes + digest
+- [x] `tests/WindroseServerManager.Core.Tests/Fixtures/TempServerFixture.cs` — creates a minimal fake server dir on the test temp volume for install/launcher tests
+- [x] `tests/WindroseServerManager.Core.Tests/Fixtures/SampleArchiveBuilder.cs` — in-memory WindrosePlus-shaped + UE4SS-shaped zips for extract/atomic-move tests
 
 ---
 
