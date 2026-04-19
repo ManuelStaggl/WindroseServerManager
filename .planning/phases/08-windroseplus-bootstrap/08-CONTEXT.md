@@ -20,9 +20,9 @@ Infrastructure phase — establishes the shared `WindrosePlusService` that fetch
 - **First install offline:** Hard-fail with a clear error message and a retry button — no silent degradation, no partial server creation
 
 ### UE4SS Handling
-- **Source:** UE4SS comes entirely from the WindrosePlus GitHub release asset (HumanGenome bundles it). We do not fetch UE4SS separately and do not maintain a compatibility matrix
+- **Source (REVISED 2026-04-19):** WindrosePlus v1.0.6 `WindrosePlus.zip` does NOT bundle UE4SS — its `install.ps1` fetches UE4SS from the `UE4SS-RE/RE-UE4SS` GitHub repo at install time. Decision: **replicate `install.ps1` fetch logic in C#** inside `WindrosePlusService`. Fetch WindrosePlus release + UE4SS release separately, merge both payloads during install. Do not shell out to PowerShell (breaks progress/cancel semantics). The UE4SS tag to fetch is the one `install.ps1` pins — read it from the script at build-time or pin it in a constants file; revisit if HumanGenome changes their bootstrap approach
 - **Preexisting install:** Binaries are overwritten on re-install; user config files (WindrosePlus.json / .ini) are preserved
-- **Extraction integrity:** Verify archive against the SHA published by the GitHub Releases API asset. Extract into a temp directory, then atomic-move into the server directory — the server stays functional until extraction is complete
+- **Extraction integrity:** Verify each downloaded archive against the `assets[].digest` field (SHA-256) from the GitHub Releases API. If digest is null (older tags), log a warning and continue. Extract into a temp directory on the SAME volume as the server install (cross-volume `File.Move` silently degrades to copy+delete — breaks atomicity), then atomic-move into the server directory
 
 ### Launcher Switch & Persistence
 - **Flag storage:** The per-server "WindrosePlus active" flag lives in the existing per-server `ServerInstallInfo` / AppSettings structure. Migration rule: servers without the flag (carried over from v1.0/v1.1) are treated as opted-out until the Phase 9 retrofit dialog explicitly sets them
@@ -109,7 +109,7 @@ Infrastructure phase — establishes the shared `WindrosePlusService` that fetch
 - **Version pinning per server** (UPGRADE-01, v1.3) — user choice to lock a specific WindrosePlus version
 - **Automatic background upgrade check** (UPGRADE-01, v1.3) — notify when upstream releases a new version
 - **Prerelease channel opt-in** — advanced-user feature, not needed for v1.2
-- **UE4SS version independence** — bundling our own UE4SS separately if HumanGenome ever drops it from their release
+- **UE4SS version independence** — bundling our own UE4SS separately if HumanGenome ever drops it from their release (superseded by 2026-04-19 decision: we already fetch UE4SS independently via C# reimplementation of install.ps1)
 
 </deferred>
 
