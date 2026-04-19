@@ -484,8 +484,9 @@
     <sys:String x:Key="Wizard.WindrosePlus.RconTooltip">Wird für WindrosePlus-Admin-HTTP-Befehle verwendet</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.PortLabel">Dashboard-Port</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.PortHint">Wird automatisch gewählt (18080–18099). In den Einstellungen änderbar.</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.SteamIdLabel">Admin Steam-ID</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.SteamIdLabel">Admin Steam-ID *</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.SteamIdPlaceholder">SteamID64 oder steamcommunity.com/profiles/...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.SteamIdRequired">Pflichtfeld — wird als Server-Admin eingetragen.</sys:String>
 
     <sys:String x:Key="Wizard.WindrosePlus.Progress.Downloading">WindrosePlus wird heruntergeladen...</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.Progress.Extracting">WindrosePlus wird entpackt...</sys:String>

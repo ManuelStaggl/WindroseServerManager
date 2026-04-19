@@ -12,6 +12,7 @@ public interface IWindrosePlusOptInContext
     int DashboardPort { get; }
     string AdminSteamId { get; set; }
     bool HasSteamIdError { get; }
+    bool IsSteamIdMissing { get; }
     void RegeneratePassword();
     void ValidateSteamId();
 }

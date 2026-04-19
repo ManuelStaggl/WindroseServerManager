@@ -32,6 +32,13 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
+    /// <summary>
+    /// True when opt-in is active but the Steam-ID field is still empty.
+    /// Drives a "Pflichtfeld" caption under the field so the user sees why
+    /// the Weiter-Button stays disabled.
+    /// </summary>
+    public bool IsSteamIdMissing => IsOptingIn && string.IsNullOrWhiteSpace(AdminSteamId);
+
     public InstallWizardViewModel(
         IServerInstallService install,
         IWindrosePlusService wplus,
@@ -60,9 +67,14 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
     partial void OnIsOptingInChanged(bool value)
     {
         if (!value) HasSteamIdError = false;
+        OnPropertyChanged(nameof(IsSteamIdMissing));
         GoNextCommand.NotifyCanExecuteChanged();
     }
-    partial void OnAdminSteamIdChanged(string value) => GoNextCommand.NotifyCanExecuteChanged();
+    partial void OnAdminSteamIdChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsSteamIdMissing));
+        GoNextCommand.NotifyCanExecuteChanged();
+    }
     partial void OnHasSteamIdErrorChanged(bool value) => GoNextCommand.NotifyCanExecuteChanged();
     partial void OnErrorMessageChanged(string? value) => OnPropertyChanged(nameof(HasError));
 
