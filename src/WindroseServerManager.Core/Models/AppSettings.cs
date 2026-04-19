@@ -62,4 +62,14 @@ public sealed class AppSettings
     public Dictionary<string, bool> WindrosePlusActiveByServer { get; set; } = new();
     /// <summary>Per-server WindrosePlus version tag most recently installed. Key = server InstallDir (full path, normalized).</summary>
     public Dictionary<string, string> WindrosePlusVersionByServer { get; set; } = new();
+
+    // WindrosePlus (v1.2 Phase 9 opt-in state)
+    /// <summary>Per-server RCON password generated at opt-in time. Key = server InstallDir.</summary>
+    public Dictionary<string, string> WindrosePlusRconPasswordByServer { get; set; } = new();
+    /// <summary>Per-server WindrosePlus dashboard HTTP port (18080..18099 preferred, else OS-assigned). Key = server InstallDir.</summary>
+    public Dictionary<string, int>    WindrosePlusDashboardPortByServer { get; set; } = new();
+    /// <summary>Per-server admin SteamID64 entered in wizard/retrofit. Key = server InstallDir.</summary>
+    public Dictionary<string, string> WindrosePlusAdminSteamIdByServer  { get; set; } = new();
+    /// <summary>Per-server opt-in state for WindrosePlus. Key = server InstallDir. Default: NeverAsked (seeded by migration).</summary>
+    public Dictionary<string, OptInState> WindrosePlusOptInStateByServer { get; set; } = new();
 }

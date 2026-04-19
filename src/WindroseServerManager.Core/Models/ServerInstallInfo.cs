@@ -7,8 +7,12 @@ public sealed record ServerInstallInfo(
     long SizeBytes,
     DateTime? LastUpdatedUtc,
     bool WindrosePlusActive = false,
-    string? WindrosePlusVersionTag = null)
+    string? WindrosePlusVersionTag = null,
+    string? WindrosePlusRconPassword = null,
+    int WindrosePlusDashboardPort = 0,
+    string? WindrosePlusAdminSteamId = null,
+    OptInState WindrosePlusOptInState = OptInState.NeverAsked)
 {
     public static ServerInstallInfo NotInstalled(string installDir) =>
-        new(false, installDir, null, 0, null, false, null);
+        new(false, installDir, null, 0, null);
 }
