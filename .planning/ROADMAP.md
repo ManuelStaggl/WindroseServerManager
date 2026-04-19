@@ -46,11 +46,11 @@ Plans:
   2. On wizard confirmation, the app generates a secure random RCON password, captures the admin Steam-ID, and picks a free local port for the WindrosePlus dashboard (no hardcoded port)
   3. First launch of v1.2 detects per existing server whether WindrosePlus is installed; servers without it are offered a non-modal retrofit dialog with the same feature list and opt-out
   4. The retrofit choice persists per server across restarts; no server is ever upgraded silently — explicit confirmation is required every time
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Wave 1: foundation — OptInState enum, AppSettings + ServerInstallInfo extensions, RCON/SteamID/FreePort helpers, opt-in migration + Wave-0 xUnit tests
-- [ ] 09-02-PLAN.md — Wave 2: InstallWizardWindow (3-step) + shared WindrosePlusOptInControl + InstallWizardViewModel + "New server" entry point + bilingual strings
+- [x] 09-01-PLAN.md — Wave 1: foundation — OptInState enum, AppSettings + ServerInstallInfo extensions, RCON/SteamID/FreePort helpers, opt-in migration + Wave-0 xUnit tests
+- [x] 09-02-PLAN.md — Wave 2: InstallWizardWindow (3-step) + shared WindrosePlusOptInControl + InstallWizardViewModel + "New server" entry point + bilingual strings
 - [ ] 09-03-PLAN.md — Wave 3: Retrofit banner on DashboardView + RetrofitDialog reusing WindrosePlusOptInControl (RETRO-02/03)
 
 ### Phase 10: Health & Support
@@ -87,7 +87,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
-| 9. Opt-in UX (Wizard + Retrofit) | 1/3 | In Progress|  |
+| 9. Opt-in UX (Wizard + Retrofit) | 2/3 | In Progress|  |
 | 10. Health & Support | 0/0 | Not started | — |
 | 11. Feature Views | 0/0 | Not started | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |

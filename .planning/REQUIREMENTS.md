@@ -20,8 +20,8 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Install Wizard
 
-- [ ] **WIZARD-01**: New-server wizard includes a WindrosePlus step listing features gained (Kick/Ban/Broadcast/Events/Chart/INI-Editor) with a link to the WindrosePlus GitHub
-- [ ] **WIZARD-02**: WindrosePlus is default-on in the wizard; user can opt-out with one click
+- [x] **WIZARD-01**: New-server wizard includes a WindrosePlus step listing features gained (Kick/Ban/Broadcast/Events/Chart/INI-Editor) with a link to the WindrosePlus GitHub
+- [x] **WIZARD-02**: WindrosePlus is default-on in the wizard; user can opt-out with one click
 - [x] **WIZARD-03**: Wizard sets a secure random RCON password and captures the admin Steam-ID on confirmation
 - [x] **WIZARD-04**: Wizard picks a free local port for the WindrosePlus dashboard (no fixed port, supports multi-instance users)
 

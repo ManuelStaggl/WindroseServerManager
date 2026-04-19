@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-04-19T18:10:18Z"
-last_activity: 2026-04-19 — Plan 09-01 executed (3 feat commits, 34 Phase9 tests green, full suite 105/105)
+last_updated: "2026-04-19T19:00:00Z"
+last_activity: 2026-04-19 — Plan 09-02 executed (2 feat + 5 fix commits, wizard smoke-tested, WIZARD-01/02 complete)
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 9 — Opt-in UX (Wizard + Retrofit)
-Plan: 02 — next (wizard UI); Plan 01 (foundation) complete
-Status: Phase 9 foundation shipped — data contract + helpers + migration in place
-Last activity: 2026-04-19 — Plan 09-01 executed (3 feat commits, 34 Phase9 tests green, full suite 105/105)
+Plan: 03 — next (retrofit dialog); Plans 01 + 02 complete
+Status: Phase 9 wizard complete — InstallWizardWindow + WindrosePlusOptInControl + IWindrosePlusOptInContext shipped
+Last activity: 2026-04-19 — Plan 09-02 executed (2 feat + 5 fix commits, wizard smoke-tested, WIZARD-01/02 complete)
 
 ## Project Reference
 
@@ -88,10 +88,19 @@ v1.2 scope decisions:
 - `OnShowWindrosePlusLicenseClick` uses `FindControl<T>("name")` instead of x:Name field access — Avalonia source generator did not emit fields for the new elements; FindControl matches the pre-existing `VersionText` pattern in the same dialog constructor
 - Localization namespace established for WindrosePlus: `About.ThirdPartyLicenses.*`, `About.WindrosePlus.*`, `Warning.WindrosePlus*`, `Error.WindrosePlus*` — Phases 9-12 extend this
 
+## Decisions (Plan 09-02)
+
+- `IWindrosePlusOptInContext` defined as a separate interface file — UserControl code-behind casts DataContext to the interface only; both InstallWizardViewModel (Plan 02) and RetrofitDialogViewModel (Plan 03) implement it; zero VM-type coupling in the UserControl
+- Feature grid uses compact 3×2 layout (3 columns, 2 rows) — fits inside 560 px wizard without vertical scroll at 100% DPI; original plan described 2×3
+- Stepper rendered via three inline named Borders with Classes toggled from code-behind — simpler than an IntEqualsConverter + ItemsControl for a fixed 3-step flow
+- SteamIdParser extended to explicitly recognize vanity `/id/` URLs and return null — needed for deterministic red-border UX; plan originally only mentioned generic invalid input handling
+- Retrofit.* string keys (`Retrofit.Banner.Title`, `Retrofit.Banner.Body`, `Retrofit.Banner.Action.Install/Later`, `Retrofit.Dialog.Title`) ship in Plan 02 — Plan 03 reuses without adding new string keys
+- `AddTransient<InstallWizardViewModel>` in DI — each wizard open resolves fresh instance with new RCON password + port probe; Singleton would share stale state across opens
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 9 Plan 01 (foundation) complete. Next: Plan 09-02 — Wizard UI (Avalonia ContentDialog consuming `RconPasswordGenerator.Generate()`, `FreePortProbe.FindFreePort()`, `SteamIdParser.ExtractSteamId64()` and persisting via `AppSettingsService.UpdateAsync`).
+Phase 9 Plan 02 (wizard UI) complete. Next: Plan 09-03 — Retrofit dialog (RetrofitDialogViewModel implementing IWindrosePlusOptInContext, retrofit banner on DashboardView, reusing WindrosePlusOptInControl).
