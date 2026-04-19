@@ -13,10 +13,10 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Bootstrap (WindrosePlus packaging)
 
-- [ ] **WPLUS-01**: App fetches the latest WindrosePlus release from GitHub Releases API and caches the archive locally as offline-install fallback
-- [ ] **WPLUS-02**: WindrosePlus install extracts into the active server's game-binaries directory and produces a working UE4SS + WindrosePlus payload
-- [ ] **WPLUS-03**: WindrosePlus LICENSE (MIT, HumanGenome) is bundled with the install and shown in the About dialog; name "WindrosePlus" is never rebranded
-- [ ] **WPLUS-04**: On server launch, app uses `StartWindrosePlusServer.bat` when WindrosePlus is active and `WindroseServer.exe` when the server has opted out
+- [x] **WPLUS-01**: App fetches the latest WindrosePlus release from GitHub Releases API and caches the archive locally as offline-install fallback
+- [x] **WPLUS-02**: WindrosePlus install extracts into the active server's game-binaries directory and produces a working UE4SS + WindrosePlus payload
+- [x] **WPLUS-03**: WindrosePlus LICENSE (MIT, HumanGenome) is bundled with the install and shown in the About dialog; name "WindrosePlus" is never rebranded
+- [x] **WPLUS-04**: On server launch, app uses `StartWindrosePlusServer.bat` when WindrosePlus is active and `WindroseServer.exe` when the server has opted out
 
 ### Install Wizard
 
@@ -85,10 +85,10 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WPLUS-01 | 8 | Pending |
-| WPLUS-02 | 8 | Pending |
-| WPLUS-03 | 8 | Pending |
-| WPLUS-04 | 8 | Pending |
+| WPLUS-01 | 8 | Complete |
+| WPLUS-02 | 8 | Complete |
+| WPLUS-03 | 8 | Complete |
+| WPLUS-04 | 8 | Complete |
 | WIZARD-01 | 9 | Pending |
 | WIZARD-02 | 9 | Pending |
 | WIZARD-03 | 9 | Pending |

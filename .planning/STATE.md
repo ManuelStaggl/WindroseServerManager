@@ -3,9 +3,9 @@
 ## Current Position
 
 Phase: 8 — WindrosePlus Bootstrap
-Plan: —
-Status: Roadmap complete — ready for `/gsd:plan-phase 8`
-Last activity: 2026-04-19 — v1.2 roadmap created (phases 8–12)
+Plan: 02 (next — Wave 1 implementation)
+Status: Plan 08-01 complete — contract + fixtures + skipped behavior tests landed
+Last activity: 2026-04-19 — Plan 08-01 executed (3 tasks, 55 passed / 13 skipped / 0 failed)
 
 ## Project Reference
 
@@ -20,7 +20,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 
 | Phase | Status |
 |-------|--------|
-| 8. WindrosePlus Bootstrap | Not started — next |
+| 8. WindrosePlus Bootstrap | In progress — Plan 01/03 complete (contract + fixtures + skipped behavior tests) |
 | 9. Opt-in UX (Wizard + Retrofit) | Not started |
 | 10. Health & Support | Not started |
 | 11. Feature Views | Not started |
@@ -40,10 +40,18 @@ v1.2 scope decisions:
 - Phase 8 establishes a shared `WindrosePlusService` consumed by all later phases
 - WindrosePlus collaboration proposal posted as GitHub issue at HumanGenome/WindrosePlus 2026-04-19 — user chose to proceed independently regardless of upstream response (MIT license covers bundling)
 
+## Decisions (Plan 08-01)
+
+- License filename bundled into server dir: `WindrosePlus-LICENSE.txt` (groups alphabetically with `.wplus-version` marker)
+- Expected `WindrosePlusService` constructor signature for Plan 02: `(ILogger<WindrosePlusService> logger, IHttpClientFactory httpClientFactory, string cacheDir)`
+- Per-server WP state keyed by full `InstallDir` path in `AppSettings.WindrosePlusActiveByServer` / `WindrosePlusVersionByServer`; `ServerInstallInfo` fields are read-through (no double-persistence)
+- Wave-0 tests ship as `[Fact(Skip=...)]` against `IWindrosePlusService`; Plan 02 removes `Skip` args and instantiates the concrete class — minimal diff
+- `FakeGithubReleaseServer.FailWindrosePlusAsset` toggle added to support the atomic-install-failure test (mid-download 500 simulation)
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Run `/gsd:plan-phase 8` to break Phase 8 (WindrosePlus Bootstrap) into executable plans.
+Run `/gsd:execute-plan 8 2` to execute Plan 08-02 (Wave 1: `WindrosePlusService` implementation — unskip the 13 behavior tests).
