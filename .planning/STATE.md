@@ -16,10 +16,10 @@ progress:
 
 ## Current Position
 
-Phase: 9 — Opt-in UX (Wizard + Retrofit)
-Plan: 03 — COMPLETE; all 3 plans done
-Status: Phase 9 complete — retrofit banner + dialog shipped (RetrofitBannerViewModel, RetrofitDialog, DashboardView integration, Settings WP card). RETRO-02/03 + all WIZARD-01..04 + RETRO-01 satisfied.
-Last activity: 2026-04-19 — Plan 09-03 executed (3 feat commits, retrofit banner + dialog smoke-tested, RETRO-02/03 complete)
+Phase: 10 — Health & Support
+Plan: 01 — COMPLETE
+Status: Phase 10 Plan 01 complete — HealthCheckHelper + ReportUrlBuilder shipped as Core static helpers, 6 Phase10 tests GREEN, full 112-test suite passes. HEALTH-01 + HEALTH-02 satisfied.
+Last activity: 2026-04-20 — Plan 10-01 executed (TDD RED→GREEN, 2 commits: test + feat)
 
 ## Project Reference
 
@@ -36,7 +36,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 |-------|--------|
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
 | 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
-| 10. Health & Support | Not started |
+| 10. Health & Support | In Progress — Plan 01/02 complete (HealthCheckHelper + ReportUrlBuilder). Plan 02 pending. |
 | 11. Feature Views | Not started |
 | 12. Empty States (Opt-out UX) | Not started |
 
@@ -105,10 +105,18 @@ v1.2 scope decisions:
 - No close-X on banner (RETRO-03 compliance): only explicit "Jetzt installieren" or "Nicht jetzt" exits are provided
 - WindrosePlus Settings card added (extra, Rule 2 deviation): users who dismissed "Nicht jetzt" need a stable re-entry point to install/manage WP without JSON editing
 
+## Decisions (Plan 10-01)
+
+- Both helpers are `public static` classes — no `InternalsVisibleTo` needed; test project reaches them directly via ProjectReference
+- `port <= 0` guard (not `== 0`) in HealthCheckHelper to cover negative port edge cases
+- Linked CTS with `CancelAfter(3s)` as inner safety-net independent of caller token
+- ReportUrlBuilder uses C# 8+ range slice `l[..MaxLogLineChars]` for truncation
+- No InternalsVisibleTo added to Core.csproj — all types are public
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 9 complete. Next: Phase 10 — Health & Support (WindrosePlus HTTP dashboard polling, inline health-check banner, "Report to WindrosePlus" GitHub issue button).
+Phase 10 Plan 01 complete. Next: Phase 10 Plan 02 — Wire HealthCheckHelper + ReportUrlBuilder into DashboardViewModel (HTTP polling, health banner, report button).

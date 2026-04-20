@@ -33,8 +33,8 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Health & Support
 
-- [ ] **HEALTH-01**: App polls the WindrosePlus HTTP dashboard after server start and shows an inline banner if the endpoint does not respond
-- [ ] **HEALTH-02**: The incompat banner offers a "Report to WindrosePlus" button that opens a prefilled GitHub issue (Windrose version, WindrosePlus version, server log tail)
+- [x] **HEALTH-01**: App polls the WindrosePlus HTTP dashboard after server start and shows an inline banner if the endpoint does not respond
+- [x] **HEALTH-02**: The incompat banner offers a "Report to WindrosePlus" button that opens a prefilled GitHub issue (Windrose version, WindrosePlus version, server log tail)
 
 ### Player Management
 
@@ -96,8 +96,8 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 | RETRO-01 | 9 | Complete |
 | RETRO-02 | 9 | Pending |
 | RETRO-03 | 9 | Pending |
-| HEALTH-01 | 10 | Pending |
-| HEALTH-02 | 10 | Pending |
+| HEALTH-01 | 10 | Complete |
+| HEALTH-02 | 10 | Complete |
 | PLAYER-01 | 11 | Pending |
 | PLAYER-02 | 11 | Pending |
 | PLAYER-03 | 11 | Pending |

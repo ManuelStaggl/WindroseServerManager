@@ -61,7 +61,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. After server start, the app polls the WindrosePlus HTTP dashboard; if the endpoint does not respond within the health-check window, an inline banner appears in the server's main view explaining the incompatibility
   2. The banner's "Report to WindrosePlus" button opens a prefilled GitHub issue on the HumanGenome/WindrosePlus repository containing the Windrose version, WindrosePlus version, and server log tail
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 10-01-PLAN.md — Wave 1: Core helpers (HealthCheckHelper + ReportUrlBuilder) + Wave-0 xUnit tests
@@ -93,7 +93,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
 | 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
-| 10. Health & Support | 0/2 | Not started | — |
+| 10. Health & Support | 1/2 | In Progress|  |
 | 11. Feature Views | 0/0 | Not started | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |
 
