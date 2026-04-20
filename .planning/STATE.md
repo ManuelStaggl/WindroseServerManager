@@ -9,7 +9,7 @@ progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 11 — Feature Views
-Plan: 04 — COMPLETE
-Status: Plan 11-04 complete — Canvas-based Sea-Chart view shipped: PlayerMarkerViewModel (CanvasX/CanvasY/SelectCommand), SeaChartViewModel (5s poll timer, auto-expanding world bounds, marker diff by SteamId, GenerateMap RCON + map.png polling), SeaChartView.axaml (Canvas + ItemsControl markers + detail panel), i18n strings (EN + DE). CHART-01 + CHART-02 satisfied. 155/155 tests pass, 0 build errors.
-Last activity: 2026-04-20 — Plan 11-04 executed (Sea-Chart view: PlayerMarkerViewModel + SeaChartViewModel + Canvas XAML + i18n)
+Plan: 02 — COMPLETE
+Status: Plan 11-02 complete — Players view shipped: PlayersViewModel (System.Timers.Timer poll, DiffUpdate, KickAsync/BanAsync/BroadcastAsync RelayCommands, IDisposable), BanDialog (Permanent/Timed, BanDialogResult record), PlayersView.axaml (DataGrid + toolbar), i18n 22 keys DE+EN. PLAYER-01...PLAYER-04 satisfied. 155/155 tests pass, 0 build errors.
+Last activity: 2026-04-20 — Plan 11-02 executed (Players view: poll timer + kick/ban/broadcast RCON + BanDialog + full DataGrid UI)
 
 ## Project Reference
 
@@ -141,10 +141,16 @@ v1.2 scope decisions:
 - `EventsViewModel` ctor takes `IWindrosePlusApiService` as future extension point (not used in Plan 03); Plan 02 may use it for kick/ban integrations
 - Skeleton ViewModels/Views for Plans 11-02/11-04/11-05 (PlayersViewModel, SeaChartViewModel, EditorViewModel + Views) committed in this plan because linter auto-updated MainWindowViewModel to reference all 4 Phase-11 nav types simultaneously — staged to keep build green
 
+## Decisions (Plan 11-02)
+
+- DiffUpdate avoids ObservableCollection.Clear() on each poll tick — prevents selection loss and reduces UI jank during refresh cycles
+- BanDialogResult(int? Minutes) record: null=permanent, int=timed duration — clean discriminated-union pattern without enum, pattern-matched in BanAsync
+- Watermark attribute kept on TextBox (matching project-wide convention) instead of PlaceholderText
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 11 Plan 04 complete. Next: Phase 11 Plan 02 — Players view (player list, kick/ban, RCON commands) or Plan 05 — Config Editor (INI editor with inline validation).
+Phase 11 Plan 02 complete. Next: Phase 11 Plan 05 — Config Editor (INI editor for windrose_plus.json with inline validation).

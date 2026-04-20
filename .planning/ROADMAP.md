@@ -76,7 +76,7 @@ Plans:
   2. The Events view streams join/leave records from `events.log` live via FileSystemWatcher, supports filtering/search by name/Steam-ID/type, and stays responsive at >1000 entries (virtualization or pagination)
   3. The Sea-Chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`; clicking a marker opens a popover with name, Steam-ID, alive state, and ship info when available
   4. The INI/Multiplier editor lists all WindrosePlus-exposed settings grouped by category, validates values against the config schema inline before save, writes the config file on save, and prompts the user to restart when the server is running
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [ ] 11-01-PLAN.md — Wave 1: foundation — IWindrosePlusApiService + EventsLogParser + SeaChartMath + WindrosePlusConfigSchema + 5 Core models + Wave-0 xUnit tests + skeleton ViewModels/Pages + nav wiring + DI registration
@@ -101,7 +101,7 @@ Plans:
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
 | 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
 | 10. Health & Support | 2/2 | Complete    | 2026-04-20 |
-| 11. Feature Views | 3/5 | In Progress|  |
+| 11. Feature Views | 4/5 | In Progress|  |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |
 
 ## Coverage Map
