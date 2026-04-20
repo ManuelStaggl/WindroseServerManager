@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using WindroseServerManager.App.Services;
+using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
@@ -28,12 +29,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<NavItem> NavItems { get; }
     public ObservableCollection<NavItem> FooterItems { get; }
+    public ObservableCollection<ServerEntry> Servers { get; } = new();
     public IToastService Toasts { get; }
 
     [ObservableProperty] private ViewModelBase? _currentPage;
     [ObservableProperty] private NavItem? _selectedMainItem;
     [ObservableProperty] private NavItem? _selectedFooterItem;
+    [ObservableProperty] private ServerEntry? _activeServer;
     private bool _suppressSelectionSync;
+
+    public bool HasMultipleServers => Servers.Count > 1;
 
     // --- App-Update-Banner ---
     [ObservableProperty] private bool _isUpdateBannerVisible;
@@ -61,7 +66,7 @@ public partial class MainWindowViewModel : ViewModelBase
         NavItems = new ObservableCollection<NavItem>
         {
             new() { TitleKey = "Nav.Dashboard", Icon = "\uE80F", VmType = typeof(DashboardViewModel) },
-            new() { TitleKey = "Nav.Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
+            new() { TitleKey = "Nav.Server", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
             new() { TitleKey = "Nav.ServerControl", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
             new() { TitleKey = "Nav.Configuration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
             // Phase 11 — WindrosePlus Feature Views
@@ -91,6 +96,13 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedMainItem = hasInstall ? NavItems[0] : NavItems[1];
 
         appUpdate.UpdateChecked += OnUpdateChecked;
+
+        // Initiale Server-Liste laden
+        SyncServersFromSettings(settings.Current);
+
+        // Bei Einstellungsänderungen (z.B. Server hinzugefügt/entfernt) neu synchronisieren
+        settings.Changed += current =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => SyncServersFromSettings(current));
     }
 
     partial void OnSelectedMainItemChanged(NavItem? value)
@@ -115,6 +127,39 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var vm = (ViewModelBase)App.Services.GetService(item.VmType)!;
         _nav.NavigateTo(vm);
+    }
+
+    partial void OnActiveServerChanged(ServerEntry? value)
+    {
+        if (value is null) return;
+        _ = SelectServerSafeAsync(value.Id);
+    }
+
+    private async Task SelectServerSafeAsync(string serverId)
+    {
+        try
+        {
+            await _settings.SelectServerAsync(serverId).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Server-Wechsel zu {ServerId} fehlgeschlagen", serverId);
+        }
+    }
+
+    private void SyncServersFromSettings(WindroseServerManager.Core.Models.AppSettings current)
+    {
+        Servers.Clear();
+        foreach (var server in current.Servers)
+            Servers.Add(server);
+
+        OnPropertyChanged(nameof(HasMultipleServers));
+
+        // Aktiven Server setzen ohne OnActiveServerChanged auszulösen (kein SelectServerAsync-Call nötig)
+        var activeId = current.ActiveServerId;
+        var active = Servers.FirstOrDefault(s => s.Id == activeId) ?? Servers.FirstOrDefault();
+        _activeServer = active;
+        OnPropertyChanged(nameof(ActiveServer));
     }
 
     [RelayCommand]

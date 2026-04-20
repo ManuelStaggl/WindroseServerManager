@@ -18,6 +18,7 @@
     <sys:String x:Key="Window.Maximize">Maximieren</sys:String>
     <sys:String x:Key="Window.Close">Schließen</sys:String>
     <sys:String x:Key="Nav.MainMenu">Hauptmenü</sys:String>
+    <sys:String x:Key="Nav.ServerSelector">Aktiver Server</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
@@ -527,6 +528,26 @@
 
     <sys:String x:Key="Installation.NewServer">Neuen Server einrichten</sys:String>
     <sys:String x:Key="Action.Back">Zurück</sys:String>
+
+    <!-- Multi-Server Management (Phase 12) -->
+    <sys:String x:Key="Nav.Server">Server</sys:String>
+    <sys:String x:Key="Server.AddNew">Neuer Server</sys:String>
+    <sys:String x:Key="Server.Active">Aktiv</sys:String>
+    <sys:String x:Key="Server.SetActive">Aktiv setzen</sys:String>
+    <sys:String x:Key="Server.Delete">Server löschen</sys:String>
+    <sys:String x:Key="Server.Delete.Confirm">Server aus der Liste entfernen? Die Dateien auf der Festplatte bleiben erhalten.</sys:String>
+    <sys:String x:Key="Server.Empty">Kein Server konfiguriert</sys:String>
+    <sys:String x:Key="Server.Empty.Hint">Klicke auf "Neuer Server" um deinen ersten Windrose-Server einzurichten.</sys:String>
+    <sys:String x:Key="Server.Step1.Title">Server einrichten</sys:String>
+    <sys:String x:Key="Server.Step2.Title">WindrosePlus</sys:String>
+    <sys:String x:Key="Server.Step3.Title">Installation</sys:String>
+    <sys:String x:Key="Server.Name.Label">Server-Name</sys:String>
+    <sys:String x:Key="Server.Name.Hint">z.B. Mein Windrose Server</sys:String>
+    <sys:String x:Key="Server.Cancel">Abbrechen</sys:String>
+    <sys:String x:Key="Server.Next">Weiter</sys:String>
+    <sys:String x:Key="Server.Back">Zurück</sys:String>
+    <sys:String x:Key="Server.StartInstall">Installation starten</sys:String>
+    <sys:String x:Key="Server.Done">Fertig</sys:String>
 
     <!-- Phase 11 — Events View (EVENT-01, EVENT-02, EVENT-03) -->
     <sys:String x:Key="Events.Title">Ereignislog</sys:String>

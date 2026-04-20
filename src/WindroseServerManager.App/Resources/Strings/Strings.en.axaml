@@ -18,6 +18,7 @@
     <sys:String x:Key="Window.Maximize">Maximize</sys:String>
     <sys:String x:Key="Window.Close">Close</sys:String>
     <sys:String x:Key="Nav.MainMenu">Main menu</sys:String>
+    <sys:String x:Key="Nav.ServerSelector">Active server</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
@@ -527,6 +528,26 @@
 
     <sys:String x:Key="Installation.NewServer">Set Up New Server</sys:String>
     <sys:String x:Key="Action.Back">Back</sys:String>
+
+    <!-- Multi-Server Management (Phase 12) -->
+    <sys:String x:Key="Nav.Server">Server</sys:String>
+    <sys:String x:Key="Server.AddNew">New Server</sys:String>
+    <sys:String x:Key="Server.Active">Active</sys:String>
+    <sys:String x:Key="Server.SetActive">Set Active</sys:String>
+    <sys:String x:Key="Server.Delete">Delete Server</sys:String>
+    <sys:String x:Key="Server.Delete.Confirm">Remove server from list? Files on disk will be preserved.</sys:String>
+    <sys:String x:Key="Server.Empty">No server configured</sys:String>
+    <sys:String x:Key="Server.Empty.Hint">Click "New Server" to set up your first Windrose server.</sys:String>
+    <sys:String x:Key="Server.Step1.Title">Set up server</sys:String>
+    <sys:String x:Key="Server.Step2.Title">WindrosePlus</sys:String>
+    <sys:String x:Key="Server.Step3.Title">Installation</sys:String>
+    <sys:String x:Key="Server.Name.Label">Server name</sys:String>
+    <sys:String x:Key="Server.Name.Hint">e.g. My Windrose Server</sys:String>
+    <sys:String x:Key="Server.Cancel">Cancel</sys:String>
+    <sys:String x:Key="Server.Next">Next</sys:String>
+    <sys:String x:Key="Server.Back">Back</sys:String>
+    <sys:String x:Key="Server.StartInstall">Start Installation</sys:String>
+    <sys:String x:Key="Server.Done">Done</sys:String>
 
     <!-- Phase 11 — Events View (EVENT-01, EVENT-02, EVENT-03) -->
     <sys:String x:Key="Events.Title">Event Log</sys:String>

@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:WindroseServerManager.App.ViewModels"
         xmlns:svc="using:WindroseServerManager.App.Services"
+        xmlns:models="using:WindroseServerManager.Core.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
@@ -77,7 +78,7 @@
                 Background="{DynamicResource BrandNavySurfaceBrush}"
                 BorderBrush="{DynamicResource BrandNavyBorderBrush}"
                 BorderThickness="0,0,1,0">
-            <Grid RowDefinitions="Auto,*,Auto">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
                 <!-- Logo-Bereich dient zugleich als Drag-Zone für das Fenster -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="18,18,18,16" Spacing="12"
                             Name="SidebarDragZone" Background="Transparent">
@@ -114,14 +115,43 @@
                     </StackPanel>
                 </StackPanel>
 
-                <ListBox Grid.Row="1"
+                <!-- Server-Selektor: nur sichtbar wenn >1 Server konfiguriert -->
+                <Border Grid.Row="1"
+                        IsVisible="{Binding HasMultipleServers}"
+                        Margin="8,0,8,8"
+                        Padding="0"
+                        CornerRadius="6"
+                        Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                        BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                        BorderThickness="1">
+                    <StackPanel Margin="10,8,10,8" Spacing="4">
+                        <TextBlock Text="{DynamicResource Nav.ServerSelector}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                                   FontWeight="SemiBold" />
+                        <ComboBox ItemsSource="{Binding Servers}"
+                                  SelectedItem="{Binding ActiveServer}"
+                                  HorizontalAlignment="Stretch"
+                                  CornerRadius="4"
+                                  Padding="8,4"
+                                  AutomationProperties.Name="{DynamicResource Nav.ServerSelector}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:ServerEntry">
+                                    <TextBlock Text="{Binding Name}" FontSize="13" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <ListBox Grid.Row="2"
                          Classes="nav"
                          ItemsSource="{Binding NavItems}"
                          SelectedItem="{Binding SelectedMainItem}"
                          ItemTemplate="{StaticResource NavItemTemplate}"
                          AutomationProperties.Name="{DynamicResource Nav.MainMenu}" />
 
-                <StackPanel Grid.Row="2" Margin="0,0,0,8">
+                <StackPanel Grid.Row="3" Margin="0,0,0,8">
                     <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" Margin="8,8" />
                     <ListBox Classes="nav nav-footer"
                              ItemsSource="{Binding FooterItems}"
