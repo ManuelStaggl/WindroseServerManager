@@ -1,82 +1,391 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
-             xmlns:svc="using:WindroseServerManager.App.Services"
+             xmlns:controls="using:WindroseServerManager.App.Views.Controls"
              x:Class="WindroseServerManager.App.Views.Pages.InstallationView"
              x:DataType="vm:InstallationViewModel">
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-        <TextBlock Grid.Row="0" Classes="page-title" Text="{DynamicResource Installation.Title}" />
-        <TextBlock Grid.Row="1" Classes="caption" Text="{DynamicResource Installation.Subtitle}" Margin="0,4,0,20" />
+    <UserControl.Resources>
+        <vm:IntEqualsConverter x:Key="IntEquals" />
+        <vm:IntGreaterThanConverter x:Key="IntGreater" />
+        <vm:IntLessThanConverter x:Key="IntLess" />
+    </UserControl.Resources>
 
-        <Border Grid.Row="2" Classes="card" Margin="0,0,0,16">
-            <StackPanel Spacing="12">
-                <TextBlock Classes="section-header" Text="{DynamicResource Installation.InstallDir}" />
-                <Grid ColumnDefinitions="*,Auto" >
-                    <TextBox Grid.Column="0" Text="{Binding InstallDir}" Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
-                    <Button Grid.Column="1" Content="{DynamicResource Action.Browse}" Command="{Binding PickFolderCommand}" Margin="8,0,0,0" />
-                </Grid>
-                <TextBlock Classes="caption" TextWrapping="Wrap"
-                           Text="{DynamicResource Installation.PathHint}" />
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Classes="primary" Content="{DynamicResource Installation.NewServer}"
-                            Command="{Binding OpenNewServerWizardCommand}"
-                            IsEnabled="{Binding !IsInstalling}" />
-                    <Button Classes="primary" Content="{DynamicResource Installation.InstallOrUpdate}"
-                            Command="{Binding InstallCommand}"
-                            IsEnabled="{Binding !IsInstalling}" />
-                    <Button Classes="action-btn" Content="{DynamicResource Action.Cancel}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsInstalling}" />
-                    <Button Classes="action-btn" Content="{DynamicResource Action.Recheck}" Command="{Binding RefreshCommand}" />
-                    <Button Classes="subtle" Content="{DynamicResource Action.OpenInExplorer}" Command="{Binding OpenInstallDirCommand}"
-                            IsEnabled="{Binding CanOpenInstallDir}" />
-                </StackPanel>
-                <TextBlock Classes="body muted" Text="{Binding CurrentPhase}" IsVisible="{Binding IsInstalling}" />
-                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsInstalling}" Height="4" />
-            </StackPanel>
-        </Border>
+    <Grid>
+        <!-- ================================================================ -->
+        <!-- SERVER LIST (IsAddingServer = false)                             -->
+        <!-- ================================================================ -->
+        <Grid RowDefinitions="Auto,Auto,*"
+              IsVisible="{Binding !IsAddingServer}">
 
-        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
-            <StackPanel Spacing="12">
-                <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0" Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Installation.Status}" />
-                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                            <Panel Width="12" Height="12">
-                                <Ellipse Width="12" Height="12"
-                                         Fill="{DynamicResource BrandSuccessBrush}"
-                                         IsVisible="{Binding InstallInfo.IsInstalled, FallbackValue=False}" />
-                                <Ellipse Width="12" Height="12"
-                                         Fill="{DynamicResource BrandTextMutedBrush}"
-                                         IsVisible="{Binding !InstallInfo.IsInstalled, FallbackValue=True}" />
-                            </Panel>
-                            <TextBlock Classes="section-header"
-                                       Text="{Binding InstalledStatusText}" />
-                        </StackPanel>
+            <!-- Page header -->
+            <TextBlock Grid.Row="0"
+                       Classes="page-title"
+                       Text="{DynamicResource Nav.Server}" />
+            <TextBlock Grid.Row="1"
+                       Classes="caption"
+                       Margin="0,4,0,20"
+                       Text="{DynamicResource Installation.Subtitle}" />
+
+            <Grid Grid.Row="2" RowDefinitions="Auto,*">
+
+                <!-- "Neuer Server" button -->
+                <Button Grid.Row="0"
+                        Classes="primary"
+                        Content="{DynamicResource Server.AddNew}"
+                        Command="{Binding AddServerCommand}"
+                        Margin="0,0,0,16" />
+
+                <!-- Empty state -->
+                <Border Grid.Row="1"
+                        Classes="card"
+                        IsVisible="{Binding ServerCards.Count,
+                                   Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="12"
+                                Margin="0,40">
+                        <TextBlock Classes="section-header"
+                                   HorizontalAlignment="Center"
+                                   Text="{DynamicResource Server.Empty}" />
+                        <TextBlock Classes="body muted"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="360"
+                                   TextAlignment="Center"
+                                   Text="{DynamicResource Server.Empty.Hint}" />
+                        <Button Classes="primary"
+                                HorizontalAlignment="Center"
+                                Content="{DynamicResource Server.AddNew}"
+                                Command="{Binding AddServerCommand}"
+                                Margin="0,8,0,0" />
                     </StackPanel>
-                    <Button Grid.Column="1" VerticalAlignment="Center"
-                            Content="{DynamicResource Installation.CheckUpdate}" Command="{Binding CheckUpdateCommand}"
-                            IsEnabled="{Binding !IsCheckingUpdate}" />
-                </Grid>
-                <TextBlock Classes="body muted" Text="{Binding BuildIdDisplay}" />
-                <TextBlock Classes="body muted" Text="{Binding BinaryDisplay}" TextWrapping="Wrap" />
-                <TextBlock Classes="body muted" Text="{Binding LastUpdatedDisplay}" />
-                <TextBlock Classes="body" Text="{Binding UpdateMessageDisplay}" TextWrapping="Wrap"
-                           IsVisible="{Binding UpdateMessageDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            </StackPanel>
-        </Border>
+                </Border>
 
-        <Border Grid.Row="4" Classes="card">
-            <Grid RowDefinitions="Auto,*">
-                <TextBlock Grid.Row="0" Classes="section-header" Text="{DynamicResource Installation.Log}" Margin="0,0,0,8" />
-                <ScrollViewer Grid.Row="1" svc:AutoScrollBehavior.IsEnabled="True">
-                    <ItemsControl ItemsSource="{Binding Log}">
+                <!-- Server cards list -->
+                <ScrollViewer Grid.Row="1"
+                              IsVisible="{Binding ServerCards.Count,
+                                         Converter={x:Static vm:IntToBoolConverter.Instance}}"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ServerCards}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" FontFamily="Consolas,Courier New" FontSize="12" />
+                            <DataTemplate DataType="vm:ServerCardViewModel">
+                                <Border Classes="card"
+                                        Margin="0,0,0,10">
+                                    <Grid ColumnDefinitions="*,Auto">
+
+                                        <!-- Left: name + path + active badge -->
+                                        <StackPanel Grid.Column="0"
+                                                    Spacing="6"
+                                                    VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <TextBlock Classes="section-header"
+                                                           Text="{Binding Name}" />
+                                                <!-- Active badge -->
+                                                <Border CornerRadius="4"
+                                                        Background="{DynamicResource BrandAmberBrush}"
+                                                        Padding="6,2"
+                                                        IsVisible="{Binding IsActive}">
+                                                    <TextBlock Classes="caption"
+                                                               Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                                               Text="{DynamicResource Server.Active}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Classes="body muted"
+                                                       Text="{Binding InstallDir}"
+                                                       TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+
+                                        <!-- Right: action buttons -->
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    VerticalAlignment="Center">
+                                            <Button Classes="subtle"
+                                                    Content="{DynamicResource Server.SetActive}"
+                                                    IsVisible="{Binding !IsActive}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).SelectServerCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            <Button Classes="danger"
+                                                    Content="{DynamicResource Server.Delete}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).DeleteServerCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
             </Grid>
-        </Border>
+        </Grid>
+
+        <!-- ================================================================ -->
+        <!-- INLINE WIZARD (IsAddingServer = true)                           -->
+        <!-- ================================================================ -->
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
+              IsVisible="{Binding IsAddingServer}"
+              RowSpacing="0">
+
+            <!-- Wizard page title -->
+            <TextBlock Grid.Row="0"
+                       Classes="page-title"
+                       Text="{DynamicResource Server.AddNew}"
+                       Margin="0,0,0,4" />
+
+            <!-- Stepper header — 3 indicators driven by WizardStep binding -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto,*,Auto,*,Auto"
+                  Margin="0,12,0,24">
+
+                <!-- Step 1 indicator -->
+                <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <!-- Active (step = 1) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandAmberBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntEquals}, ConverterParameter=1}">
+                        <TextBlock Text="1" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <!-- Done (step > 1) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandSuccessBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntGreater}, ConverterParameter=1}">
+                        <TextBlock Text="✓" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption" HorizontalAlignment="Center"
+                               Text="{DynamicResource Server.Step1.Title}" />
+                </StackPanel>
+
+                <Border Grid.Column="1" Height="1" VerticalAlignment="Top" Margin="4,11,4,0"
+                        Background="{DynamicResource BrandNavyBorderBrush}" />
+
+                <!-- Step 2 indicator -->
+                <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <!-- Inactive (step < 2) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntLess}, ConverterParameter=2}">
+                        <TextBlock Text="2" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <!-- Active (step = 2) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandAmberBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntEquals}, ConverterParameter=2}">
+                        <TextBlock Text="2" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <!-- Done (step > 2) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandSuccessBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntGreater}, ConverterParameter=2}">
+                        <TextBlock Text="✓" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption" HorizontalAlignment="Center"
+                               Text="{DynamicResource Server.Step2.Title}" />
+                </StackPanel>
+
+                <Border Grid.Column="3" Height="1" VerticalAlignment="Top" Margin="4,11,4,0"
+                        Background="{DynamicResource BrandNavyBorderBrush}" />
+
+                <!-- Step 3 indicator -->
+                <StackPanel Grid.Column="4" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
+                    <!-- Inactive (step < 3) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntLess}, ConverterParameter=3}">
+                        <TextBlock Text="3" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <!-- Active (step = 3) -->
+                    <Border Width="24" Height="24" CornerRadius="12"
+                            Background="{DynamicResource BrandAmberBrush}"
+                            IsVisible="{Binding WizardStep, Converter={StaticResource IntEquals}, ConverterParameter=3}">
+                        <TextBlock Text="3" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="caption" HorizontalAlignment="Center"
+                               Text="{DynamicResource Server.Step3.Title}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Scrollable step content -->
+            <ScrollViewer Grid.Row="2"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="24">
+
+                    <!-- Step 1: Server name + install dir -->
+                    <Border Classes="card"
+                            IsVisible="{Binding WizardStep,
+                                       Converter={StaticResource IntEquals}, ConverterParameter=1}">
+                        <StackPanel Spacing="16">
+                            <TextBlock Classes="section-header"
+                                       Text="{DynamicResource Server.Step1.Title}" />
+
+                            <!-- Server name -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="body"
+                                           Text="{DynamicResource Server.Name.Label}" />
+                                <TextBox Text="{Binding NewServerName, Mode=TwoWay}"
+                                         Watermark="{DynamicResource Server.Name.Hint}" />
+                            </StackPanel>
+
+                            <!-- Install dir -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="body"
+                                           Text="{DynamicResource Installation.InstallDir}" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding NewInstallDir, Mode=TwoWay}"
+                                             Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
+                                    <Button Grid.Column="1"
+                                            Content="{DynamicResource Action.Browse}"
+                                            Command="{Binding BrowseDirCommand}"
+                                            Margin="8,0,0,0" />
+                                </Grid>
+                                <TextBlock Classes="caption muted"
+                                           TextWrapping="Wrap"
+                                           Text="{DynamicResource Installation.PathHint}" />
+                            </StackPanel>
+
+                            <!-- Validation error -->
+                            <TextBlock Classes="caption"
+                                       Foreground="{DynamicResource BrandErrorBrush}"
+                                       TextWrapping="Wrap"
+                                       IsVisible="{Binding Step1Error,
+                                                  Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                       Text="{Binding Step1Error}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Step 2: WindrosePlus opt-in -->
+                    <Border Classes="card"
+                            IsVisible="{Binding WizardStep,
+                                       Converter={StaticResource IntEquals}, ConverterParameter=2}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="section-header"
+                                       Text="{DynamicResource Server.Step2.Title}" />
+                            <controls:WindrosePlusOptInControl />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Step 3: Progress / result -->
+                    <Border Classes="card"
+                            IsVisible="{Binding WizardStep,
+                                       Converter={StaticResource IntEquals}, ConverterParameter=3}">
+                        <StackPanel Spacing="16">
+                            <TextBlock Classes="section-header"
+                                       Text="{DynamicResource Server.Step3.Title}" />
+
+                            <!-- Summary (before install starts) -->
+                            <StackPanel Spacing="4"
+                                        IsVisible="{Binding !IsInstalling}">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="caption muted"
+                                               Text="{DynamicResource Server.Name.Label}" />
+                                    <TextBlock Classes="body"
+                                               Text="{Binding NewServerName}" />
+                                </StackPanel>
+                                <StackPanel Spacing="2" Margin="0,8,0,0">
+                                    <TextBlock Classes="caption muted"
+                                               Text="{DynamicResource Installation.InstallDir}" />
+                                    <TextBlock Classes="body"
+                                               Text="{Binding NewInstallDir}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Spacing="2" Margin="0,8,0,0">
+                                    <TextBlock Classes="caption muted"
+                                               Text="WindrosePlus" />
+                                    <TextBlock Classes="body"
+                                               Text="{Binding IsOptingIn,
+                                                      Converter={x:Static vm:BoolToYesNoConverter.Instance}}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Progress bar + phase text (while installing) -->
+                            <StackPanel Spacing="8"
+                                        IsVisible="{Binding IsInstalling}">
+                                <ProgressBar IsIndeterminate="True" Height="4" />
+                                <TextBlock Classes="caption"
+                                           Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                                           Text="{Binding CurrentPhase}" />
+                            </StackPanel>
+
+                            <!-- Phase text after install done (not installing, completed) -->
+                            <TextBlock Classes="body muted"
+                                       Text="{Binding CurrentPhase}"
+                                       IsVisible="{Binding InstallCompleted}" />
+
+                            <!-- Error -->
+                            <TextBlock Classes="body"
+                                       Foreground="{DynamicResource BrandErrorBrush}"
+                                       TextWrapping="Wrap"
+                                       IsVisible="{Binding HasWizardError}"
+                                       Text="{Binding WizardError}" />
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer buttons -->
+            <Grid Grid.Row="3"
+                  ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                  Margin="0,16,0,0">
+
+                <!-- Cancel -->
+                <Button Grid.Column="1"
+                        Classes="subtle"
+                        Content="{DynamicResource Server.Cancel}"
+                        Command="{Binding CancelAddCommand}"
+                        Margin="0,0,8,0" />
+
+                <!-- Back (steps 2 and 3, not during install) -->
+                <Button Grid.Column="2"
+                        Classes="subtle"
+                        Content="{DynamicResource Server.Back}"
+                        Command="{Binding PrevStepCommand}"
+                        Margin="0,0,8,0"
+                        IsVisible="{Binding WizardStep,
+                                   Converter={StaticResource IntGreater}, ConverterParameter=1}"
+                        IsEnabled="{Binding !IsInstalling}" />
+
+                <!-- Next (steps 1 and 2) -->
+                <Button Grid.Column="3"
+                        Classes="primary"
+                        Content="{DynamicResource Server.Next}"
+                        Command="{Binding NextStepCommand}"
+                        IsVisible="{Binding WizardStep,
+                                   Converter={StaticResource IntLess}, ConverterParameter=3}" />
+
+                <!-- Install (step 3, not yet completed) -->
+                <Button Grid.Column="4"
+                        Classes="primary"
+                        Content="{DynamicResource Server.StartInstall}"
+                        Command="{Binding InstallCommand}"
+                        IsVisible="{Binding WizardStep,
+                                   Converter={StaticResource IntEquals}, ConverterParameter=3}"
+                        IsEnabled="{Binding !IsInstalling}" />
+
+                <!-- Done (after success) -->
+                <Button Grid.Column="4"
+                        Classes="primary"
+                        Content="{DynamicResource Server.Done}"
+                        Command="{Binding FinishWizardCommand}"
+                        IsVisible="{Binding InstallCompleted}" />
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

@@ -5,5 +5,8 @@ namespace WindroseServerManager.App.Views.Pages;
 
 public partial class InstallationView : UserControl
 {
-    public InstallationView() { AvaloniaXamlLoader.Load(this); }
+    public InstallationView()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
 }
