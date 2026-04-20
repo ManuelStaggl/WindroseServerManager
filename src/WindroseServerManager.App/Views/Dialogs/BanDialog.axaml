@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WindroseServerManager.App.Views.Dialogs.BanDialog"
+        Width="460"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrandNavySurfaceBrush}"
+        Title="{DynamicResource Players.Ban.Title}">
+    <Border CornerRadius="8"
+            Background="{DynamicResource BrandNavySurfaceBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            Padding="20">
+        <StackPanel Spacing="16">
+            <TextBlock x:Name="TitleText" Classes="section-header" TextWrapping="Wrap" />
+            <TextBlock x:Name="MessageText" Classes="body" TextWrapping="Wrap" />
+
+            <StackPanel Spacing="8">
+                <RadioButton x:Name="PermanentRadio"
+                             GroupName="BanMode"
+                             IsChecked="True"
+                             Content="{DynamicResource Players.Ban.Permanent}" />
+                <RadioButton x:Name="TimedRadio"
+                             GroupName="BanMode"
+                             Content="{DynamicResource Players.Ban.Timed}" />
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0"
+                            IsEnabled="{Binding #TimedRadio.IsChecked}">
+                    <TextBlock Text="{DynamicResource Players.Ban.Minutes}" VerticalAlignment="Center" />
+                    <NumericUpDown x:Name="MinutesInput"
+                                   Minimum="1" Maximum="525600"
+                                   Value="60" Width="140"
+                                   FormatString="0" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+                <Button x:Name="CancelButton" Content="{DynamicResource Action.Cancel}" Click="OnCancelClick" />
+                <Button x:Name="ConfirmButton" Classes="danger" Content="{DynamicResource Players.Ban}" Click="OnConfirmClick" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
