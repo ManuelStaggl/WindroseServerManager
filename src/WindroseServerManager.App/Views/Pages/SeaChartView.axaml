@@ -26,7 +26,7 @@
                         <ItemsPanelTemplate><Canvas /></ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerTheme>
-                        <ControlTheme TargetType="ContentPresenter">
+                        <ControlTheme TargetType="ContentPresenter" x:DataType="vm:PlayerMarkerViewModel">
                             <Setter Property="Canvas.Left" Value="{Binding CanvasX}" />
                             <Setter Property="Canvas.Top"  Value="{Binding CanvasY}" />
                         </ControlTheme>
