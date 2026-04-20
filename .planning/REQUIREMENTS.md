@@ -38,10 +38,10 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Player Management
 
-- [ ] **PLAYER-01**: Players view lists all currently connected players with name, Steam-ID, alive state, session duration; refreshes on a configurable interval
-- [ ] **PLAYER-02**: User can kick a selected player with a confirmation dialog
-- [ ] **PLAYER-03**: User can ban a selected player (permanent or timed) with a confirmation dialog
-- [ ] **PLAYER-04**: User can broadcast a chat message to all connected players via a single input field
+- [x] **PLAYER-01**: Players view lists all currently connected players with name, Steam-ID, alive state, session duration; refreshes on a configurable interval
+- [x] **PLAYER-02**: User can kick a selected player with a confirmation dialog
+- [x] **PLAYER-03**: User can ban a selected player (permanent or timed) with a confirmation dialog
+- [x] **PLAYER-04**: User can broadcast a chat message to all connected players via a single input field
 
 ### Events History
 
@@ -51,14 +51,14 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Sea-Chart Viewer
 
-- [ ] **CHART-01**: Sea-chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`
+- [x] **CHART-01**: Sea-chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`
 - [ ] **CHART-02**: Clicking a player marker opens a popover with name, Steam-ID, alive state, ship info (if available)
 
 ### Multiplier / INI Editor
 
-- [ ] **EDITOR-01**: Editor lists all WindrosePlus-exposed settings (spawn multipliers, loot rates, etc.) grouped by category
-- [ ] **EDITOR-02**: Editor validates values against the WindrosePlus config schema before save; invalid values show inline errors
-- [ ] **EDITOR-03**: Save writes the WindrosePlus config file and, if the server is running, notifies the user that a restart is needed
+- [x] **EDITOR-01**: Editor lists all WindrosePlus-exposed settings (spawn multipliers, loot rates, etc.) grouped by category
+- [x] **EDITOR-02**: Editor validates values against the WindrosePlus config schema before save; invalid values show inline errors
+- [x] **EDITOR-03**: Save writes the WindrosePlus config file and, if the server is running, notifies the user that a restart is needed
 
 ### Empty States (opt-out UX)
 
@@ -98,18 +98,18 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 | RETRO-03 | 9 | Pending |
 | HEALTH-01 | 10 | Complete |
 | HEALTH-02 | 10 | Complete |
-| PLAYER-01 | 11 | Pending |
-| PLAYER-02 | 11 | Pending |
-| PLAYER-03 | 11 | Pending |
-| PLAYER-04 | 11 | Pending |
+| PLAYER-01 | 11 | Complete |
+| PLAYER-02 | 11 | Complete |
+| PLAYER-03 | 11 | Complete |
+| PLAYER-04 | 11 | Complete |
 | EVENT-01 | 11 | Complete |
 | EVENT-02 | 11 | Complete |
 | EVENT-03 | 11 | Complete |
-| CHART-01 | 11 | Pending |
+| CHART-01 | 11 | Complete |
 | CHART-02 | 11 | Pending |
-| EDITOR-01 | 11 | Pending |
-| EDITOR-02 | 11 | Pending |
-| EDITOR-03 | 11 | Pending |
+| EDITOR-01 | 11 | Complete |
+| EDITOR-02 | 11 | Complete |
+| EDITOR-03 | 11 | Complete |
 | EMPTY-01 | 12 | Pending |
 | EMPTY-02 | 12 | Pending |
 

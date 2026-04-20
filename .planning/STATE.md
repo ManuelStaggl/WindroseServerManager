@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-20T04:39:45.361Z"
-last_activity: "2026-04-20 — Plan 11-03 executed (2 feat commits: EventsViewModel, EventsView + strings + nav)"
+last_updated: "2026-04-20T08:35:00.000Z"
+last_activity: "2026-04-20 — Plan 11-01 executed (2 feat commits: Core models/service/helpers/tests, skeleton VMs/Views/DI/nav/strings)"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 11 — Feature Views
-Plan: 03 — COMPLETE
-Status: Plan 11-03 complete — EventsViewModel (FileSystemWatcher + tail-read + 150ms debounce + log-rotation detection) + EventsView AXAML + i18n strings (7 Events.* + 4 Nav.* keys DE+EN) + Nav integration shipped. EVENT-01/02/03 satisfied. 155/155 tests pass.
-Last activity: 2026-04-20 — Plan 11-03 executed (2 feat commits: EventsViewModel, EventsView + strings + nav)
+Plan: 01 — COMPLETE (retroactive — 11-03 already committed prior)
+Status: Plan 11-01 complete — IWindrosePlusApiService + WindrosePlusApiService + EventsLogParser + SeaChartMath + WindrosePlusConfigSchema + 5 Core models + 43 Wave-0 xUnit tests (all green) + 4 skeleton ViewModels/Views + DI registration + Nav entries + localization strings shipped. PLAYER-01..04 + EVENT-01/03 + CHART-01 + EDITOR-01..03 satisfied. 155/155 tests pass.
+Last activity: 2026-04-20 — Plan 11-01 executed (2 feat commits: Core models/service/helpers/tests, skeleton VMs/Views/DI/nav/strings)
 
 ## Project Reference
 
@@ -37,7 +37,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
 | 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
 | 10. Health & Support | ✅ Complete — All 2 plans done. HEALTH-01 + HEALTH-02 satisfied. Health banner + report URL + rate-limit + grace period shipped. |
-| 11. Feature Views | Not started |
+| 11. Feature Views | 🔄 In progress — Plan 01 complete (foundation: IWindrosePlusApiService + helpers + models + skeleton VMs/Views). Plans 02–05 remain. |
 | 12. Empty States (Opt-out UX) | Not started |
 
 ## Accumulated Context
@@ -119,6 +119,14 @@ v1.2 scope decisions:
 - IHttpClientFactory injected into DashboardViewModel (already registered via `s.AddHttpClient()` in App.axaml.cs — no new DI registration needed)
 - Health check block placed inside the `!string.IsNullOrWhiteSpace(serverDir)` branch after the retrofit banner block — reuses same `serverDir` variable
 - `danger` button class used for "Report Issue" — matches existing usage in ConfigurationView/BackupsView/ModsView
+
+## Decisions (Plan 11-01)
+
+- `WindrosePlusApiService` uses `ILogger<WindrosePlusApiService>` from `Microsoft.Extensions.Logging` (not Serilog static `Log`) — Core.csproj has no Serilog package; consistent with WindrosePlusService precedent
+- Port guard uses `port <= 0` (not `== 0`) to defensively cover negative port edge cases (matches Phase 10 HealthCheckHelper precedent)
+- `EventsLogParser.TryParseLine` only accepts `type = "join" | "leave"` (case-insensitive); unknown types return null — safe extensibility for future event types
+- `WriteConfigAsync` uses atomic `.tmp` then `File.Move(overwrite:true)` pattern — matches established `EnsureArchiveCachedAsync` pattern in `WindrosePlusService`
+- `WindrosePlusApiService` takes `ILogger<T>` as third constructor param — DI injects it automatically; tests use `NullLogger<WindrosePlusApiService>.Instance`
 
 ## Decisions (Plan 11-03)
 
