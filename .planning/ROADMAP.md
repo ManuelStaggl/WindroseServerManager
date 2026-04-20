@@ -76,7 +76,14 @@ Plans:
   2. The Events view streams join/leave records from `events.log` live via FileSystemWatcher, supports filtering/search by name/Steam-ID/type, and stays responsive at >1000 entries (virtualization or pagination)
   3. The Sea-Chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`; clicking a marker opens a popover with name, Steam-ID, alive state, and ship info when available
   4. The INI/Multiplier editor lists all WindrosePlus-exposed settings grouped by category, validates values against the config schema inline before save, writes the config file on save, and prompts the user to restart when the server is running
-**Plans:** TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — Wave 1: foundation — IWindrosePlusApiService + EventsLogParser + SeaChartMath + WindrosePlusConfigSchema + 5 Core models + Wave-0 xUnit tests + skeleton ViewModels/Pages + nav wiring + DI registration
+- [ ] 11-02-PLAN.md — Wave 2: PlayersViewModel full impl (poll timer + kick/ban/broadcast) + PlayersView DataGrid UI + Players.* strings (PLAYER-01..04)
+- [ ] 11-03-PLAN.md — Wave 3: EventsViewModel (FileSystemWatcher + tail-read + filter) + EventsView virtualized DataGrid + Events.* strings (EVENT-01..03)
+- [ ] 11-04-PLAN.md — Wave 4: SeaChartViewModel + PlayerMarkerViewModel + SeaChartView Canvas + markers + detail panel + Generate-Map + SeaChart.* strings (CHART-01..02)
+- [ ] 11-05-PLAN.md — Wave 5: ConfigEntryViewModel + EditorViewModel + EditorView grouped editor + Save/Validate/Restart-prompt + Editor.* strings (EDITOR-01..03)
 
 ### Phase 12: Empty States (Opt-out UX)
 **Goal:** Users who opted out of WindrosePlus never see a broken or disabled feature — every WindrosePlus-dependent view explains what's missing and offers a one-click path to install it.
@@ -94,7 +101,7 @@ Plans:
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
 | 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
 | 10. Health & Support | 2/2 | Complete    | 2026-04-20 |
-| 11. Feature Views | 0/0 | Not started | — |
+| 11. Feature Views | 0/5 | In progress | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |
 
 ## Coverage Map
