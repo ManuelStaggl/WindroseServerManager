@@ -93,7 +93,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
 | 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
-| 10. Health & Support | 2/2 | Complete   | 2026-04-20 |
+| 10. Health & Support | 2/2 | Complete    | 2026-04-20 |
 | 11. Feature Views | 0/0 | Not started | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |
 
