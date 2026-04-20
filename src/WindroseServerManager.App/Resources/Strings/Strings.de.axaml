@@ -542,4 +542,22 @@
     <sys:String x:Key="Nav.Events">Ereignisse</sys:String>
     <sys:String x:Key="Nav.SeaChart">Seekarte</sys:String>
     <sys:String x:Key="Nav.Editor">INI-Editor</sys:String>
+
+    <!-- Phase 11 — Players View -->
+    <sys:String x:Key="Players.Title">Spieler</sys:String>
+    <sys:String x:Key="Players.Subtitle">Verbundene Spieler — wird automatisch aktualisiert</sys:String>
+
+    <!-- Phase 11 — Sea Chart View -->
+    <sys:String x:Key="SeaChart.Title">Seekarte</sys:String>
+    <sys:String x:Key="SeaChart.Subtitle">Live-Spielerpositionen</sys:String>
+    <sys:String x:Key="SeaChart.GenerateMap">Karte generieren</sys:String>
+    <sys:String x:Key="SeaChart.Refresh">Aktualisieren</sys:String>
+    <sys:String x:Key="SeaChart.NoMap">Noch keine Karte generiert. Klicke 'Karte generieren'.</sys:String>
+    <sys:String x:Key="SeaChart.Error">/query-Endpunkt nicht erreichbar.</sys:String>
+    <sys:String x:Key="SeaChart.Detail.Alive">Lebt</sys:String>
+    <sys:String x:Key="SeaChart.Detail.Close">Schließen</sys:String>
+
+    <!-- Phase 11 — Config Editor View -->
+    <sys:String x:Key="Editor.Title">Konfiguration</sys:String>
+    <sys:String x:Key="Editor.Subtitle">windrose_plus.json Einstellungen</sys:String>
 </ResourceDictionary>
