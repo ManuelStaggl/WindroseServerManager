@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-20T04:44:07Z"
-last_activity: "2026-04-20 — Plan 11-04 executed (Sea-Chart view: PlayerMarkerViewModel + SeaChartViewModel + Canvas XAML + i18n)"
+last_updated: "2026-04-20T08:00:00Z"
+last_activity: "2026-04-20 — Plan 11-05 executed (Config Editor view: ConfigEntryViewModel + EditorViewModel + EditorView XAML + i18n)"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 13
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 11 — Feature Views
-Plan: 02 — COMPLETE
-Status: Plan 11-02 complete — Players view shipped: PlayersViewModel (System.Timers.Timer poll, DiffUpdate, KickAsync/BanAsync/BroadcastAsync RelayCommands, IDisposable), BanDialog (Permanent/Timed, BanDialogResult record), PlayersView.axaml (DataGrid + toolbar), i18n 22 keys DE+EN. PLAYER-01...PLAYER-04 satisfied. 155/155 tests pass, 0 build errors.
-Last activity: 2026-04-20 — Plan 11-02 executed (Players view: poll timer + kick/ban/broadcast RCON + BanDialog + full DataGrid UI)
+Plan: 05 — COMPLETE
+Status: Plan 11-05 complete — Config Editor shipped: ConfigEntryViewModel (inline validation via WindrosePlusConfigSchema.Validate, ToTypedValue, JsonElement handling), EditorViewModel (LoadAsync grouped by Category, SaveCommand gated on CanSave, WriteConfigAsync atomic, RestartRequired toast when Running), EditorView.axaml (grouped ItemsControl, BrandErrorBrush inline errors, Save button), i18n 7 keys DE+EN. EDITOR-01, EDITOR-02, EDITOR-03 satisfied. 155/155 tests pass, 0 build errors.
+Last activity: 2026-04-20 — Plan 11-05 executed (Config Editor view: grouped inline-validated editor for windrose_plus.json)
 
 ## Project Reference
 
@@ -147,10 +147,18 @@ v1.2 scope decisions:
 - BanDialogResult(int? Minutes) record: null=permanent, int=timed duration — clean discriminated-union pattern without enum, pattern-matched in BanAsync
 - Watermark attribute kept on TextBox (matching project-wide convention) instead of PlaceholderText
 
+## Decisions (Plan 11-05)
+
+- `CategoryGroup` helper class defined inline in `EditorViewModel.cs` — simple data holder, no separate file needed
+- `FormatValue` special-cases `System.Text.Json.JsonElement` — STJ deserializes `Dictionary<string, object?>` values as `JsonElement`; must unwrap per ValueKind for correct string display
+- `SaveCommand.NotifyCanExecuteChanged` called from each entry's `PropertyChanged` handler for `HasError` — keeps button disabled state in sync with per-entry validation
+- `Editor.Subtitle` skeleton key from Plan 11-01 removed from both DE+EN string files — replaced by 7 functional keys
+- `BrandErrorBrush` confirmed from `WindrosePlusOptInControl.axaml` usage — project convention for error foreground
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 11 Plan 02 complete. Next: Phase 11 Plan 05 — Config Editor (INI editor for windrose_plus.json with inline validation).
+Phase 11 complete (all 5 plans done). All 12 requirements (PLAYER-01..04, EVENT-01..03, SEACHART-01..02, EDITOR-01..03) satisfied. Next: Phase 12 — Empty States (Opt-out UX).
