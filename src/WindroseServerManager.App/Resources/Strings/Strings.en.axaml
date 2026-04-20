@@ -546,6 +546,27 @@
     <!-- Phase 11 — Players View -->
     <sys:String x:Key="Players.Title">Players</sys:String>
     <sys:String x:Key="Players.Subtitle">Connected players — refreshes automatically</sys:String>
+    <sys:String x:Key="Players.Column.Name">Name</sys:String>
+    <sys:String x:Key="Players.Column.SteamId">Steam ID</sys:String>
+    <sys:String x:Key="Players.Column.Alive">Alive</sys:String>
+    <sys:String x:Key="Players.Column.Session">Session (s)</sys:String>
+    <sys:String x:Key="Players.Kick">Kick</sys:String>
+    <sys:String x:Key="Players.Ban">Ban</sys:String>
+    <sys:String x:Key="Players.Broadcast.Label">Broadcast message…</sys:String>
+    <sys:String x:Key="Players.Broadcast.Send">Send</sys:String>
+    <sys:String x:Key="Players.Broadcast.Sent">Broadcast sent.</sys:String>
+    <sys:String x:Key="Players.Kick.Title">Kick Player</sys:String>
+    <sys:String x:Key="Players.Kick.Message">Kick {0} from the server?</sys:String>
+    <sys:String x:Key="Players.Ban.Title">Ban Player</sys:String>
+    <sys:String x:Key="Players.Ban.Message">Ban {0} from the server. Choose duration:</sys:String>
+    <sys:String x:Key="Players.Ban.Permanent">Permanent</sys:String>
+    <sys:String x:Key="Players.Ban.Timed">Timed</sys:String>
+    <sys:String x:Key="Players.Ban.Minutes">Minutes:</sys:String>
+    <sys:String x:Key="Players.Kicked">Player {0} kicked.</sys:String>
+    <sys:String x:Key="Players.Banned">Player {0} banned permanently.</sys:String>
+    <sys:String x:Key="Players.BannedTimed">Player {0} banned for {1} minutes.</sys:String>
+    <sys:String x:Key="Players.Empty">No players connected.</sys:String>
+    <sys:String x:Key="Players.Error">Could not reach WindrosePlus dashboard.</sys:String>
 
     <!-- Phase 11 — Sea Chart View -->
     <sys:String x:Key="SeaChart.Title">Sea Chart</sys:String>

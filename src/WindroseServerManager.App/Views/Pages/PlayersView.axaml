@@ -1,10 +1,67 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             xmlns:m="using:WindroseServerManager.Core.Models"
              x:Class="WindroseServerManager.App.Views.Pages.PlayersView"
              x:DataType="vm:PlayersViewModel">
-    <StackPanel Margin="24" Spacing="8">
-        <TextBlock Text="{DynamicResource Players.Title}" Classes="page-title" />
-        <TextBlock Text="{DynamicResource Players.Subtitle}" Opacity="0.7" />
-    </StackPanel>
+    <Grid Margin="24" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="16">
+
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="{DynamicResource Players.Title}" Classes="page-title" />
+            <TextBlock Text="{DynamicResource Players.Subtitle}" Opacity="0.7" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                CornerRadius="6" Padding="12,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+        </Border>
+
+        <Border Grid.Row="2" Classes="card">
+            <Grid>
+                <DataGrid ItemsSource="{Binding Players}"
+                          SelectedItem="{Binding SelectedPlayer, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="Horizontal"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Players.Column.Name}"    Binding="{Binding Name}"           Width="*" />
+                        <DataGridTextColumn Header="{DynamicResource Players.Column.SteamId}" Binding="{Binding SteamId}"        Width="Auto" />
+                        <DataGridCheckBoxColumn Header="{DynamicResource Players.Column.Alive}" Binding="{Binding Alive}"        Width="Auto" />
+                        <DataGridTextColumn Header="{DynamicResource Players.Column.Session}" Binding="{Binding SessionSeconds}" Width="Auto" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock Text="{DynamicResource Players.Empty}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                           IsVisible="{Binding HasNoPlayers}" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+            <Button Grid.Column="0"
+                    Content="{DynamicResource Players.Kick}"
+                    Classes="danger"
+                    Command="{Binding KickCommand}"
+                    CommandParameter="{Binding SelectedPlayer}"
+                    IsEnabled="{Binding SelectedPlayer, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Button Grid.Column="1"
+                    Content="{DynamicResource Players.Ban}"
+                    Classes="danger"
+                    Command="{Binding BanCommand}"
+                    CommandParameter="{Binding SelectedPlayer}"
+                    IsEnabled="{Binding SelectedPlayer, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBox Grid.Column="2"
+                     Text="{Binding BroadcastMessage, Mode=TwoWay}"
+                     Watermark="{DynamicResource Players.Broadcast.Label}" />
+            <Button Grid.Column="3"
+                    Content="{DynamicResource Players.Broadcast.Send}"
+                    Command="{Binding BroadcastCommand}" />
+        </Grid>
+    </Grid>
 </UserControl>

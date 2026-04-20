@@ -546,6 +546,27 @@
     <!-- Phase 11 — Players View -->
     <sys:String x:Key="Players.Title">Spieler</sys:String>
     <sys:String x:Key="Players.Subtitle">Verbundene Spieler — wird automatisch aktualisiert</sys:String>
+    <sys:String x:Key="Players.Column.Name">Name</sys:String>
+    <sys:String x:Key="Players.Column.SteamId">Steam-ID</sys:String>
+    <sys:String x:Key="Players.Column.Alive">Lebt</sys:String>
+    <sys:String x:Key="Players.Column.Session">Sitzung (s)</sys:String>
+    <sys:String x:Key="Players.Kick">Kicken</sys:String>
+    <sys:String x:Key="Players.Ban">Bannen</sys:String>
+    <sys:String x:Key="Players.Broadcast.Label">Nachricht an alle…</sys:String>
+    <sys:String x:Key="Players.Broadcast.Send">Senden</sys:String>
+    <sys:String x:Key="Players.Broadcast.Sent">Nachricht gesendet.</sys:String>
+    <sys:String x:Key="Players.Kick.Title">Spieler kicken</sys:String>
+    <sys:String x:Key="Players.Kick.Message">{0} vom Server kicken?</sys:String>
+    <sys:String x:Key="Players.Ban.Title">Spieler bannen</sys:String>
+    <sys:String x:Key="Players.Ban.Message">{0} vom Server bannen. Dauer wählen:</sys:String>
+    <sys:String x:Key="Players.Ban.Permanent">Dauerhaft</sys:String>
+    <sys:String x:Key="Players.Ban.Timed">Befristet</sys:String>
+    <sys:String x:Key="Players.Ban.Minutes">Minuten:</sys:String>
+    <sys:String x:Key="Players.Kicked">Spieler {0} gekickt.</sys:String>
+    <sys:String x:Key="Players.Banned">Spieler {0} dauerhaft gebannt.</sys:String>
+    <sys:String x:Key="Players.BannedTimed">Spieler {0} für {1} Minuten gebannt.</sys:String>
+    <sys:String x:Key="Players.Empty">Keine Spieler verbunden.</sys:String>
+    <sys:String x:Key="Players.Error">WindrosePlus-Dashboard nicht erreichbar.</sys:String>
 
     <!-- Phase 11 — Sea Chart View -->
     <sys:String x:Key="SeaChart.Title">Seekarte</sys:String>
