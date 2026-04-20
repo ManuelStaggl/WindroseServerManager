@@ -519,6 +519,12 @@
     <sys:String x:Key="Retrofit.Banner.Action.Later">Nicht jetzt</sys:String>
     <sys:String x:Key="Retrofit.Dialog.Title">WindrosePlus installieren</sys:String>
 
+    <!-- Phase 10 — Health Banner (HEALTH-01, HEALTH-02) -->
+    <sys:String x:Key="Health.Banner.Title">WindrosePlus antwortet nicht</sys:String>
+    <sys:String x:Key="Health.Banner.Body">Nach dem Serverstart konnte kein Kontakt zum WindrosePlus-Dashboard hergestellt werden. Möglicherweise ist WindrosePlus mit der aktuellen Windrose-Version inkompatibel.</sys:String>
+    <sys:String x:Key="Health.Banner.Action.Report">Problem melden</sys:String>
+    <sys:String x:Key="Health.Banner.Action.Dismiss">Verbergen</sys:String>
+
     <sys:String x:Key="Installation.NewServer">Neuen Server einrichten</sys:String>
     <sys:String x:Key="Action.Back">Zurück</sys:String>
 </ResourceDictionary>
