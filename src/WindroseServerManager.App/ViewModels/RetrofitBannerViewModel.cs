@@ -12,6 +12,7 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class RetrofitBannerViewModel : ViewModelBase, IWindrosePlusOptInContext
 {
     private readonly IWindrosePlusService _wplus;
+    private readonly IWindrosePlusApiService _wplusApi;
     private readonly IAppSettingsService _settings;
     private readonly IToastService _toasts;
 
@@ -41,11 +42,13 @@ public partial class RetrofitBannerViewModel : ViewModelBase, IWindrosePlusOptIn
     public RetrofitBannerViewModel(
         string serverInstallDir,
         IWindrosePlusService wplus,
+        IWindrosePlusApiService wplusApi,
         IAppSettingsService settings,
         IToastService toasts)
     {
         ServerInstallDir = serverInstallDir;
         _wplus = wplus;
+        _wplusApi = wplusApi;
         _settings = settings;
         _toasts = toasts;
         RconPassword = RconPasswordGenerator.Generate(24);
@@ -133,6 +136,13 @@ public partial class RetrofitBannerViewModel : ViewModelBase, IWindrosePlusOptIn
                     };
                 });
                 await _wplus.InstallAsync(ServerInstallDir, progress, CancellationToken.None);
+
+                // Write windrose_plus.json so WindrosePlus uses the configured port/password.
+                var cfg = _wplusApi.ReadConfig(ServerInstallDir) ?? new WindroseServerManager.Core.Models.WindrosePlusConfig();
+                cfg.Server["http_port"] = DashboardPort;
+                cfg.Server["rcon_enabled"] = true;
+                cfg.Server["rcon_password"] = RconPassword;
+                await _wplusApi.WriteConfigAsync(ServerInstallDir, cfg, CancellationToken.None);
             }
 
             var state = IsOptingIn ? OptInState.OptedIn : OptInState.OptedOut;

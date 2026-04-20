@@ -72,7 +72,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
 
         try
         {
-            await Dispatcher.UIThread.InvokeAsync(() => { IsLoading = true; ErrorMessage = null; });
+            await Dispatcher.UIThread.InvokeAsync(() => { IsLoading = true; });
             var result = await _api.GetStatusAsync(serverDir, ct).ConfigureAwait(false);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -83,6 +83,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
                 }
                 else
                 {
+                    ErrorMessage = null;
                     DiffUpdate(result.Players);
                 }
             });

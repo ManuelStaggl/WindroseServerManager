@@ -25,6 +25,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly IAppUpdateService _appUpdate;
     private readonly ILocalizationService _localization;
     private readonly IWindrosePlusService _wplus;
+    private readonly IWindrosePlusApiService _wplusApi;
 
     [ObservableProperty] private bool _autoRestartOnCrash;
     [ObservableProperty] private int _gracefulShutdownSeconds;
@@ -67,7 +68,8 @@ public partial class SettingsViewModel : ViewModelBase
         IAutoStartService autoStart,
         IAppUpdateService appUpdate,
         ILocalizationService localization,
-        IWindrosePlusService wplus)
+        IWindrosePlusService wplus,
+        IWindrosePlusApiService wplusApi)
     {
         _settings = settings;
         _toasts = toasts;
@@ -76,6 +78,7 @@ public partial class SettingsViewModel : ViewModelBase
         _appUpdate = appUpdate;
         _localization = localization;
         _wplus = wplus;
+        _wplusApi = wplusApi;
 
         var c = settings.Current;
         _autoRestartOnCrash = c.AutoRestartOnCrash;
@@ -357,7 +360,7 @@ public partial class SettingsViewModel : ViewModelBase
             is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
         if (top is null) return;
 
-        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _settings, _toasts);
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _wplusApi, _settings, _toasts);
         var dialog = new RetrofitDialog { DataContext = bannerVm };
         var confirmed = await dialog.ShowDialog<bool>(top);
         if (confirmed)

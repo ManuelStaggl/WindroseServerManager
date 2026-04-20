@@ -13,6 +13,7 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
 {
     private readonly IServerInstallService _install;
     private readonly IWindrosePlusService _wplus;
+    private readonly IWindrosePlusApiService _wplusApi;
     private readonly IAppSettingsService _settings;
     private readonly IToastService _toasts;
     private CancellationTokenSource? _cts;
@@ -42,12 +43,14 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
     public InstallWizardViewModel(
         IServerInstallService install,
         IWindrosePlusService wplus,
+        IWindrosePlusApiService wplusApi,
         IAppSettingsService settings,
         IToastService toasts,
         ILocalizationService localization)
     {
         _install = install;
         _wplus = wplus;
+        _wplusApi = wplusApi;
         _settings = settings;
         _toasts = toasts;
         _ = localization; // keep the ctor signature open for future language-change hooks
@@ -155,6 +158,13 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
                     };
                 });
                 await _wplus.InstallAsync(InstallDir, progress, _cts.Token);
+
+                // Write windrose_plus.json so WindrosePlus uses the configured port/password.
+                var cfg = _wplusApi.ReadConfig(InstallDir) ?? new WindroseServerManager.Core.Models.WindrosePlusConfig();
+                cfg.Server["http_port"] = DashboardPort;
+                cfg.Server["rcon_enabled"] = true;
+                cfg.Server["rcon_password"] = RconPassword;
+                await _wplusApi.WriteConfigAsync(InstallDir, cfg, _cts.Token);
             }
 
             // 3) Persist per-server state

@@ -23,6 +23,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private readonly IToastService _toasts;
     private readonly INavigationService _nav;
     private readonly IWindrosePlusService _wplus;
+    private readonly IWindrosePlusApiService _wplusApi;
     private readonly IHttpClientFactory _httpFactory;
     private readonly System.Timers.Timer _timer;
 
@@ -158,6 +159,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         IToastService toasts,
         ILocalizationService localization,
         IWindrosePlusService wplus,
+        IWindrosePlusApiService wplusApi,
         IHttpClientFactory httpFactory)
     {
         _install = install;
@@ -169,6 +171,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _nav = nav;
         _toasts = toasts;
         _wplus = wplus;
+        _wplusApi = wplusApi;
         _httpFactory = httpFactory;
         _proc.StatusChanged += OnServerStatusChanged;
         _status = _proc.Status;
@@ -328,7 +331,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
                     {
                         if (RetrofitBanner is not null)
                             RetrofitBanner.StateChanged -= OnRetrofitStateChanged;
-                        RetrofitBanner = new RetrofitBannerViewModel(serverDir, _wplus, _settings, _toasts);
+                        RetrofitBanner = new RetrofitBannerViewModel(serverDir, _wplus, _wplusApi, _settings, _toasts);
                         RetrofitBanner.StateChanged += OnRetrofitStateChanged;
                     }
                     RetrofitBannerVisible = true;
