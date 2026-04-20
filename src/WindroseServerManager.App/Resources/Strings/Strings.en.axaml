@@ -580,5 +580,10 @@
 
     <!-- Phase 11 — Config Editor View -->
     <sys:String x:Key="Editor.Title">Config Editor</sys:String>
-    <sys:String x:Key="Editor.Subtitle">windrose_plus.json settings</sys:String>
+    <sys:String x:Key="Editor.Save">Save</sys:String>
+    <sys:String x:Key="Editor.Saved">Configuration saved.</sys:String>
+    <sys:String x:Key="Editor.RestartRequired">Server must be restarted for changes to take effect.</sys:String>
+    <sys:String x:Key="Editor.ValidationError">One or more values are invalid.</sys:String>
+    <sys:String x:Key="Editor.Error.Load">Could not load configuration.</sys:String>
+    <sys:String x:Key="Editor.Error.Save">Could not save configuration.</sys:String>
 </ResourceDictionary>

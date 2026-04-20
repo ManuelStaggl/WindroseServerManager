@@ -3,8 +3,66 @@
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
              x:Class="WindroseServerManager.App.Views.Pages.EditorView"
              x:DataType="vm:EditorViewModel">
-    <StackPanel Margin="24" Spacing="8">
-        <TextBlock Text="{DynamicResource Editor.Title}" Classes="page-title" />
-        <TextBlock Text="{DynamicResource Editor.Subtitle}" Opacity="0.7" />
-    </StackPanel>
+    <Grid Margin="24" RowDefinitions="Auto,*,Auto" RowSpacing="12">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="{DynamicResource Editor.Title}" Classes="page-title" />
+        </StackPanel>
+
+        <!-- Grouped entry list -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Categories}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CategoryGroup">
+                        <Border BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12"
+                                Margin="0,0,0,12">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding Category}" Classes="section-header" />
+                                <ItemsControl ItemsSource="{Binding Entries}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ConfigEntryViewModel">
+                                            <Grid ColumnDefinitions="200,*,Auto"
+                                                  Margin="0,4"
+                                                  ColumnSpacing="12">
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding DisplayName}"
+                                                           VerticalAlignment="Center" />
+                                                <TextBox Grid.Column="1"
+                                                         Text="{Binding RawValue, Mode=TwoWay}" />
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding ErrorMessage}"
+                                                           Foreground="{DynamicResource BrandErrorBrush}"
+                                                           IsVisible="{Binding HasError}"
+                                                           VerticalAlignment="Center"
+                                                           MinWidth="160" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Footer: validation summary + Save button -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8">
+            <TextBlock Text="{DynamicResource Editor.ValidationError}"
+                       Foreground="{DynamicResource BrandErrorBrush}"
+                       IsVisible="{Binding HasAnyError}"
+                       VerticalAlignment="Center" />
+            <Button Content="{DynamicResource Editor.Save}"
+                    Command="{Binding SaveCommand}"
+                    Classes="accent" />
+        </StackPanel>
+
+    </Grid>
 </UserControl>

@@ -580,5 +580,10 @@
 
     <!-- Phase 11 — Config Editor View -->
     <sys:String x:Key="Editor.Title">Konfiguration</sys:String>
-    <sys:String x:Key="Editor.Subtitle">windrose_plus.json Einstellungen</sys:String>
+    <sys:String x:Key="Editor.Save">Speichern</sys:String>
+    <sys:String x:Key="Editor.Saved">Konfiguration gespeichert.</sys:String>
+    <sys:String x:Key="Editor.RestartRequired">Server muss neu gestartet werden, damit Änderungen wirksam werden.</sys:String>
+    <sys:String x:Key="Editor.ValidationError">Ein oder mehrere Werte sind ungültig.</sys:String>
+    <sys:String x:Key="Editor.Error.Load">Konfiguration konnte nicht geladen werden.</sys:String>
+    <sys:String x:Key="Editor.Error.Save">Konfiguration konnte nicht gespeichert werden.</sys:String>
 </ResourceDictionary>
