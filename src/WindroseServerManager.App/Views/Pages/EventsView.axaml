@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             x:Class="WindroseServerManager.App.Views.Pages.EventsView"
+             x:DataType="vm:EventsViewModel">
+    <Grid Margin="24" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="{DynamicResource Events.Title}" Classes="page-title" />
+        </StackPanel>
+        <TextBox Grid.Row="1"
+                 Text="{Binding FilterText, Mode=TwoWay}"
+                 Watermark="{DynamicResource Events.Filter.Placeholder}" />
+        <Border Grid.Row="2" BorderBrush="{DynamicResource BrandNavyBorderBrush}" BorderThickness="1" CornerRadius="6">
+            <Grid>
+                <!-- Avalonia DataGrid enables row virtualization by default (no EnableRowVirtualization property needed) -->
+                <DataGrid ItemsSource="{Binding FilteredEvents}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Events.Column.Time}"
+                                            Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                            Width="Auto" />
+                        <DataGridTextColumn Header="{DynamicResource Events.Column.Type}"
+                                            Binding="{Binding Type}"
+                                            Width="Auto" />
+                        <DataGridTextColumn Header="{DynamicResource Events.Column.Player}"
+                                            Binding="{Binding Name}"
+                                            Width="*" />
+                        <DataGridTextColumn Header="{DynamicResource Events.Column.SteamId}"
+                                            Binding="{Binding SteamId}"
+                                            Width="Auto" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsVisible="{Binding HasNoEvents}">
+                    <TextBlock Text="{DynamicResource Events.Empty}" Opacity="0.7" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

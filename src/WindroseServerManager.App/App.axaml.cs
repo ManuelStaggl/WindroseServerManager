@@ -73,6 +73,7 @@ public partial class App : Application
         s.AddSingleton<ILocalizationService, LocalizationService>();
         s.AddSingleton<ISteamCmdService, SteamCmdService>();
         s.AddSingleton<IWindrosePlusService, WindrosePlusService>();
+        s.AddSingleton<IWindrosePlusApiService, WindrosePlusApiService>();
         s.AddSingleton<IServerInstallService, ServerInstallService>();
         s.AddSingleton<IServerProcessService, ServerProcessService>();
         s.AddSingleton<IServerConfigService, ServerConfigService>();
@@ -104,6 +105,12 @@ public partial class App : Application
         s.AddSingleton<BackupsViewModel>();
         s.AddSingleton<ModsViewModel>();
         s.AddSingleton<SettingsViewModel>();
+
+        // Phase 11 — Feature Views (WindrosePlus)
+        s.AddSingleton<PlayersViewModel>();
+        s.AddSingleton<EventsViewModel>();
+        s.AddSingleton<SeaChartViewModel>();
+        s.AddSingleton<EditorViewModel>();
     }
 
     private void OnTrayShowMainWindow(object? sender, EventArgs e)

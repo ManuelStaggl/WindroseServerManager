@@ -64,6 +64,11 @@ public partial class MainWindowViewModel : ViewModelBase
             new() { TitleKey = "Nav.Installation", Icon = "\uE896", VmType = typeof(InstallationViewModel) },
             new() { TitleKey = "Nav.ServerControl", Icon = "\uE756", VmType = typeof(ServerControlViewModel) },
             new() { TitleKey = "Nav.Configuration", Icon = "\uE9E9", VmType = typeof(ConfigurationViewModel) },
+            // Phase 11 — WindrosePlus Feature Views
+            new() { TitleKey = "Nav.Players",  Icon = "\uE716", VmType = typeof(PlayersViewModel) },
+            new() { TitleKey = "Nav.Events",   Icon = "\uE81C", VmType = typeof(EventsViewModel) },
+            new() { TitleKey = "Nav.SeaChart", Icon = "\uE909", VmType = typeof(SeaChartViewModel) },
+            new() { TitleKey = "Nav.Editor",   Icon = "\uE70F", VmType = typeof(EditorViewModel) },
             new() { TitleKey = "Nav.Mods", Icon = "\uEA86", VmType = typeof(ModsViewModel) },
             new() { TitleKey = "Nav.Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },
         };

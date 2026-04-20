@@ -527,4 +527,19 @@
 
     <sys:String x:Key="Installation.NewServer">Set Up New Server</sys:String>
     <sys:String x:Key="Action.Back">Back</sys:String>
+
+    <!-- Phase 11 — Events View (EVENT-01, EVENT-02, EVENT-03) -->
+    <sys:String x:Key="Events.Title">Event Log</sys:String>
+    <sys:String x:Key="Events.Column.Time">Time</sys:String>
+    <sys:String x:Key="Events.Column.Type">Type</sys:String>
+    <sys:String x:Key="Events.Column.Player">Player</sys:String>
+    <sys:String x:Key="Events.Column.SteamId">Steam ID</sys:String>
+    <sys:String x:Key="Events.Filter.Placeholder">Filter by name, Steam ID, or type…</sys:String>
+    <sys:String x:Key="Events.Empty">No events recorded yet.</sys:String>
+
+    <!-- Phase 11 — Navigation -->
+    <sys:String x:Key="Nav.Players">Players</sys:String>
+    <sys:String x:Key="Nav.Events">Events</sys:String>
+    <sys:String x:Key="Nav.SeaChart">Sea Chart</sys:String>
+    <sys:String x:Key="Nav.Editor">INI Editor</sys:String>
 </ResourceDictionary>
