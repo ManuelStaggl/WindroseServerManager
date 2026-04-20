@@ -9,6 +9,33 @@
             <TextBlock Classes="page-title" Text="{DynamicResource Dashboard.Title}" />
             <TextBlock Classes="caption" Text="{DynamicResource Dashboard.Subtitle}" Margin="0,4,0,20" />
 
+            <!-- Phase 10: Health banner — WindrosePlus dashboard not responding (HEALTH-01, HEALTH-02) -->
+            <Border Classes="card" Margin="0,0,0,16"
+                    IsVisible="{Binding HealthBannerVisible}"
+                    BorderBrush="{DynamicResource BrandErrorBrush}"
+                    BorderThickness="1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Classes="section-header"
+                                   Foreground="{DynamicResource BrandErrorBrush}"
+                                   Text="{DynamicResource Health.Banner.Title}" />
+                        <TextBlock Classes="body"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="{DynamicResource Health.Banner.Body}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                                VerticalAlignment="Center">
+                        <Button Classes="danger"
+                                Content="{DynamicResource Health.Banner.Action.Report}"
+                                Command="{Binding HealthBanner.OpenReportCommand}" />
+                        <Button Classes="subtle"
+                                Content="{DynamicResource Health.Banner.Action.Dismiss}"
+                                Command="{Binding HealthBanner.DismissCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!-- Retrofit Banner (WindrosePlus available for existing v1.1 servers) -->
             <Border Classes="card" Margin="0,0,0,16"
                     IsVisible="{Binding RetrofitBannerVisible}"
