@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-20T08:35:00.000Z"
-last_activity: "2026-04-20 — Plan 11-01 executed (2 feat commits: Core models/service/helpers/tests, skeleton VMs/Views/DI/nav/strings)"
+last_updated: "2026-04-20T04:44:07Z"
+last_activity: "2026-04-20 — Plan 11-04 executed (Sea-Chart view: PlayerMarkerViewModel + SeaChartViewModel + Canvas XAML + i18n)"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 13
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 11 — Feature Views
-Plan: 01 — COMPLETE (retroactive — 11-03 already committed prior)
-Status: Plan 11-01 complete — IWindrosePlusApiService + WindrosePlusApiService + EventsLogParser + SeaChartMath + WindrosePlusConfigSchema + 5 Core models + 43 Wave-0 xUnit tests (all green) + 4 skeleton ViewModels/Views + DI registration + Nav entries + localization strings shipped. PLAYER-01..04 + EVENT-01/03 + CHART-01 + EDITOR-01..03 satisfied. 155/155 tests pass.
-Last activity: 2026-04-20 — Plan 11-01 executed (2 feat commits: Core models/service/helpers/tests, skeleton VMs/Views/DI/nav/strings)
+Plan: 04 — COMPLETE
+Status: Plan 11-04 complete — Canvas-based Sea-Chart view shipped: PlayerMarkerViewModel (CanvasX/CanvasY/SelectCommand), SeaChartViewModel (5s poll timer, auto-expanding world bounds, marker diff by SteamId, GenerateMap RCON + map.png polling), SeaChartView.axaml (Canvas + ItemsControl markers + detail panel), i18n strings (EN + DE). CHART-01 + CHART-02 satisfied. 155/155 tests pass, 0 build errors.
+Last activity: 2026-04-20 — Plan 11-04 executed (Sea-Chart view: PlayerMarkerViewModel + SeaChartViewModel + Canvas XAML + i18n)
 
 ## Project Reference
 
@@ -37,7 +37,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
 | 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
 | 10. Health & Support | ✅ Complete — All 2 plans done. HEALTH-01 + HEALTH-02 satisfied. Health banner + report URL + rate-limit + grace period shipped. |
-| 11. Feature Views | 🔄 In progress — Plan 01 complete (foundation: IWindrosePlusApiService + helpers + models + skeleton VMs/Views). Plans 02–05 remain. |
+| 11. Feature Views | 🔄 In progress — Plans 01, 03, 04 complete (foundation + Events view + Sea-Chart view). Plans 02, 05 remain. |
 | 12. Empty States (Opt-out UX) | Not started |
 
 ## Accumulated Context
@@ -128,6 +128,13 @@ v1.2 scope decisions:
 - `WriteConfigAsync` uses atomic `.tmp` then `File.Move(overwrite:true)` pattern — matches established `EnsureArchiveCachedAsync` pattern in `WindrosePlusService`
 - `WindrosePlusApiService` takes `ILogger<T>` as third constructor param — DI injects it automatically; tests use `NullLogger<WindrosePlusApiService>.Instance`
 
+## Decisions (Plan 11-04)
+
+- `PointerPressed` on Ellipse instead of `TapGestureRecognizer`: `<TapGestureRecognizer>` caused Avalonia AVLN2000 compile error (type not resolvable); PointerPressed directly on element achieves the same result
+- `x:DataType="vm:PlayerMarkerViewModel"` on `ControlTheme` for Canvas.Left/Top setters: required for Avalonia compiled binding engine to resolve CanvasX/CanvasY in ItemContainerTheme scope
+- Toggle deselect on repeat click: `ReferenceEquals(SelectedMarker, marker) ? null : marker` — tapping same marker closes detail panel
+- Auto-expanding world bounds start at ±30000: low confidence on actual Windrose world extent; bounds grow as player position data arrives each poll
+
 ## Decisions (Plan 11-03)
 
 - `EnableRowVirtualization` removed from EventsView.axaml — this is a WPF-only property; Avalonia DataGrid enables row virtualization by default with no attribute required
@@ -140,4 +147,4 @@ None.
 
 ## Next Step
 
-Phase 11 Plan 03 complete. Next: Phase 11 Plan 04 — Sea Chart view OR Phase 11 Plan 04 — INI Editor view (depending on plan numbering).
+Phase 11 Plan 04 complete. Next: Phase 11 Plan 02 — Players view (player list, kick/ban, RCON commands) or Plan 05 — Config Editor (INI editor with inline validation).

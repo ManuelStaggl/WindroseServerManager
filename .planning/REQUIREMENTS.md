@@ -52,7 +52,7 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 ### Sea-Chart Viewer
 
 - [x] **CHART-01**: Sea-chart view renders a top-down world map with live player positions polled from WindrosePlus `/query`
-- [ ] **CHART-02**: Clicking a player marker opens a popover with name, Steam-ID, alive state, ship info (if available)
+- [x] **CHART-02**: Clicking a player marker opens a popover with name, Steam-ID, alive state, ship info (if available)
 
 ### Multiplier / INI Editor
 
@@ -106,7 +106,7 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 | EVENT-02 | 11 | Complete |
 | EVENT-03 | 11 | Complete |
 | CHART-01 | 11 | Complete |
-| CHART-02 | 11 | Pending |
+| CHART-02 | 11 | Complete |
 | EDITOR-01 | 11 | Complete |
 | EDITOR-02 | 11 | Complete |
 | EDITOR-03 | 11 | Complete |
