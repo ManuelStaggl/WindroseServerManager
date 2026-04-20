@@ -16,7 +16,7 @@ Unlock player-management, events, sea-chart, and config-editor features by bundl
  (completed 2026-04-19)
 - [x] **Phase 9: Opt-in UX (Wizard + Retrofit)** — New-server wizard step and retrofit dialog for v1.0/v1.1 servers
  (completed 2026-04-19)
-- [ ] **Phase 10: Health & Support** — Dashboard health-check banner + "Report to WindrosePlus" issue helper
+- [x] **Phase 10: Health & Support** — Dashboard health-check banner + "Report to WindrosePlus" issue helper (completed 2026-04-20)
 - [ ] **Phase 11: Feature Views** — Players, Events, Sea-Chart, and INI/Multiplier editor built on the WindrosePlus HTTP/log surface
 - [ ] **Phase 12: Empty States (Opt-out UX)** — Dedicated empty states with install CTAs in every WindrosePlus-dependent view
 
@@ -61,7 +61,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. After server start, the app polls the WindrosePlus HTTP dashboard; if the endpoint does not respond within the health-check window, an inline banner appears in the server's main view explaining the incompatibility
   2. The banner's "Report to WindrosePlus" button opens a prefilled GitHub issue on the HumanGenome/WindrosePlus repository containing the Windrose version, WindrosePlus version, and server log tail
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 10-01-PLAN.md — Wave 1: Core helpers (HealthCheckHelper + ReportUrlBuilder) + Wave-0 xUnit tests
@@ -93,7 +93,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. WindrosePlus Bootstrap | 3/3 | Complete   | 2026-04-19 |
 | 9. Opt-in UX (Wizard + Retrofit) | 3/3 | Complete   | 2026-04-19 |
-| 10. Health & Support | 1/2 | In Progress|  |
+| 10. Health & Support | 2/2 | Complete   | 2026-04-20 |
 | 11. Feature Views | 0/0 | Not started | — |
 | 12. Empty States (Opt-out UX) | 0/0 | Not started | — |
 

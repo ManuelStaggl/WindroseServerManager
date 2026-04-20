@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-19T19:00:38.499Z"
-last_activity: 2026-04-19 — Plan 09-03 executed (3 feat commits, retrofit banner + dialog smoke-tested, RETRO-02/03 complete)
+last_updated: "2026-04-20T03:29:57.037Z"
+last_activity: "2026-04-20 — Plan 10-01 executed (TDD RED→GREEN, 2 commits: test + feat)"
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # State
@@ -17,9 +17,9 @@ progress:
 ## Current Position
 
 Phase: 10 — Health & Support
-Plan: 01 — COMPLETE
-Status: Phase 10 Plan 01 complete — HealthCheckHelper + ReportUrlBuilder shipped as Core static helpers, 6 Phase10 tests GREEN, full 112-test suite passes. HEALTH-01 + HEALTH-02 satisfied.
-Last activity: 2026-04-20 — Plan 10-01 executed (TDD RED→GREEN, 2 commits: test + feat)
+Plan: 02 — COMPLETE
+Status: Phase 10 complete — HealthBannerViewModel + DashboardViewModel health-check loop + DashboardView AXAML card shipped. HEALTH-01 + HEALTH-02 fully satisfied end-to-end. 112/112 tests pass.
+Last activity: 2026-04-20 — Plan 10-02 executed (3 feat commits: HealthBannerViewModel + strings, DashboardViewModel integration, DashboardView AXAML card)
 
 ## Project Reference
 
@@ -36,7 +36,7 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 |-------|--------|
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
 | 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
-| 10. Health & Support | In Progress — Plan 01/02 complete (HealthCheckHelper + ReportUrlBuilder). Plan 02 pending. |
+| 10. Health & Support | ✅ Complete — All 2 plans done. HEALTH-01 + HEALTH-02 satisfied. Health banner + report URL + rate-limit + grace period shipped. |
 | 11. Feature Views | Not started |
 | 12. Empty States (Opt-out UX) | Not started |
 
@@ -113,10 +113,17 @@ v1.2 scope decisions:
 - ReportUrlBuilder uses C# 8+ range slice `l[..MaxLogLineChars]` for truncation
 - No InternalsVisibleTo added to Core.csproj — all types are public
 
+## Decisions (Plan 10-02)
+
+- HealthBannerViewModel receives windroseBuildId as `string?` ctor param instead of IServerConfigService — `ServerDescription.DeploymentId` is on the outer envelope class (`ServerDescriptionFile`), not on the inner class returned by `LoadServerDescriptionAsync`; `InstallInfo.BuildId` is the correct Windrose version proxy
+- IHttpClientFactory injected into DashboardViewModel (already registered via `s.AddHttpClient()` in App.axaml.cs — no new DI registration needed)
+- Health check block placed inside the `!string.IsNullOrWhiteSpace(serverDir)` branch after the retrofit banner block — reuses same `serverDir` variable
+- `danger` button class used for "Report Issue" — matches existing usage in ConfigurationView/BackupsView/ModsView
+
 ## Blockers
 
 None.
 
 ## Next Step
 
-Phase 10 Plan 01 complete. Next: Phase 10 Plan 02 — Wire HealthCheckHelper + ReportUrlBuilder into DashboardViewModel (HTTP polling, health banner, report button).
+Phase 10 complete. Next: Phase 11 — Feature Views (player list, events, sea chart, INI editor).
