@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,6 +23,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private readonly IToastService _toasts;
     private readonly INavigationService _nav;
     private readonly IWindrosePlusService _wplus;
+    private readonly IHttpClientFactory _httpFactory;
     private readonly System.Timers.Timer _timer;
 
     [ObservableProperty] private ServerInstallInfo? _installInfo;
@@ -46,6 +48,17 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private bool _retrofitBannerVisible;
     [ObservableProperty] private RetrofitBannerViewModel? _retrofitBanner;
+
+    // Phase 10 — Health banner (HEALTH-01, HEALTH-02)
+    [ObservableProperty] private bool _healthBannerVisible;
+    [ObservableProperty] private HealthBannerViewModel? _healthBanner;
+
+    private bool _healthBannerDismissedForSession;
+    private bool _lastHealthCheckFailed;
+    private DateTime _healthCheckCooldownUntilUtc = DateTime.MinValue;
+    private DateTime _healthCheckStartDelayUntilUtc = DateTime.MinValue;
+    private ServerStatus _lastObservedStatus = ServerStatus.Stopped;
+    private HttpClient? _healthHttpClient;
 
     public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
                                     && Directory.Exists(_settings.Current.ServerInstallDir);
@@ -144,7 +157,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         INavigationService nav,
         IToastService toasts,
         ILocalizationService localization,
-        IWindrosePlusService wplus)
+        IWindrosePlusService wplus,
+        IHttpClientFactory httpFactory)
     {
         _install = install;
         _proc = proc;
@@ -155,6 +169,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _nav = nav;
         _toasts = toasts;
         _wplus = wplus;
+        _httpFactory = httpFactory;
         _proc.StatusChanged += OnServerStatusChanged;
         _status = _proc.Status;
 
@@ -322,16 +337,76 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
                 {
                     RetrofitBannerVisible = false;
                 }
+
+                // Phase 10 — WindrosePlus health check (HEALTH-01)
+                // Only relevant when WP is active AND server is running.
+                var wpActiveForHealth = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDir, false);
+
+                // Detect Stopped/Starting -> Running transition → arm 15s grace period
+                if (_lastObservedStatus != ServerStatus.Running && Status == ServerStatus.Running)
+                {
+                    _healthCheckStartDelayUntilUtc = DateTime.UtcNow.AddSeconds(15);
+                    _healthBannerDismissedForSession = false; // new start cycle, let banner fire again
+                    _lastHealthCheckFailed = false;
+                }
+                // Reset on server stop
+                if (Status != ServerStatus.Running)
+                {
+                    _lastHealthCheckFailed = false;
+                }
+                _lastObservedStatus = Status;
+
+                var nowUtc = DateTime.UtcNow;
+                var inGrace = nowUtc < _healthCheckStartDelayUntilUtc;
+
+                if (wpActiveForHealth && Status == ServerStatus.Running && !inGrace && nowUtc >= _healthCheckCooldownUntilUtc)
+                {
+                    _healthCheckCooldownUntilUtc = nowUtc.AddSeconds(10);
+                    var portForHealth = _settings.Current.WindrosePlusDashboardPortByServer.GetValueOrDefault(serverDir, 0);
+                    _healthHttpClient ??= _httpFactory.CreateClient();
+                    _healthHttpClient.Timeout = TimeSpan.FromSeconds(3);
+                    _lastHealthCheckFailed = !await HealthCheckHelper.IsHealthyAsync(portForHealth, _healthHttpClient, ct).ConfigureAwait(true);
+                }
+
+                var shouldShowHealth = wpActiveForHealth
+                    && Status == ServerStatus.Running
+                    && !inGrace
+                    && _lastHealthCheckFailed
+                    && !_healthBannerDismissedForSession;
+
+                if (shouldShowHealth)
+                {
+                    var portForBanner = _settings.Current.WindrosePlusDashboardPortByServer.GetValueOrDefault(serverDir, 0);
+                    if (HealthBanner is null || HealthBanner.ServerInstallDir != serverDir || HealthBanner.DashboardPort != portForBanner)
+                    {
+                        if (HealthBanner is not null)
+                            HealthBanner.StateChanged -= OnHealthStateChanged;
+                        HealthBanner = new HealthBannerViewModel(serverDir, portForBanner, _wplus, _proc, InstallInfo?.BuildId);
+                        HealthBanner.StateChanged += OnHealthStateChanged;
+                    }
+                    HealthBannerVisible = true;
+                }
+                else
+                {
+                    HealthBannerVisible = false;
+                }
             }
             else
             {
                 RetrofitBannerVisible = false;
+                HealthBannerVisible = false;
             }
         }
         catch { }
     }
 
     private void OnRetrofitStateChanged() => _ = RefreshAsync(CancellationToken.None);
+
+    private void OnHealthStateChanged()
+    {
+        _healthBannerDismissedForSession = true;
+        HealthBannerVisible = false;
+    }
 
     [RelayCommand]
     private async Task CopyInviteCodeAsync()
@@ -517,5 +592,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _proc.StatusChanged -= OnServerStatusChanged;
         if (RetrofitBanner is not null)
             RetrofitBanner.StateChanged -= OnRetrofitStateChanged;
+        if (HealthBanner is not null)
+            HealthBanner.StateChanged -= OnHealthStateChanged;
+        _healthHttpClient?.Dispose();
+        _healthHttpClient = null;
     }
 }
