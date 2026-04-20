@@ -45,9 +45,9 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 
 ### Events History
 
-- [ ] **EVENT-01**: Events view streams join/leave records from WindrosePlus `events.log` live (FileSystemWatcher)
-- [ ] **EVENT-02**: Events can be searched and filtered by player name, Steam-ID, and event type
-- [ ] **EVENT-03**: Events view paginates or virtualizes for >1000 entries (no UI freeze)
+- [x] **EVENT-01**: Events view streams join/leave records from WindrosePlus `events.log` live (FileSystemWatcher)
+- [x] **EVENT-02**: Events can be searched and filtered by player name, Steam-ID, and event type
+- [x] **EVENT-03**: Events view paginates or virtualizes for >1000 entries (no UI freeze)
 
 ### Sea-Chart Viewer
 
@@ -102,9 +102,9 @@ Windrose has no native admin features (no RCON, no A2S response, no admin consol
 | PLAYER-02 | 11 | Pending |
 | PLAYER-03 | 11 | Pending |
 | PLAYER-04 | 11 | Pending |
-| EVENT-01 | 11 | Pending |
-| EVENT-02 | 11 | Pending |
-| EVENT-03 | 11 | Pending |
+| EVENT-01 | 11 | Complete |
+| EVENT-02 | 11 | Complete |
+| EVENT-03 | 11 | Complete |
 | CHART-01 | 11 | Pending |
 | CHART-02 | 11 | Pending |
 | EDITOR-01 | 11 | Pending |
