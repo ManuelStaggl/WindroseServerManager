@@ -31,9 +31,12 @@ public partial class SeaChartView : UserControl
         (DataContext as SeaChartViewModel)?.Stop();
     }
 
-    private void OnMarkerTapped(object? sender, TappedEventArgs e)
+    private void OnMarkerPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (sender is Control c && c.DataContext is PlayerMarkerViewModel marker)
+        {
             marker.SelectCommand.Execute(null);
+            e.Handled = true;
+        }
     }
 }
