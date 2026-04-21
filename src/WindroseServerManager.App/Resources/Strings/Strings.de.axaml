@@ -628,13 +628,44 @@
     <sys:String x:Key="SeaChart.OptOut.Desc">Die Live-Seekarte benötigt WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Config Editor View -->
-    <sys:String x:Key="Editor.Title">Konfiguration</sys:String>
+    <sys:String x:Key="Editor.Title">WindrosePlus-Konfiguration</sys:String>
+    <sys:String x:Key="Editor.Subtitle">Einstellungen für das WindrosePlus-Mod (windrose_plus.json)</sys:String>
     <sys:String x:Key="Editor.Save">Speichern</sys:String>
     <sys:String x:Key="Editor.Saved">Konfiguration gespeichert.</sys:String>
     <sys:String x:Key="Editor.RestartRequired">Server muss neu gestartet werden, damit Änderungen wirksam werden.</sys:String>
     <sys:String x:Key="Editor.ValidationError">Ein oder mehrere Werte sind ungültig.</sys:String>
     <sys:String x:Key="Editor.Error.Load">Konfiguration konnte nicht geladen werden.</sys:String>
     <sys:String x:Key="Editor.Error.Save">Konfiguration konnte nicht gespeichert werden.</sys:String>
+    <sys:String x:Key="Editor.Category.Server">Server-Einstellungen</sys:String>
+    <sys:String x:Key="Editor.Category.Multipliers">Multiplikatoren</sys:String>
+    <sys:String x:Key="Editor.Multiplier.Suffix">x</sys:String>
+    <!-- Schema field names + descriptions -->
+    <sys:String x:Key="Editor.Schema.HttpPort.Name">Dashboard-Port</sys:String>
+    <sys:String x:Key="Editor.Schema.HttpPort.Desc">HTTP-Port des WindrosePlus-Dashboards. Standard: 8780. Muss mit dem eingestellten Port im Manager übereinstimmen.</sys:String>
+    <sys:String x:Key="Editor.Schema.RconEnabled.Name">RCON aktiviert</sys:String>
+    <sys:String x:Key="Editor.Schema.RconEnabled.Desc">Aktiviert die RCON-Schnittstelle für Kick, Ban und Broadcast-Befehle aus dem Manager.</sys:String>
+    <sys:String x:Key="Editor.Schema.RconPassword.Name">RCON-Passwort</sys:String>
+    <sys:String x:Key="Editor.Schema.RconPassword.Desc">Passwort für die RCON-Verbindung. Wird automatisch vom Manager verwendet.</sys:String>
+    <sys:String x:Key="Editor.Schema.Xp.Name">Erfahrungspunkte</sys:String>
+    <sys:String x:Key="Editor.Schema.Xp.Desc">Wie schnell Spieler XP sammeln. 2x = doppelte XP, 0,5x = halbe XP.</sys:String>
+    <sys:String x:Key="Editor.Schema.Loot.Name">Loot-Menge</sys:String>
+    <sys:String x:Key="Editor.Schema.Loot.Desc">Menge der Gegenstände in Truhen und Drops.</sys:String>
+    <sys:String x:Key="Editor.Schema.StackSize.Name">Stapelgröße</sys:String>
+    <sys:String x:Key="Editor.Schema.StackSize.Desc">Maximale Anzahl Gegenstände pro Inventar-Slot.</sys:String>
+    <sys:String x:Key="Editor.Schema.CraftCost.Name">Herstellungskosten</sys:String>
+    <sys:String x:Key="Editor.Schema.CraftCost.Desc">Ressourcenbedarf beim Craften. 0,5x = halbierter Materialverbrauch.</sys:String>
+    <sys:String x:Key="Editor.Schema.CropSpeed.Name">Pflanzenwachstum</sys:String>
+    <sys:String x:Key="Editor.Schema.CropSpeed.Desc">Wachstumsgeschwindigkeit von Pflanzen und Feldfrüchten.</sys:String>
+    <sys:String x:Key="Editor.Schema.CookingSpeed.Name">Kochgeschwindigkeit</sys:String>
+    <sys:String x:Key="Editor.Schema.CookingSpeed.Desc">Wie schnell Gerichte im Kochtopf oder Herd zubereitet werden.</sys:String>
+    <sys:String x:Key="Editor.Schema.HarvestYield.Name">Ernteertrag</sys:String>
+    <sys:String x:Key="Editor.Schema.HarvestYield.Desc">Menge der Ressourcen pro Ernte oder Abbau-Aktion.</sys:String>
+    <sys:String x:Key="Editor.Schema.InventorySize.Name">Inventargröße</sys:String>
+    <sys:String x:Key="Editor.Schema.InventorySize.Desc">Anzahl verfügbarer Inventar-Slots je Spieler.</sys:String>
+    <sys:String x:Key="Editor.Schema.PointsPerLevel.Name">Punkte pro Level</sys:String>
+    <sys:String x:Key="Editor.Schema.PointsPerLevel.Desc">Anzahl Skillpunkte die ein Spieler pro Level-Aufstieg erhält.</sys:String>
+    <sys:String x:Key="Editor.Schema.Weight.Name">Traglast</sys:String>
+    <sys:String x:Key="Editor.Schema.Weight.Desc">Maximale Traglast der Spieler. Beeinflusst wie viel mitgetragen werden kann.</sys:String>
     <sys:String x:Key="Editor.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
     <sys:String x:Key="Editor.OptOut.Desc">Der Konfigurations-Editor benötigt WindrosePlus.</sys:String>
 

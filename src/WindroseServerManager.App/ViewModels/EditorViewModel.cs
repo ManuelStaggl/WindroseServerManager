@@ -69,8 +69,7 @@ public partial class EditorViewModel : ViewModelBase
                     object? initial = null;
                     if (cfg is not null)
                     {
-                        var dict = schema.Category == "Server" ? cfg.Server : cfg.Multipliers;
-                        dict.TryGetValue(schema.Key, out initial);
+                        GetSection(cfg, schema).TryGetValue(schema.Key, out initial);
                     }
                     var entry = new ConfigEntryViewModel(schema, initial);
                     entry.PropertyChanged += (_, e) =>
@@ -103,6 +102,17 @@ public partial class EditorViewModel : ViewModelBase
             OnPropertyChanged(nameof(CanSave));
             SaveCommand.NotifyCanExecuteChanged();
         }
+    }
+
+    private static Dictionary<string, object?> GetSection(WindrosePlusConfig cfg, ConfigEntrySchema schema)
+    {
+        var section = schema.JsonSection ?? schema.Category.ToLowerInvariant();
+        return section switch
+        {
+            "rcon"        => cfg.Rcon,
+            "multipliers" => cfg.Multipliers,
+            _             => cfg.Server,
+        };
     }
 
     [RelayCommand]
@@ -138,11 +148,8 @@ public partial class EditorViewModel : ViewModelBase
 
         var cfg = _api.ReadConfig(serverDir) ?? new WindrosePlusConfig();
         foreach (var group in Categories)
-        {
-            var dict = group.Category == "Server" ? cfg.Server : cfg.Multipliers;
             foreach (var entry in group.Entries)
-                dict[entry.Key] = entry.ToTypedValue();
-        }
+                GetSection(cfg, entry.Schema)[entry.Key] = entry.ToTypedValue();
 
         try
         {
@@ -163,6 +170,7 @@ public partial class EditorViewModel : ViewModelBase
 public sealed class CategoryGroup
 {
     public string Category { get; }
+    public string CategoryDisplayName => Loc.Get($"Editor.Category.{Category}");
     public IReadOnlyList<ConfigEntryViewModel> Entries { get; }
 
     public CategoryGroup(string category, IReadOnlyList<ConfigEntryViewModel> entries)

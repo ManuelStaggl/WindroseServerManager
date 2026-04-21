@@ -2,17 +2,22 @@ using System.Globalization;
 
 namespace WindroseServerManager.Core.Services;
 
+/// <summary>
+/// JsonSection: the JSON root key to read/write ("server", "rcon", "multipliers").
+/// Null = use lowercase Category as fallback.
+/// </summary>
 public sealed record ConfigEntrySchema(
     string Category, string Key, string Type,
-    double? Min, double? Max, object? Default, string DescriptionKey);
+    double? Min, double? Max, object? Default, string DescriptionKey,
+    string? JsonSection = null);
 
 public static class WindrosePlusConfigSchema
 {
     public static IReadOnlyList<ConfigEntrySchema> All { get; } = new List<ConfigEntrySchema>
     {
-        new("Server", "http_port",         "int",   1024, 65535, 8780,  "Editor.Schema.HttpPort"),
-        new("Server", "rcon_enabled",      "bool",  null, null,  false, "Editor.Schema.RconEnabled"),
-        new("Server", "rcon_password",     "string",null, null,  "",    "Editor.Schema.RconPassword"),
+        new("Server", "http_port", "int",    1024, 65535, 8780,  "Editor.Schema.HttpPort",    "server"),
+        new("Server", "enabled",   "bool",   null, null,  false, "Editor.Schema.RconEnabled",  "rcon"),
+        new("Server", "password",  "string", null, null,  "",    "Editor.Schema.RconPassword", "rcon"),
         new("Multipliers", "xp",              "float", 0.1, 100, 1.0, "Editor.Schema.Xp"),
         new("Multipliers", "loot",            "float", 0.1, 100, 1.0, "Editor.Schema.Loot"),
         new("Multipliers", "stack_size",      "float", 0.1, 100, 1.0, "Editor.Schema.StackSize"),

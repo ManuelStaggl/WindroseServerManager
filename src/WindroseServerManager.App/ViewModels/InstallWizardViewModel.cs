@@ -162,8 +162,8 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
                 // Write windrose_plus.json so WindrosePlus uses the configured port/password.
                 var cfg = _wplusApi.ReadConfig(InstallDir) ?? new WindroseServerManager.Core.Models.WindrosePlusConfig();
                 cfg.Server["http_port"] = DashboardPort;
-                cfg.Server["rcon_enabled"] = true;
-                cfg.Server["rcon_password"] = RconPassword;
+                cfg.Rcon["enabled"] = true;
+                cfg.Rcon["password"] = RconPassword;
                 await _wplusApi.WriteConfigAsync(InstallDir, cfg, _cts.Token);
             }
 

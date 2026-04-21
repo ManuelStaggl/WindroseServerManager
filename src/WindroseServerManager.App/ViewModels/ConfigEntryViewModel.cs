@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using WindroseServerManager.App.Services;
 using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
@@ -13,8 +15,43 @@ public partial class ConfigEntryViewModel : ObservableObject
 
     public string Category => Schema.Category;
     public string Key => Schema.Key;
-    public string DisplayName => Schema.Key;
+
+    // Localized display
+    public string DisplayName => Loc.Get(Schema.DescriptionKey + ".Name");
+    public string Description => Loc.Get(Schema.DescriptionKey + ".Desc");
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+
+    // Type discriminators for the view
+    public bool IsFloat    => Schema.Type == "float";
+    public bool IsBool     => Schema.Type == "bool";
+    public bool IsInt      => Schema.Type == "int";
+    public bool IsPassword => Schema.Key  == "rcon_password";
+    public bool IsText     => !IsFloat && !IsBool;
+
+    // Slider range capped at 10 for practical UX (text box allows up to schema max)
+    public double SliderMin => Schema.Min ?? 0.1;
+    public double SliderMax => Math.Min(Schema.Max ?? 10.0, 10.0);
+
+    // Two-way double property for Slider (floats only)
+    public double SliderValue
+    {
+        get => double.TryParse(RawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var d)
+               ? Math.Clamp(d, SliderMin, SliderMax)
+               : (double)(Schema.Default ?? 1.0);
+        set
+        {
+            var formatted = value.ToString("0.##", CultureInfo.InvariantCulture);
+            if (formatted != RawValue)
+                RawValue = formatted;
+        }
+    }
+
+    // Two-way bool property for ToggleSwitch (bools only)
+    public bool BoolValue
+    {
+        get => bool.TryParse(RawValue, out var b) && b;
+        set => RawValue = value ? "true" : "false";
+    }
 
     public ConfigEntryViewModel(ConfigEntrySchema schema, object? initialValue)
     {
@@ -23,7 +60,12 @@ public partial class ConfigEntryViewModel : ObservableObject
         Validate();
     }
 
-    partial void OnRawValueChanged(string value) => Validate();
+    partial void OnRawValueChanged(string value)
+    {
+        Validate();
+        OnPropertyChanged(nameof(SliderValue));
+        OnPropertyChanged(nameof(BoolValue));
+    }
 
     private void Validate()
     {

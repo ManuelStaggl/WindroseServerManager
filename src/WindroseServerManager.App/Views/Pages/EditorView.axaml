@@ -23,43 +23,133 @@
 
         <!-- Normal content -->
         <Grid IsVisible="{Binding IsWindrosePlusActive}"
-              RowDefinitions="Auto,*,Auto" RowSpacing="12">
+              RowDefinitions="Auto,*,Auto" RowSpacing="16">
 
             <!-- Header -->
-            <StackPanel Grid.Row="0" Spacing="4">
+            <StackPanel Grid.Row="0" Spacing="2">
                 <TextBlock Text="{DynamicResource Editor.Title}" Classes="page-title" />
+                <TextBlock Text="{DynamicResource Editor.Subtitle}" Classes="caption"
+                           Foreground="{DynamicResource BrandTextMutedBrush}" />
             </StackPanel>
 
-            <!-- Grouped entry list -->
+            <!-- Categories -->
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding Categories}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:CategoryGroup">
                             <Border BorderBrush="{DynamicResource BrandNavyBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="6"
-                                    Padding="12"
-                                    Margin="0,0,0,12">
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="{Binding Category}" Classes="section-header" />
-                                    <ItemsControl ItemsSource="{Binding Entries}">
+                                    BorderThickness="1" CornerRadius="8"
+                                    Margin="0,0,0,16">
+                                <!-- Category header -->
+                                <StackPanel>
+                                    <Border Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                                            CornerRadius="8,8,0,0" Padding="16,12">
+                                        <TextBlock Text="{Binding CategoryDisplayName}"
+                                                   Classes="section-header" />
+                                    </Border>
+
+                                    <!-- Entries -->
+                                    <ItemsControl ItemsSource="{Binding Entries}" Margin="0">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate x:DataType="vm:ConfigEntryViewModel">
-                                                <Grid ColumnDefinitions="200,*,Auto"
-                                                      Margin="0,4"
-                                                      ColumnSpacing="12">
-                                                    <TextBlock Grid.Column="0"
-                                                               Text="{Binding DisplayName}"
-                                                               VerticalAlignment="Center" />
-                                                    <TextBox Grid.Column="1"
-                                                             Text="{Binding RawValue, Mode=TwoWay}" />
-                                                    <TextBlock Grid.Column="2"
-                                                               Text="{Binding ErrorMessage}"
-                                                               Foreground="{DynamicResource BrandErrorBrush}"
-                                                               IsVisible="{Binding HasError}"
-                                                               VerticalAlignment="Center"
-                                                               MinWidth="160" />
-                                                </Grid>
+                                                <Border BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                                                        BorderThickness="0,0,0,1"
+                                                        Padding="16,14">
+                                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+
+                                                        <!-- Float: full-width slider row -->
+                                                        <Grid Grid.Row="0" IsVisible="{Binding IsFloat}"
+                                                              ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                                            <!-- Left: name + desc -->
+                                                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding DisplayName}"
+                                                                           FontWeight="SemiBold" FontSize="14" />
+                                                                <TextBlock Text="{Binding Description}"
+                                                                           FontSize="12" TextWrapping="Wrap"
+                                                                           Foreground="{DynamicResource BrandTextMutedBrush}" />
+                                                            </StackPanel>
+                                                            <!-- Right: value badge -->
+                                                            <Border Grid.Column="1"
+                                                                    Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                                                                    CornerRadius="6" Padding="10,4"
+                                                                    VerticalAlignment="Center" MinWidth="64">
+                                                                <StackPanel Orientation="Horizontal" Spacing="2"
+                                                                            HorizontalAlignment="Center">
+                                                                    <TextBlock Text="{Binding RawValue}"
+                                                                               FontFamily="Consolas,Courier New"
+                                                                               FontSize="14" FontWeight="SemiBold"
+                                                                               Foreground="{DynamicResource BrandAmberBrush}" />
+                                                                    <TextBlock Text="{DynamicResource Editor.Multiplier.Suffix}"
+                                                                               FontSize="12"
+                                                                               Foreground="{DynamicResource BrandTextMutedBrush}"
+                                                                               VerticalAlignment="Bottom" Margin="1,0,0,1" />
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Grid>
+
+                                                        <!-- Float: Slider + TextBox -->
+                                                        <Grid Grid.Row="1" IsVisible="{Binding IsFloat}"
+                                                              ColumnDefinitions="*,80" ColumnSpacing="10">
+                                                            <Slider Grid.Column="0"
+                                                                    Value="{Binding SliderValue}"
+                                                                    Minimum="{Binding SliderMin}"
+                                                                    Maximum="{Binding SliderMax}"
+                                                                    TickFrequency="0.1"
+                                                                    SmallChange="0.1"
+                                                                    LargeChange="0.5"
+                                                                    VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="1"
+                                                                     Text="{Binding RawValue, Mode=TwoWay}"
+                                                                     HorizontalContentAlignment="Center"
+                                                                     FontFamily="Consolas,Courier New"
+                                                                     FontSize="13" />
+                                                        </Grid>
+
+                                                        <!-- Bool: label + toggle in one row -->
+                                                        <Grid Grid.Row="0" IsVisible="{Binding IsBool}"
+                                                              ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding DisplayName}"
+                                                                           FontWeight="SemiBold" FontSize="14" />
+                                                                <TextBlock Text="{Binding Description}"
+                                                                           FontSize="12" TextWrapping="Wrap"
+                                                                           Foreground="{DynamicResource BrandTextMutedBrush}" />
+                                                            </StackPanel>
+                                                            <ToggleSwitch Grid.Column="1"
+                                                                          IsChecked="{Binding BoolValue}"
+                                                                          VerticalAlignment="Center"
+                                                                          OnContent="" OffContent="" />
+                                                        </Grid>
+
+                                                        <!-- Text / Int / Password: label above, input below -->
+                                                        <StackPanel Grid.Row="0" IsVisible="{Binding IsText}"
+                                                                    Spacing="6">
+                                                            <StackPanel Spacing="2">
+                                                                <TextBlock Text="{Binding DisplayName}"
+                                                                           FontWeight="SemiBold" FontSize="14" />
+                                                                <TextBlock Text="{Binding Description}"
+                                                                           FontSize="12" TextWrapping="Wrap"
+                                                                           Foreground="{DynamicResource BrandTextMutedBrush}" />
+                                                            </StackPanel>
+                                                            <!-- Password TextBox -->
+                                                            <TextBox IsVisible="{Binding IsPassword}"
+                                                                     Text="{Binding RawValue, Mode=TwoWay}"
+                                                                     PasswordChar="•"
+                                                                     PlaceholderText="Leer lassen = kein Passwort" />
+                                                            <!-- Normal TextBox (int / string) -->
+                                                            <TextBox IsVisible="{Binding !IsPassword}"
+                                                                     Text="{Binding RawValue, Mode=TwoWay}" />
+                                                        </StackPanel>
+
+                                                        <!-- Error message (all types) -->
+                                                        <TextBlock Grid.Row="2"
+                                                                   Text="{Binding ErrorMessage}"
+                                                                   FontSize="12"
+                                                                   Foreground="{DynamicResource BrandErrorBrush}"
+                                                                   IsVisible="{Binding HasError}"
+                                                                   Margin="0,2,0,0" />
+                                                    </Grid>
+                                                </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -70,11 +160,8 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <!-- Footer: validation summary + Save button -->
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        Spacing="8">
+            <!-- Footer -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
                 <TextBlock Text="{DynamicResource Editor.ValidationError}"
                            Foreground="{DynamicResource BrandErrorBrush}"
                            IsVisible="{Binding HasAnyError}"

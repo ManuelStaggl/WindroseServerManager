@@ -628,13 +628,44 @@
     <sys:String x:Key="SeaChart.OptOut.Desc">The live sea chart requires WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Config Editor View -->
-    <sys:String x:Key="Editor.Title">Config Editor</sys:String>
+    <sys:String x:Key="Editor.Title">WindrosePlus Config</sys:String>
+    <sys:String x:Key="Editor.Subtitle">Settings for the WindrosePlus mod (windrose_plus.json)</sys:String>
     <sys:String x:Key="Editor.Save">Save</sys:String>
     <sys:String x:Key="Editor.Saved">Configuration saved.</sys:String>
     <sys:String x:Key="Editor.RestartRequired">Server must be restarted for changes to take effect.</sys:String>
     <sys:String x:Key="Editor.ValidationError">One or more values are invalid.</sys:String>
     <sys:String x:Key="Editor.Error.Load">Could not load configuration.</sys:String>
     <sys:String x:Key="Editor.Error.Save">Could not save configuration.</sys:String>
+    <sys:String x:Key="Editor.Category.Server">Server Settings</sys:String>
+    <sys:String x:Key="Editor.Category.Multipliers">Multipliers</sys:String>
+    <sys:String x:Key="Editor.Multiplier.Suffix">x</sys:String>
+    <!-- Schema field names + descriptions -->
+    <sys:String x:Key="Editor.Schema.HttpPort.Name">Dashboard Port</sys:String>
+    <sys:String x:Key="Editor.Schema.HttpPort.Desc">HTTP port of the WindrosePlus dashboard. Default: 8780. Must match the port configured in the manager.</sys:String>
+    <sys:String x:Key="Editor.Schema.RconEnabled.Name">RCON Enabled</sys:String>
+    <sys:String x:Key="Editor.Schema.RconEnabled.Desc">Enables the RCON interface for kick, ban and broadcast commands from the manager.</sys:String>
+    <sys:String x:Key="Editor.Schema.RconPassword.Name">RCON Password</sys:String>
+    <sys:String x:Key="Editor.Schema.RconPassword.Desc">Password for the RCON connection. Used automatically by the manager.</sys:String>
+    <sys:String x:Key="Editor.Schema.Xp.Name">Experience Points</sys:String>
+    <sys:String x:Key="Editor.Schema.Xp.Desc">How fast players earn XP. 2x = double XP, 0.5x = half XP.</sys:String>
+    <sys:String x:Key="Editor.Schema.Loot.Name">Loot Amount</sys:String>
+    <sys:String x:Key="Editor.Schema.Loot.Desc">Amount of items in chests and drops.</sys:String>
+    <sys:String x:Key="Editor.Schema.StackSize.Name">Stack Size</sys:String>
+    <sys:String x:Key="Editor.Schema.StackSize.Desc">Maximum number of items per inventory slot.</sys:String>
+    <sys:String x:Key="Editor.Schema.CraftCost.Name">Crafting Cost</sys:String>
+    <sys:String x:Key="Editor.Schema.CraftCost.Desc">Resource requirements when crafting. 0.5x = half the material cost.</sys:String>
+    <sys:String x:Key="Editor.Schema.CropSpeed.Name">Crop Growth</sys:String>
+    <sys:String x:Key="Editor.Schema.CropSpeed.Desc">Growth speed of plants and crops.</sys:String>
+    <sys:String x:Key="Editor.Schema.CookingSpeed.Name">Cooking Speed</sys:String>
+    <sys:String x:Key="Editor.Schema.CookingSpeed.Desc">How fast dishes are prepared in a cooking pot or stove.</sys:String>
+    <sys:String x:Key="Editor.Schema.HarvestYield.Name">Harvest Yield</sys:String>
+    <sys:String x:Key="Editor.Schema.HarvestYield.Desc">Amount of resources per harvest or mining action.</sys:String>
+    <sys:String x:Key="Editor.Schema.InventorySize.Name">Inventory Size</sys:String>
+    <sys:String x:Key="Editor.Schema.InventorySize.Desc">Number of available inventory slots per player.</sys:String>
+    <sys:String x:Key="Editor.Schema.PointsPerLevel.Name">Points per Level</sys:String>
+    <sys:String x:Key="Editor.Schema.PointsPerLevel.Desc">Number of skill points a player receives per level-up.</sys:String>
+    <sys:String x:Key="Editor.Schema.Weight.Name">Carry Weight</sys:String>
+    <sys:String x:Key="Editor.Schema.Weight.Desc">Maximum carry weight for players. Affects how much can be carried.</sys:String>
     <sys:String x:Key="Editor.OptOut.Title">WindrosePlus Not Active</sys:String>
     <sys:String x:Key="Editor.OptOut.Desc">The config editor requires WindrosePlus.</sys:String>
 
