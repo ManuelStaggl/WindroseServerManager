@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using WindroseServerManager.App.Services;
+using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
@@ -13,11 +15,17 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class SeaChartViewModel : ViewModelBase, IDisposable
 {
     private readonly IWindrosePlusApiService _api;
+    private readonly IWindrosePlusService _wplus;
     private readonly IAppSettingsService _settings;
+    private readonly IToastService _toasts;
     private CancellationTokenSource? _cts;
 
     [ObservableProperty] private Uri? _livemapUrl;
     [ObservableProperty] private string? _errorMessage;
+
+    public bool IsWindrosePlusActive =>
+        _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(
+            _settings.ActiveServerDir ?? string.Empty, false);
 
     public bool HasLivemap => LivemapUrl is not null;
 
@@ -40,13 +48,21 @@ public partial class SeaChartViewModel : ViewModelBase, IDisposable
 
     partial void OnLivemapUrlChanged(Uri? value) => OnPropertyChanged(nameof(HasLivemap));
 
-    public SeaChartViewModel(IWindrosePlusApiService api, IAppSettingsService settings)
+    public SeaChartViewModel(IWindrosePlusApiService api, IWindrosePlusService wplus, IAppSettingsService settings, IToastService toasts)
     {
         _api = api;
+        _wplus = wplus;
         _settings = settings;
+        _toasts = toasts;
     }
 
-    public void Start() => RefreshUrl();
+    public void Start()
+    {
+        OnPropertyChanged(nameof(IsWindrosePlusActive));
+        if (IsWindrosePlusActive) RefreshUrl();
+        else LivemapUrl = null;
+    }
+
     public void Stop() { _cts?.Cancel(); }
     public void UpdateCanvasSize(double width, double height) { /* reserved for future canvas rendering */ }
 
@@ -113,6 +129,24 @@ public partial class SeaChartViewModel : ViewModelBase, IDisposable
         if (LivemapUrl is null) return;
         try { Process.Start(new ProcessStartInfo(LivemapUrl.ToString()) { UseShellExecute = true }); }
         catch (Exception ex) { Log.Warning(ex, "Failed to open livemap in browser"); }
+    }
+
+    [RelayCommand]
+    private async Task InstallWindrosePlusAsync()
+    {
+        var dir = _settings.ActiveServerDir;
+        if (string.IsNullOrWhiteSpace(dir)) return;
+        var top = (Avalonia.Application.Current?.ApplicationLifetime
+            as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (top is null) return;
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _api, _settings, _toasts);
+        var dialog = new RetrofitDialog { DataContext = bannerVm };
+        var confirmed = await dialog.ShowDialog<bool>(top);
+        if (confirmed)
+        {
+            OnPropertyChanged(nameof(IsWindrosePlusActive));
+            Start();
+        }
     }
 
     public void Dispose()

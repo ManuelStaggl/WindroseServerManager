@@ -17,6 +17,7 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class PlayersViewModel : ViewModelBase, IDisposable
 {
     private readonly IWindrosePlusApiService _api;
+    private readonly IWindrosePlusService _wplus;
     private readonly IAppSettingsService _settings;
     private readonly IToastService _toasts;
     private readonly System.Timers.Timer _pollTimer;
@@ -28,12 +29,17 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private WindrosePlusPlayer? _selectedPlayer;
     [ObservableProperty] private string _broadcastMessage = string.Empty;
 
+    public bool IsWindrosePlusActive =>
+        _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(
+            _settings.ActiveServerDir ?? string.Empty, false);
+
     public bool HasPlayers => Players.Count > 0;
     public bool HasNoPlayers => !IsLoading && string.IsNullOrEmpty(ErrorMessage) && Players.Count == 0;
 
-    public PlayersViewModel(IWindrosePlusApiService api, IAppSettingsService settings, IToastService toasts)
+    public PlayersViewModel(IWindrosePlusApiService api, IWindrosePlusService wplus, IAppSettingsService settings, IToastService toasts)
     {
         _api = api;
+        _wplus = wplus;
         _settings = settings;
         _toasts = toasts;
         _pollTimer = new System.Timers.Timer();
@@ -48,6 +54,8 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
 
     public void Start()
     {
+        OnPropertyChanged(nameof(IsWindrosePlusActive));
+        if (!IsWindrosePlusActive) return;
         var interval = Math.Max(3, _settings.Current.WindrosePlusPlayerRefreshSeconds);
         _pollTimer.Interval = interval * 1000;
         _pollTimer.Start();
@@ -187,6 +195,23 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
         {
             _toasts.Success(Loc.Get("Players.Broadcast.Sent"));
             BroadcastMessage = string.Empty;
+        }
+    }
+
+    [RelayCommand]
+    private async Task InstallWindrosePlusAsync()
+    {
+        var dir = _settings.ActiveServerDir;
+        if (string.IsNullOrWhiteSpace(dir)) return;
+        var top = GetMainWindow();
+        if (top is null) return;
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _api, _settings, _toasts);
+        var dialog = new RetrofitDialog { DataContext = bannerVm };
+        var confirmed = await dialog.ShowDialog<bool>(top);
+        if (confirmed)
+        {
+            OnPropertyChanged(nameof(IsWindrosePlusActive));
+            Start();
         }
     }
 

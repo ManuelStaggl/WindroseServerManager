@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using WindroseServerManager.App.Services;
+using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
@@ -17,6 +18,7 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class EditorViewModel : ViewModelBase
 {
     private readonly IWindrosePlusApiService _api;
+    private readonly IWindrosePlusService _wplus;
     private readonly IAppSettingsService _settings;
     private readonly IServerProcessService _proc;
     private readonly IToastService _toasts;
@@ -25,18 +27,27 @@ public partial class EditorViewModel : ViewModelBase
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string? _errorMessage;
 
+    public bool IsWindrosePlusActive =>
+        _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(
+            _settings.ActiveServerDir ?? string.Empty, false);
+
     public bool HasAnyError => Categories.Any(c => c.Entries.Any(e => e.HasError));
     public bool CanSave => !HasAnyError && !IsLoading;
 
-    public EditorViewModel(IWindrosePlusApiService api, IAppSettingsService settings, IServerProcessService proc, IToastService toasts)
+    public EditorViewModel(IWindrosePlusApiService api, IWindrosePlusService wplus, IAppSettingsService settings, IServerProcessService proc, IToastService toasts)
     {
         _api = api;
+        _wplus = wplus;
         _settings = settings;
         _proc = proc;
         _toasts = toasts;
     }
 
-    public void Start() => _ = LoadAsync();
+    public void Start()
+    {
+        OnPropertyChanged(nameof(IsWindrosePlusActive));
+        if (IsWindrosePlusActive) _ = LoadAsync();
+    }
 
     [RelayCommand]
     public async Task LoadAsync()
@@ -91,6 +102,24 @@ public partial class EditorViewModel : ViewModelBase
             IsLoading = false;
             OnPropertyChanged(nameof(CanSave));
             SaveCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    [RelayCommand]
+    private async Task InstallWindrosePlusAsync()
+    {
+        var dir = _settings.ActiveServerDir;
+        if (string.IsNullOrWhiteSpace(dir)) return;
+        var top = (Avalonia.Application.Current?.ApplicationLifetime
+            as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (top is null) return;
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _api, _settings, _toasts);
+        var dialog = new WindroseServerManager.App.Views.Dialogs.RetrofitDialog { DataContext = bannerVm };
+        var confirmed = await dialog.ShowDialog<bool>(top);
+        if (confirmed)
+        {
+            OnPropertyChanged(nameof(IsWindrosePlusActive));
+            Start();
         }
     }
 

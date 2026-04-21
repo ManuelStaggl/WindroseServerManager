@@ -3,31 +3,53 @@
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
              x:Class="WindroseServerManager.App.Views.Pages.SeaChartView"
              x:DataType="vm:SeaChartViewModel">
-    <Grid Margin="24" RowDefinitions="Auto,*" RowSpacing="12">
+    <Panel Margin="24">
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
-            <TextBlock Text="{DynamicResource SeaChart.Title}" Classes="page-title" VerticalAlignment="Center" />
-            <Button Content="{DynamicResource SeaChart.OpenLivemap}"
-                    Command="{Binding OpenLivemapCommand}" />
-            <Button Content="{DynamicResource SeaChart.Refresh}"
-                    Command="{Binding ReloadCommand}" />
+        <!-- Opt-out empty state -->
+        <StackPanel IsVisible="{Binding !IsWindrosePlusActive}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+            <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                       FontSize="48" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+            <TextBlock Text="{DynamicResource SeaChart.OptOut.Title}"
+                       Classes="section-header" HorizontalAlignment="Center" />
+            <TextBlock Text="{DynamicResource SeaChart.OptOut.Desc}"
+                       Classes="body" HorizontalAlignment="Center" TextAlignment="Center"
+                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+            <Button Content="{DynamicResource WindrosePlus.OptOut.Cta}"
+                    Command="{Binding InstallWindrosePlusCommand}"
+                    HorizontalAlignment="Center" Margin="0,4,0,0" />
         </StackPanel>
 
-        <Border Grid.Row="1" Classes="card" Padding="0" ClipToBounds="True">
-            <Grid>
-                <NativeWebView x:Name="LiveMapWebView"
-                               Source="{Binding LivemapUrl}"
-                               IsVisible="{Binding HasLivemap}" />
-                <!-- Empty state when dashboard is not running -->
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
-                            IsVisible="{Binding !HasLivemap}">
-                    <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                               FontSize="48" HorizontalAlignment="Center"
-                               Foreground="{DynamicResource BrandTextMutedBrush}" />
-                    <TextBlock Text="{DynamicResource SeaChart.NoMap}"
-                               Classes="section-header" HorizontalAlignment="Center" />
-                </StackPanel>
-            </Grid>
-        </Border>
-    </Grid>
+        <!-- Normal content -->
+        <Grid IsVisible="{Binding IsWindrosePlusActive}"
+              RowDefinitions="Auto,*" RowSpacing="12">
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="{DynamicResource SeaChart.Title}" Classes="page-title" VerticalAlignment="Center" />
+                <Button Content="{DynamicResource SeaChart.OpenLivemap}"
+                        Command="{Binding OpenLivemapCommand}" />
+                <Button Content="{DynamicResource SeaChart.Refresh}"
+                        Command="{Binding ReloadCommand}" />
+            </StackPanel>
+
+            <Border Grid.Row="1" Classes="card" Padding="0" ClipToBounds="True">
+                <Grid>
+                    <NativeWebView x:Name="LiveMapWebView"
+                                   Source="{Binding LivemapUrl}"
+                                   IsVisible="{Binding HasLivemap}" />
+                    <!-- Empty state when dashboard is not running -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
+                                IsVisible="{Binding !HasLivemap}">
+                        <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="48" HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}" />
+                        <TextBlock Text="{DynamicResource SeaChart.NoMap}"
+                                   Classes="section-header" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid><!-- /Normal content -->
+
+    </Panel>
 </UserControl>

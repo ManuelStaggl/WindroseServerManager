@@ -576,6 +576,8 @@
     <sys:String x:Key="Events.Column.SteamId">Steam-ID</sys:String>
     <sys:String x:Key="Events.Filter.Placeholder">Filtern nach Name oder Typ…</sys:String>
     <sys:String x:Key="Events.Empty">Noch keine Ereignisse aufgezeichnet.</sys:String>
+    <sys:String x:Key="Events.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
+    <sys:String x:Key="Events.OptOut.Desc">Das Ereignislog benötigt WindrosePlus.</sys:String>
     <sys:String x:Key="Events.Badge.Join">BEITRITT</sys:String>
     <sys:String x:Key="Events.Badge.Leave">VERLASSEN</sys:String>
 
@@ -609,6 +611,8 @@
     <sys:String x:Key="Players.BannedTimed">Spieler {0} für {1} Minuten gebannt.</sys:String>
     <sys:String x:Key="Players.Empty">Keine Spieler verbunden.</sys:String>
     <sys:String x:Key="Players.Error">WindrosePlus-Dashboard nicht erreichbar.</sys:String>
+    <sys:String x:Key="Players.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
+    <sys:String x:Key="Players.OptOut.Desc">Spielerverwaltung (Kick, Ban, Broadcast) benötigt WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Sea Chart View -->
     <sys:String x:Key="SeaChart.Title">Seekarte</sys:String>
@@ -620,6 +624,8 @@
     <sys:String x:Key="SeaChart.Error">WindrosePlus-Dashboard nicht erreichbar.</sys:String>
     <sys:String x:Key="SeaChart.Detail.Alive">Lebt</sys:String>
     <sys:String x:Key="SeaChart.Detail.Close">Schließen</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Desc">Die Live-Seekarte benötigt WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Config Editor View -->
     <sys:String x:Key="Editor.Title">Konfiguration</sys:String>
@@ -629,4 +635,9 @@
     <sys:String x:Key="Editor.ValidationError">Ein oder mehrere Werte sind ungültig.</sys:String>
     <sys:String x:Key="Editor.Error.Load">Konfiguration konnte nicht geladen werden.</sys:String>
     <sys:String x:Key="Editor.Error.Save">Konfiguration konnte nicht gespeichert werden.</sys:String>
+    <sys:String x:Key="Editor.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
+    <sys:String x:Key="Editor.OptOut.Desc">Der Konfigurations-Editor benötigt WindrosePlus.</sys:String>
+
+    <!-- Phase 12 — Shared opt-out CTA -->
+    <sys:String x:Key="WindrosePlus.OptOut.Cta">WindrosePlus installieren</sys:String>
 </ResourceDictionary>

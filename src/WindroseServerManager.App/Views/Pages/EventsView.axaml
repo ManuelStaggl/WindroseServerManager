@@ -4,7 +4,27 @@
              xmlns:m="using:WindroseServerManager.Core.Models"
              x:Class="WindroseServerManager.App.Views.Pages.EventsView"
              x:DataType="vm:EventsViewModel">
-    <Grid Margin="24" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+    <Panel Margin="24">
+
+        <!-- Opt-out empty state -->
+        <StackPanel IsVisible="{Binding !IsWindrosePlusActive}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+            <TextBlock Text="&#xE7C3;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                       FontSize="48" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+            <TextBlock Text="{DynamicResource Events.OptOut.Title}"
+                       Classes="section-header" HorizontalAlignment="Center" />
+            <TextBlock Text="{DynamicResource Events.OptOut.Desc}"
+                       Classes="body" HorizontalAlignment="Center" TextAlignment="Center"
+                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+            <Button Content="{DynamicResource WindrosePlus.OptOut.Cta}"
+                    Command="{Binding InstallWindrosePlusCommand}"
+                    HorizontalAlignment="Center" Margin="0,4,0,0" />
+        </StackPanel>
+
+        <!-- Normal content -->
+        <Grid IsVisible="{Binding IsWindrosePlusActive}"
+              RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
         <StackPanel Grid.Row="0" Spacing="4">
             <TextBlock Text="{DynamicResource Events.Title}" Classes="page-title" />
@@ -91,5 +111,7 @@
                 </StackPanel>
             </Grid>
         </Border>
-    </Grid>
+        </Grid><!-- /Normal content -->
+
+    </Panel>
 </UserControl>

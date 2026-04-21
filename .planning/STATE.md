@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-20T08:00:00Z"
-last_activity: "2026-04-20 — Plan 11-05 executed (Config Editor view: ConfigEntryViewModel + EditorViewModel + EditorView XAML + i18n)"
+last_updated: "2026-04-21T00:00:00Z"
+last_activity: "2026-04-21 — Phase 12 executed: opt-out Empty States für Players/Events/SeaChart/Editor — IsWindrosePlusActive guard + InstallWindrosePlusCommand + i18n (DE+EN) + Panel-Overlay in allen 4 Views"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
   completed_plans: 13
 ---
@@ -37,8 +37,8 @@ See: .planning/REQUIREMENTS.md (27 v1.2 requirements, fully mapped)
 | 8. WindrosePlus Bootstrap | ✅ Complete — All 3 plans done (contract + service impl + DI wiring/About-dialog). WPLUS-01…04 satisfied. |
 | 9. Opt-in UX (Wizard + Retrofit) | ✅ Complete — All 3 plans done. WIZARD-01..04 + RETRO-01..03 satisfied. Retrofit banner + dialog + Settings WP card shipped. |
 | 10. Health & Support | ✅ Complete — All 2 plans done. HEALTH-01 + HEALTH-02 satisfied. Health banner + report URL + rate-limit + grace period shipped. |
-| 11. Feature Views | 🔄 In progress — Plans 01, 03, 04 complete (foundation + Events view + Sea-Chart view). Plans 02, 05 remain. |
-| 12. Empty States (Opt-out UX) | Not started |
+| 11. Feature Views | ✅ Complete — All 5 plans done. PLAYER-01..04 + EVENT-01..03 + SEACHART-01..02 + EDITOR-01..03 satisfied. |
+| 12. Empty States (Opt-out UX) | ✅ Complete — EMPTY-01 + EMPTY-02 satisfied. IsWindrosePlusActive guard + InstallWindrosePlusCommand + opt-out Panel overlay in all 4 views + i18n DE+EN. |
 
 ## Accumulated Context
 
@@ -161,4 +161,4 @@ None.
 
 ## Next Step
 
-Phase 11 complete (all 5 plans done). All 12 requirements (PLAYER-01..04, EVENT-01..03, SEACHART-01..02, EDITOR-01..03) satisfied. Next: Phase 12 — Empty States (Opt-out UX).
+Milestone v1.2 complete — all 5 phases done, all 27 requirements satisfied. Ready for release: `/gsd:complete-milestone`.

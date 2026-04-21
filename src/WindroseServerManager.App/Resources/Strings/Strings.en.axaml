@@ -576,6 +576,8 @@
     <sys:String x:Key="Events.Column.SteamId">Steam ID</sys:String>
     <sys:String x:Key="Events.Filter.Placeholder">Filter by name or type…</sys:String>
     <sys:String x:Key="Events.Empty">No events recorded yet.</sys:String>
+    <sys:String x:Key="Events.OptOut.Title">WindrosePlus Not Active</sys:String>
+    <sys:String x:Key="Events.OptOut.Desc">The event log requires WindrosePlus.</sys:String>
     <sys:String x:Key="Events.Badge.Join">JOIN</sys:String>
     <sys:String x:Key="Events.Badge.Leave">LEAVE</sys:String>
 
@@ -609,6 +611,8 @@
     <sys:String x:Key="Players.BannedTimed">Player {0} banned for {1} minutes.</sys:String>
     <sys:String x:Key="Players.Empty">No players connected.</sys:String>
     <sys:String x:Key="Players.Error">Could not reach WindrosePlus dashboard.</sys:String>
+    <sys:String x:Key="Players.OptOut.Title">WindrosePlus Not Active</sys:String>
+    <sys:String x:Key="Players.OptOut.Desc">Player management (kick, ban, broadcast) requires WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Sea Chart View -->
     <sys:String x:Key="SeaChart.Title">Sea Chart</sys:String>
@@ -620,6 +624,8 @@
     <sys:String x:Key="SeaChart.Error">WindrosePlus dashboard not reachable.</sys:String>
     <sys:String x:Key="SeaChart.Detail.Alive">Alive</sys:String>
     <sys:String x:Key="SeaChart.Detail.Close">Close</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Title">WindrosePlus Not Active</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Desc">The live sea chart requires WindrosePlus.</sys:String>
 
     <!-- Phase 11 — Config Editor View -->
     <sys:String x:Key="Editor.Title">Config Editor</sys:String>
@@ -629,4 +635,9 @@
     <sys:String x:Key="Editor.ValidationError">One or more values are invalid.</sys:String>
     <sys:String x:Key="Editor.Error.Load">Could not load configuration.</sys:String>
     <sys:String x:Key="Editor.Error.Save">Could not save configuration.</sys:String>
+    <sys:String x:Key="Editor.OptOut.Title">WindrosePlus Not Active</sys:String>
+    <sys:String x:Key="Editor.OptOut.Desc">The config editor requires WindrosePlus.</sys:String>
+
+    <!-- Phase 12 — Shared opt-out CTA -->
+    <sys:String x:Key="WindrosePlus.OptOut.Cta">Install WindrosePlus</sys:String>
 </ResourceDictionary>

@@ -5,7 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using WindroseServerManager.App.Services;
+using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
 using WindroseServerManager.Core.Services;
 
@@ -14,7 +17,9 @@ namespace WindroseServerManager.App.ViewModels;
 public partial class EventsViewModel : ViewModelBase, IDisposable
 {
     private readonly IWindrosePlusApiService _api;
+    private readonly IWindrosePlusService _wplus;
     private readonly IAppSettingsService _settings;
+    private readonly IToastService _toasts;
     private FileSystemWatcher? _watcher;
     private long _lastReadPosition;
     private string? _logPath;
@@ -27,13 +32,19 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string? _errorMessage;
 
+    public bool IsWindrosePlusActive =>
+        _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(
+            _settings.ActiveServerDir ?? string.Empty, false);
+
     public bool HasEvents => FilteredEvents.Count > 0;
     public bool HasNoEvents => !IsLoading && FilteredEvents.Count == 0;
 
-    public EventsViewModel(IWindrosePlusApiService api, IAppSettingsService settings)
+    public EventsViewModel(IWindrosePlusApiService api, IWindrosePlusService wplus, IAppSettingsService settings, IToastService toasts)
     {
         _api = api;
+        _wplus = wplus;
         _settings = settings;
+        _toasts = toasts;
         FilteredEvents.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasEvents));
@@ -45,8 +56,10 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
 
     public void Start()
     {
+        OnPropertyChanged(nameof(IsWindrosePlusActive));
         var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
+        if (!IsWindrosePlusActive) return;
         var dir = Path.Combine(serverDir, "windrose_plus_data");
         _logPath = Path.Combine(dir, "events.log");
 
@@ -203,6 +216,24 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
         FilteredEvents.Clear();
         foreach (var e in Events.Where(e => EventsLogParser.MatchesFilter(e, filter)))
             FilteredEvents.Add(e);
+    }
+
+    [RelayCommand]
+    private async Task InstallWindrosePlusAsync()
+    {
+        var dir = _settings.ActiveServerDir;
+        if (string.IsNullOrWhiteSpace(dir)) return;
+        var top = (Avalonia.Application.Current?.ApplicationLifetime
+            as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (top is null) return;
+        var bannerVm = new RetrofitBannerViewModel(dir, _wplus, _api, _settings, _toasts);
+        var dialog = new RetrofitDialog { DataContext = bannerVm };
+        var confirmed = await dialog.ShowDialog<bool>(top);
+        if (confirmed)
+        {
+            OnPropertyChanged(nameof(IsWindrosePlusActive));
+            Start();
+        }
     }
 
     public void Dispose()
