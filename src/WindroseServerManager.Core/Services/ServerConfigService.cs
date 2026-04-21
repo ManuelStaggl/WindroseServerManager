@@ -41,7 +41,7 @@ public sealed class ServerConfigService : IServerConfigService
 
     public string? GetConfigRoot()
     {
-        var dir = _settings.Current.ServerInstallDir;
+        var dir = _settings.ActiveServerDir;
         return string.IsNullOrWhiteSpace(dir) ? null : dir;
     }
 

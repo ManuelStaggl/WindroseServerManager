@@ -24,7 +24,7 @@ public class WindrosePlusServiceTests
         ILogger<WindrosePlusService> log = logger is null
             ? NullLogger<WindrosePlusService>.Instance
             : new LoggerAdapter<WindrosePlusService>(logger);
-        return new WindrosePlusService(log, factory, fixture.CacheDir);
+        return new WindrosePlusService(log, factory, NullAppSettingsService.Instance, fixture.CacheDir);
     }
 
     // ---------- WPLUS-01: Fetch + offline/cache ----------

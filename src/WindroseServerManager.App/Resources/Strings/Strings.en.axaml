@@ -235,11 +235,19 @@
     <sys:String x:Key="Backups.Col.Created">Created</sys:String>
     <sys:String x:Key="Backups.Col.SizeMb">Size (MB)</sys:String>
     <sys:String x:Key="Backups.Col.Automatic">Automatic</sys:String>
-    <sys:String x:Key="Backups.None">No backups yet — click 'Create backup now'</sys:String>
+    <sys:String x:Key="Backups.None.Title">No backups yet</sys:String>
+    <sys:String x:Key="Backups.None">Click 'Create backup now' to create your first backup.</sys:String>
 
     <!-- Settings -->
     <sys:String x:Key="Settings.Title">Settings</sys:String>
     <sys:String x:Key="Settings.Subtitle">App configuration</sys:String>
+    <sys:String x:Key="Settings.Group.Display">DISPLAY</sys:String>
+    <sys:String x:Key="Settings.Group.Server">SERVER</sys:String>
+    <sys:String x:Key="Settings.Group.System">NETWORK &amp; SYSTEM</sys:String>
+    <sys:String x:Key="Settings.Group.WindrosePlus">WINDROSE PLUS</sys:String>
+    <sys:String x:Key="Settings.Group.App">APP</sys:String>
+    <sys:String x:Key="Settings.Save.Title">Save settings</sys:String>
+    <sys:String x:Key="Settings.Save.Hint">Server start and Steam settings take effect on the next launch.</sys:String>
     <sys:String x:Key="Settings.Language.Title">Language</sys:String>
     <sys:String x:Key="Settings.Language.Hint">Choose 'Automatic' to follow the Windows language.</sys:String>
     <sys:String x:Key="Settings.Language.Auto">Automatic</sys:String>
@@ -276,6 +284,10 @@
     <sys:String x:Key="Settings.WindrosePlus.StatusNotInstalled">Not installed</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusNoServer">No server configured</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.ManageButton">Install / manage WindrosePlus</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.RconPassword">RCON Password</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.RconPasswordHint">The password for RCON commands and the WindrosePlus dashboard.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.RconPasswordCopied">Password copied.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.RconPasswordNone">No password configured.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Title">App updates</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Hint">Checks GitHub for a newer version of Windrose Server Manager. Automatic every 6 hours.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.CheckNow">Check for update now</sys:String>
@@ -517,7 +529,7 @@
     <sys:String x:Key="Retrofit.Banner.Title">WindrosePlus Available</sys:String>
     <sys:String x:Key="Retrofit.Banner.Body">Unlock player management, events, sea chart, and config editor.</sys:String>
     <sys:String x:Key="Retrofit.Banner.Action.Install">Install Now</sys:String>
-    <sys:String x:Key="Retrofit.Banner.Action.Later">Not Now</sys:String>
+    <sys:String x:Key="Retrofit.Banner.Action.Later">Not Interested</sys:String>
     <sys:String x:Key="Retrofit.Dialog.Title">Install WindrosePlus</sys:String>
 
     <!-- Phase 10 — Health Banner (HEALTH-01, HEALTH-02) -->
@@ -534,8 +546,13 @@
     <sys:String x:Key="Server.AddNew">New Server</sys:String>
     <sys:String x:Key="Server.Active">Active</sys:String>
     <sys:String x:Key="Server.SetActive">Set Active</sys:String>
-    <sys:String x:Key="Server.Delete">Delete Server</sys:String>
+    <sys:String x:Key="Server.InstallWindrosePlus">Install WindrosePlus</sys:String>
+    <sys:String x:Key="Error.ServerNotInstalled">Windrose Server is not installed yet. Please set up the server via "New Server" first.</sys:String>
+    <sys:String x:Key="Server.Delete">Remove Server</sys:String>
     <sys:String x:Key="Server.Delete.Confirm">Remove server from list? Files on disk will be preserved.</sys:String>
+    <sys:String x:Key="Server.Delete.WithFiles">Also delete files from disk</sys:String>
+    <sys:String x:Key="Server.Delete.DangerNote">Warning: All server files will be permanently deleted.</sys:String>
+    <sys:String x:Key="Server.DeletedWithFiles">Server and files have been deleted.</sys:String>
     <sys:String x:Key="Server.Empty">No server configured</sys:String>
     <sys:String x:Key="Server.Empty.Hint">Click "New Server" to set up your first Windrose server.</sys:String>
     <sys:String x:Key="Server.Step1.Title">Set up server</sys:String>
@@ -548,6 +565,8 @@
     <sys:String x:Key="Server.Back">Back</sys:String>
     <sys:String x:Key="Server.StartInstall">Start Installation</sys:String>
     <sys:String x:Key="Server.Done">Done</sys:String>
+    <sys:String x:Key="Server.Name.Required">Please enter a server name.</sys:String>
+    <sys:String x:Key="Server.Deleted">Server removed from list.</sys:String>
 
     <!-- Phase 11 — Events View (EVENT-01, EVENT-02, EVENT-03) -->
     <sys:String x:Key="Events.Title">Event Log</sys:String>
@@ -555,8 +574,10 @@
     <sys:String x:Key="Events.Column.Type">Type</sys:String>
     <sys:String x:Key="Events.Column.Player">Player</sys:String>
     <sys:String x:Key="Events.Column.SteamId">Steam ID</sys:String>
-    <sys:String x:Key="Events.Filter.Placeholder">Filter by name, Steam ID, or type…</sys:String>
+    <sys:String x:Key="Events.Filter.Placeholder">Filter by name or type…</sys:String>
     <sys:String x:Key="Events.Empty">No events recorded yet.</sys:String>
+    <sys:String x:Key="Events.Badge.Join">JOIN</sys:String>
+    <sys:String x:Key="Events.Badge.Leave">LEAVE</sys:String>
 
     <!-- Phase 11 — Navigation -->
     <sys:String x:Key="Nav.Players">Players</sys:String>
@@ -593,9 +614,10 @@
     <sys:String x:Key="SeaChart.Title">Sea Chart</sys:String>
     <sys:String x:Key="SeaChart.Subtitle">Live player positions</sys:String>
     <sys:String x:Key="SeaChart.GenerateMap">Generate Map</sys:String>
+    <sys:String x:Key="SeaChart.OpenLivemap">Open Live Map in Browser</sys:String>
     <sys:String x:Key="SeaChart.Refresh">Refresh</sys:String>
-    <sys:String x:Key="SeaChart.NoMap">No map generated yet. Click 'Generate Map' to create one.</sys:String>
-    <sys:String x:Key="SeaChart.Error">Could not reach /query endpoint.</sys:String>
+    <sys:String x:Key="SeaChart.NoMap">Player markers appear once players are online.</sys:String>
+    <sys:String x:Key="SeaChart.Error">WindrosePlus dashboard not reachable.</sys:String>
     <sys:String x:Key="SeaChart.Detail.Alive">Alive</sys:String>
     <sys:String x:Key="SeaChart.Detail.Close">Close</sys:String>
 

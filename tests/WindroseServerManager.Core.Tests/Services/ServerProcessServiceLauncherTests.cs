@@ -24,7 +24,7 @@ public class ServerProcessServiceLauncherTests
         ILogger<WindrosePlusService> log = logger is null
             ? NullLogger<WindrosePlusService>.Instance
             : new LoggerAdapter<WindrosePlusService>(logger);
-        return new WindrosePlusService(log, factory, fixture.CacheDir);
+        return new WindrosePlusService(log, factory, NullAppSettingsService.Instance, fixture.CacheDir);
     }
 
     private static ServerInstallInfo BuildInfo(string dir, bool active)

@@ -7,17 +7,23 @@
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
     </UserControl.KeyBindings>
     <ScrollViewer>
-        <StackPanel>
-            <TextBlock Classes="page-title" Text="{DynamicResource Settings.Title}" />
-            <TextBlock Classes="caption" Text="{DynamicResource Settings.Subtitle}" Margin="0,4,0,20" />
+        <StackPanel Margin="24,0,24,24" Spacing="0">
 
-            <!-- ==================== SPRACHE / LANGUAGE ==================== -->
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="8">
+            <!-- ═══ HEADER ═══ -->
+            <TextBlock Classes="page-title" Text="{DynamicResource Settings.Title}" />
+            <TextBlock Classes="caption" Text="{DynamicResource Settings.Subtitle}" Margin="0,4,0,0" />
+
+            <!-- ═══════════════════════════════════════
+                 GRUPPE: DARSTELLUNG
+            ═══════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.Display}" />
+
+            <Border Classes="card">
+                <StackPanel Spacing="10">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.Language.Title}" />
                     <ComboBox ItemsSource="{Binding LanguageOptions}"
                               SelectedItem="{Binding SelectedLanguageOption}"
-                              HorizontalAlignment="Left" MinWidth="220">
+                              HorizontalAlignment="Left" MinWidth="240">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding DisplayName}" />
@@ -29,137 +35,238 @@
                 </StackPanel>
             </Border>
 
-            <Border Classes="card" Margin="0,0,0,16">
+            <!-- ═══════════════════════════════════════
+                 GRUPPE: SERVER
+            ═══════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.Server}" />
+
+            <!-- Server-Start -->
+            <Border Classes="card" Margin="0,0,0,12">
                 <StackPanel Spacing="12">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.LaunchArgs.Title}" />
 
-                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.ConsoleLog}" IsChecked="{Binding LogEnabled}" />
+                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.ConsoleLog}"
+                              IsChecked="{Binding LogEnabled}" />
 
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.Extra}" />
-                        <TextBox Text="{Binding ExtraLaunchArgs}" Watermark="{DynamicResource Settings.LaunchArgs.Extra.Placeholder}" />
-                        <TextBlock Classes="caption" TextWrapping="Wrap"
-                                   Text="{DynamicResource Settings.LaunchArgs.Hint}" />
-                    </StackPanel>
+                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.AutoRestartOnCrash}"
+                              IsChecked="{Binding AutoRestartOnCrash}" />
 
-                    <CheckBox Content="{DynamicResource Settings.LaunchArgs.AutoRestartOnCrash}" IsChecked="{Binding AutoRestartOnCrash}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.GracefulShutdown}" />
+                            <NumericUpDown Value="{Binding GracefulShutdownSeconds}"
+                                           Minimum="5" Maximum="600" FormatString="0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.Extra}" />
+                            <TextBox Text="{Binding ExtraLaunchArgs}"
+                                     PlaceholderText="{DynamicResource Settings.LaunchArgs.Extra.Placeholder}" />
+                        </StackPanel>
+                    </Grid>
 
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Settings.LaunchArgs.GracefulShutdown}" />
-                        <NumericUpDown Value="{Binding GracefulShutdownSeconds}" Minimum="5" Maximum="600" FormatString="0" />
-                    </StackPanel>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.LaunchArgs.Hint}" />
                 </StackPanel>
             </Border>
 
-            <Border Classes="card" Margin="0,0,0,16">
+            <!-- Steam -->
+            <Border Classes="card">
                 <StackPanel Spacing="12">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.Steam.Title}" />
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.AppId}" />
-                        <TextBox Text="{Binding SteamAppId}" Watermark="4129620" />
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.Login}" />
-                        <TextBox Text="{Binding SteamLogin}" Watermark="anonymous" />
-                    </StackPanel>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.AppId}" />
+                            <TextBox Text="{Binding SteamAppId}" PlaceholderText="4129620" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.Steam.Login}" />
+                            <TextBox Text="{Binding SteamLogin}" PlaceholderText="anonymous" />
+                        </StackPanel>
+                    </Grid>
                     <TextBlock Classes="caption" TextWrapping="Wrap"
                                Text="{DynamicResource Settings.Steam.Hint}" />
                 </StackPanel>
             </Border>
 
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Network.Title}" />
-                    <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="{DynamicResource Settings.Network.Hint}" />
-                </StackPanel>
-            </Border>
+            <!-- ═══════════════════════════════════════
+                 GRUPPE: SYSTEM
+            ═══════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.System}" />
 
-            <Border Classes="card" Margin="0,0,0,16">
+            <!-- Netzwerk, Firewall & Autostart in einer Karte -->
+            <Border Classes="card">
                 <StackPanel Spacing="12">
-                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Firewall.Title}" />
-                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                        <Panel Width="12" Height="12">
-                            <Ellipse Width="12" Height="12"
-                                     Fill="{DynamicResource BrandSuccessBrush}"
-                                     IsVisible="{Binding IsFirewallRuleInstalled}" />
-                            <Ellipse Width="12" Height="12"
-                                     Fill="{DynamicResource BrandTextMutedBrush}"
-                                     IsVisible="{Binding !IsFirewallRuleInstalled}" />
-                        </Panel>
-                        <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.Installed}"
-                                   IsVisible="{Binding IsFirewallRuleInstalled}" />
-                        <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.NotInstalled}"
-                                   IsVisible="{Binding !IsFirewallRuleInstalled}" />
+
+                    <!-- Netzwerk-Info -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="section-header" Text="{DynamicResource Settings.Network.Title}" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.Network.Hint}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Classes="primary" Content="{DynamicResource Settings.Firewall.Add}"
-                                Command="{Binding ToggleFirewallCommand}"
-                                IsVisible="{Binding !IsFirewallRuleInstalled}"
-                                IsEnabled="{Binding !IsFirewallBusy}" />
-                        <Button Content="{DynamicResource Settings.Firewall.Remove}"
-                                Command="{Binding ToggleFirewallCommand}"
-                                IsVisible="{Binding IsFirewallRuleInstalled}"
-                                IsEnabled="{Binding !IsFirewallBusy}" />
-                        <Button Content="{DynamicResource Settings.Firewall.Check}" Command="{Binding CheckFirewallCommand}"
-                                IsEnabled="{Binding !IsFirewallBusy}" />
+
+                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+
+                    <!-- Firewall -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="section-header" FontSize="14"
+                                   Text="{DynamicResource Settings.Firewall.Title}" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <Panel Width="10" Height="10">
+                                <Ellipse Width="10" Height="10"
+                                         Fill="{DynamicResource BrandSuccessBrush}"
+                                         IsVisible="{Binding IsFirewallRuleInstalled}" />
+                                <Ellipse Width="10" Height="10"
+                                         Fill="{DynamicResource BrandTextMutedBrush}"
+                                         IsVisible="{Binding !IsFirewallRuleInstalled}" />
+                            </Panel>
+                            <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.Installed}"
+                                       IsVisible="{Binding IsFirewallRuleInstalled}" />
+                            <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.NotInstalled}"
+                                       IsVisible="{Binding !IsFirewallRuleInstalled}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Button Classes="primary" Content="{DynamicResource Settings.Firewall.Add}"
+                                    Command="{Binding ToggleFirewallCommand}"
+                                    IsVisible="{Binding !IsFirewallRuleInstalled}"
+                                    IsEnabled="{Binding !IsFirewallBusy}" />
+                            <Button Content="{DynamicResource Settings.Firewall.Remove}"
+                                    Command="{Binding ToggleFirewallCommand}"
+                                    IsVisible="{Binding IsFirewallRuleInstalled}"
+                                    IsEnabled="{Binding !IsFirewallBusy}" />
+                            <Button Content="{DynamicResource Settings.Firewall.Check}"
+                                    Command="{Binding CheckFirewallCommand}"
+                                    IsEnabled="{Binding !IsFirewallBusy}" />
+                            <ProgressBar IsIndeterminate="True" Width="60" Height="3"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding IsFirewallBusy}" />
+                        </StackPanel>
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.Firewall.Hint}" />
                     </StackPanel>
-                    <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="{DynamicResource Settings.Firewall.Hint}" />
+
+                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+
+                    <!-- Autostart -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="section-header" FontSize="14"
+                                   Text="{DynamicResource Settings.AutoStart.Title}" />
+                        <CheckBox Content="{DynamicResource Settings.AutoStart.Label}"
+                                  IsChecked="{Binding AutoStartEnabled}" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.AutoStart.Hint}" />
+                    </StackPanel>
+
                 </StackPanel>
             </Border>
 
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.AutoStart.Title}" />
-                    <CheckBox Content="{DynamicResource Settings.AutoStart.Label}"
-                              IsChecked="{Binding AutoStartEnabled}" />
-                    <TextBlock Classes="caption" TextWrapping="Wrap"
-                               Text="{DynamicResource Settings.AutoStart.Hint}" />
-                </StackPanel>
-            </Border>
+            <!-- ═══════════════════════════════════════
+                 GRUPPE: WINDROSE PLUS
+            ═══════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.WindrosePlus}" />
 
-            <!-- ==================== WINDROSEPLUS ==================== -->
-            <Border Classes="card" Margin="0,0,0,16">
-                <StackPanel Spacing="10">
-                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.WindrosePlus.Title}" />
-                    <TextBlock Classes="caption"
-                               TextWrapping="Wrap"
-                               Text="{DynamicResource Settings.WindrosePlus.Hint}" />
-                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                        <TextBlock Classes="body"
-                                   VerticalAlignment="Center"
-                                   Text="{DynamicResource Settings.WindrosePlus.StatusLabel}" />
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+
+                    <!-- Status + Verwaltung -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="section-header" Text="{DynamicResource Settings.WindrosePlus.Title}" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.WindrosePlus.Hint}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Classes="caption" VerticalAlignment="Center"
+                                       Text="{DynamicResource Settings.WindrosePlus.StatusLabel}" />
+                            <TextBlock Classes="caption" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource BrandAmberBrush}"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding WindrosePlusStatusText}" />
+                        </StackPanel>
+                        <Button Content="{DynamicResource Settings.WindrosePlus.ManageButton}"
+                                Command="{Binding OpenWindrosePlusDialogCommand}"
+                                IsEnabled="{Binding HasServerConfigured}" />
+                    </StackPanel>
+
+                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+
+                    <!-- RCON Passwort -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="section-header" FontSize="14"
+                                   Text="{DynamicResource Settings.WindrosePlus.RconPassword}" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.WindrosePlus.RconPasswordHint}" />
+
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8"
+                              IsVisible="{Binding RconPassword, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding RconPassword}"
+                                     IsReadOnly="True"
+                                     PasswordChar="{Binding ShowRconPassword, Converter={x:Static vm:BoolToPasswordCharConverter.Instance}}"
+                                     FontFamily="Consolas,Courier New" />
+                            <Button Grid.Column="1"
+                                    Command="{Binding ToggleShowRconPasswordCommand}"
+                                    ToolTip.Tip="{DynamicResource Settings.WindrosePlus.RconPassword}">
+                                <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                           Text="{Binding ShowRconPassword, Converter={x:Static vm:EnabledToEyeIconConverter.Instance}}" />
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Content="&#xE8C8;"
+                                    FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                    Command="{Binding CopyRconPasswordCommand}"
+                                    ToolTip.Tip="{DynamicResource Action.Copy}" />
+                        </Grid>
+
                         <TextBlock Classes="caption"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource BrandTextSecondaryBrush}"
-                                   Text="{Binding WindrosePlusStatusText}" />
+                                   Text="{DynamicResource Settings.WindrosePlus.RconPasswordNone}"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   IsVisible="{Binding RconPassword, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
                     </StackPanel>
-                    <Button Content="{DynamicResource Settings.WindrosePlus.ManageButton}"
-                            Command="{Binding OpenWindrosePlusDialogCommand}"
-                            IsEnabled="{Binding HasServerConfigured}" />
+
                 </StackPanel>
             </Border>
 
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Classes="primary" Content="{DynamicResource Action.Save}" Command="{Binding SaveCommand}" />
-            </StackPanel>
+            <!-- ═══════════════════════════════════════
+                 SPEICHERN
+            ═══════════════════════════════════════ -->
+            <Border Margin="0,20,0,0" Padding="16"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                    BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                    BorderThickness="1" CornerRadius="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Classes="body" FontWeight="SemiBold"
+                                   Text="{DynamicResource Settings.Save.Title}" />
+                        <TextBlock Classes="caption"
+                                   Text="{DynamicResource Settings.Save.Hint}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="primary"
+                            Content="{DynamicResource Action.Save}"
+                            Command="{Binding SaveCommand}"
+                            MinWidth="120" />
+                </Grid>
+            </Border>
 
-            <Border Classes="card" Margin="0,16,0,0">
-                <StackPanel Spacing="10">
+            <!-- ═══════════════════════════════════════
+                 GRUPPE: APP
+            ═══════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.App}" />
+
+            <!-- App-Update -->
+            <Border Classes="card" Margin="0,0,0,12">
+                <StackPanel Spacing="12">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.AppUpdate.Title}" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"
                                Text="{DynamicResource Settings.AppUpdate.Hint}" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <Button Content="{DynamicResource Settings.AppUpdate.CheckNow}"
                                 Command="{Binding CheckAppUpdateCommand}"
                                 IsEnabled="{Binding !IsUpdateCheckBusy}" />
+                        <ProgressBar IsIndeterminate="True" Width="60" Height="3"
+                                     VerticalAlignment="Center"
+                                     IsVisible="{Binding IsUpdateCheckBusy}" />
                         <TextBlock Text="{Binding UpdateCheckStatus}"
                                    Classes="caption"
                                    VerticalAlignment="Center"
                                    TextWrapping="Wrap" />
                     </StackPanel>
-                    <!-- Download/Release-Page Buttons erscheinen nur wenn ein Update verfügbar ist -->
                     <StackPanel Orientation="Horizontal" Spacing="8"
                                 IsVisible="{Binding HasUpdateAvailable}">
                         <Button Classes="primary"
@@ -173,15 +280,18 @@
                 </StackPanel>
             </Border>
 
-            <Border Classes="card" Margin="0,16,0,0">
+            <!-- Über -->
+            <Border Classes="card">
                 <StackPanel Spacing="8">
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.About.Title}" />
                     <TextBlock Classes="body" Text="{Binding AppVersionDisplay}" />
                     <TextBlock Classes="caption" Text="{DynamicResource Settings.About.License}" />
-                    <Button Content="{DynamicResource Settings.About.Show}" Command="{Binding ShowAboutCommand}"
-                            HorizontalAlignment="Left" Margin="0,8,0,0" />
+                    <Button Content="{DynamicResource Settings.About.Show}"
+                            Command="{Binding ShowAboutCommand}"
+                            HorizontalAlignment="Left" Margin="0,4,0,0" />
                 </StackPanel>
             </Border>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

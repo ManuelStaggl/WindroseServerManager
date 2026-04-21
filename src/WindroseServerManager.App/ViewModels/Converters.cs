@@ -326,6 +326,72 @@ public sealed class LogLineToBrushConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public sealed class EventTypeToBrushConverter : IValueConverter
+{
+    public static readonly EventTypeToBrushConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = value is string s && s.Equals("join", StringComparison.OrdinalIgnoreCase)
+            ? "BrandSuccessBrush" : "BrandErrorBrush";
+        var app = Application.Current;
+        if (app is not null && app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) && res is IBrush b) return b;
+        return Brushes.Gray;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}
+
+public sealed class EventTypeToLabelConverter : IValueConverter
+{
+    public static readonly EventTypeToLabelConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is string s && s.Equals("join", StringComparison.OrdinalIgnoreCase)
+            ? Loc.Get("Events.Badge.Join") : Loc.Get("Events.Badge.Leave");
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}
+
+public sealed class AliveToBrushConverter : IValueConverter
+{
+    public static readonly AliveToBrushConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = value is bool b && b ? "BrandSuccessBrush" : "BrandErrorBrush";
+        var app = Application.Current;
+        if (app is not null && app.Resources.TryGetResource(key, app.ActualThemeVariant, out var res) && res is IBrush brush) return brush;
+        return Brushes.Gray;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}
+
+public sealed class TimestampToLocalConverter : IValueConverter
+{
+    public static readonly TimestampToLocalConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is DateTime dt)
+        {
+            var local = dt.Kind == DateTimeKind.Utc ? dt.ToLocalTime() : dt;
+            return local.ToString("HH:mm:ss", culture);
+        }
+        return string.Empty;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}
+
+public sealed class TimestampToDateTimeLocalConverter : IValueConverter
+{
+    public static readonly TimestampToDateTimeLocalConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is DateTime dt)
+        {
+            var local = dt.Kind == DateTimeKind.Utc ? dt.ToLocalTime() : dt;
+            return local.ToString("dd.MM.yyyy HH:mm", culture);
+        }
+        return string.Empty;
+    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}
+
 public sealed class ServerEventTypeToIconConverter : IValueConverter
 {
     public static readonly ServerEventTypeToIconConverter Instance = new();
@@ -391,6 +457,15 @@ public sealed class ServerEventToTitleConverter : IValueConverter
         var ts = e.TimestampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", culture);
         return $"{ts}  ·  {typeLabel}";
     }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public sealed class BoolToPasswordCharConverter : IValueConverter
+{
+    public static readonly BoolToPasswordCharConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b && b ? '\0' : '●';
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }

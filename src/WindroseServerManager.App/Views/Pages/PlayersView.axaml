@@ -11,6 +11,7 @@
             <TextBlock Text="{DynamicResource Players.Subtitle}" Opacity="0.7" />
         </StackPanel>
 
+        <!-- Error Banner -->
         <Border Grid.Row="1"
                 Background="{DynamicResource BrandNavySurfaceAltBrush}"
                 CornerRadius="6" Padding="12,8"
@@ -18,48 +19,117 @@
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
         </Border>
 
-        <Border Grid.Row="2" Classes="card">
+        <!-- Player List -->
+        <Border Grid.Row="2" Classes="card" Padding="0">
             <Grid>
-                <DataGrid ItemsSource="{Binding Players}"
-                          SelectedItem="{Binding SelectedPlayer, Mode=TwoWay}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          GridLinesVisibility="Horizontal"
-                          CanUserReorderColumns="True"
-                          CanUserResizeColumns="True"
-                          CanUserSortColumns="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="{DynamicResource Players.Column.Name}"    Binding="{Binding Name}"           Width="*" />
-                        <DataGridTextColumn Header="{DynamicResource Players.Column.SteamId}" Binding="{Binding SteamId}"        Width="Auto" />
-                        <DataGridCheckBoxColumn Header="{DynamicResource Players.Column.Alive}" Binding="{Binding Alive}"        Width="Auto" />
-                        <DataGridTextColumn Header="{DynamicResource Players.Column.Session}" Binding="{Binding SessionSeconds}" Width="Auto" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <ProgressBar IsIndeterminate="True" Height="3"
+                             VerticalAlignment="Top" CornerRadius="8,8,0,0"
+                             IsVisible="{Binding IsLoading}" />
 
-                <TextBlock Text="{DynamicResource Players.Empty}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Foreground="{DynamicResource BrandTextMutedBrush}"
-                           IsVisible="{Binding HasNoPlayers}" />
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              IsVisible="{Binding HasPlayers}">
+                    <ItemsControl ItemsSource="{Binding Players}">
+                        <ItemsControl.Styles>
+                            <Style Selector="Border.player-row">
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Background" Duration="0:0:0.12" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border.player-row:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+                            </Style>
+                            <!-- Naked icon button style for Kick/Ban -->
+                            <Style Selector="Button.row-action">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+                                <Setter Property="CornerRadius" Value="4" />
+                                <Setter Property="Padding" Value="10,4" />
+                                <Setter Property="FontSize" Value="12" />
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Style>
+                            <Style Selector="Button.row-action /template/ ContentPresenter">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                            <Style Selector="Button.row-action:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+                            </Style>
+                            <Style Selector="Button.row-action.danger">
+                                <Setter Property="BorderBrush" Value="#40EF4444" />
+                                <Setter Property="Foreground" Value="{DynamicResource BrandErrorBrush}" />
+                            </Style>
+                            <Style Selector="Button.row-action.danger:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
+                                <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+                            </Style>
+                        </ItemsControl.Styles>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:WindrosePlusPlayer">
+                                <Border Classes="player-row"
+                                        Background="Transparent"
+                                        BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="16,12">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                        <!-- Alive Status Dot -->
+                                        <Ellipse Grid.Column="0"
+                                                 Width="10" Height="10"
+                                                 Margin="0,0,14,0"
+                                                 VerticalAlignment="Center"
+                                                 Fill="{Binding Alive, Converter={x:Static vm:AliveToBrushConverter.Instance}}"
+                                                 ToolTip.Tip="{Binding Alive, Converter={x:Static vm:BoolToYesNoConverter.Instance}}" />
+
+                                        <!-- Player Name -->
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Name}"
+                                                   FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+
+                                        <!-- Row Actions -->
+                                        <StackPanel Grid.Column="2"
+                                                    Orientation="Horizontal" Spacing="6"
+                                                    VerticalAlignment="Center">
+                                            <Button Classes="row-action danger"
+                                                    Content="{DynamicResource Players.Kick}"
+                                                    Command="{Binding $parent[UserControl].((vm:PlayersViewModel)DataContext).KickCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Classes="row-action danger"
+                                                    Content="{DynamicResource Players.Ban}"
+                                                    Command="{Binding $parent[UserControl].((vm:PlayersViewModel)DataContext).BanCommand}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Empty State -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
+                            IsVisible="{Binding HasNoPlayers}">
+                    <TextBlock Text="&#xE716;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="48" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource BrandTextMutedBrush}" />
+                    <TextBlock Text="{DynamicResource Players.Empty}"
+                               Classes="section-header" HorizontalAlignment="Center" />
+                </StackPanel>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
-            <Button Grid.Column="0"
-                    Content="{DynamicResource Players.Kick}"
-                    Classes="danger"
-                    Command="{Binding KickCommand}"
-                    CommandParameter="{Binding SelectedPlayer}"
-                    IsEnabled="{Binding SelectedPlayer, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            <Button Grid.Column="1"
-                    Content="{DynamicResource Players.Ban}"
-                    Classes="danger"
-                    Command="{Binding BanCommand}"
-                    CommandParameter="{Binding SelectedPlayer}"
-                    IsEnabled="{Binding SelectedPlayer, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            <TextBox Grid.Column="2"
+        <!-- Broadcast Bar -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox Grid.Column="0"
                      Text="{Binding BroadcastMessage, Mode=TwoWay}"
-                     Watermark="{DynamicResource Players.Broadcast.Label}" />
-            <Button Grid.Column="3"
+                     PlaceholderText="{DynamicResource Players.Broadcast.Label}" />
+            <Button Grid.Column="1"
                     Content="{DynamicResource Players.Broadcast.Send}"
                     Command="{Binding BroadcastCommand}" />
         </Grid>

@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WindroseServerManager.App.Views.Dialogs.DeleteServerDialog"
+        Width="420"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrandNavySurfaceBrush}"
+        Title="{DynamicResource Server.Delete}">
+    <Border CornerRadius="8"
+            Background="{DynamicResource BrandNavySurfaceBrush}"
+            BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+            BorderThickness="1"
+            Padding="20">
+        <StackPanel Spacing="16">
+
+            <!-- Title -->
+            <TextBlock Classes="section-header"
+                       Text="{DynamicResource Server.Delete}" />
+
+            <!-- Server name -->
+            <TextBlock x:Name="ServerNameText"
+                       Classes="body"
+                       TextWrapping="Wrap" />
+
+            <!-- Separator -->
+            <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" />
+
+            <!-- Delete files checkbox -->
+            <CheckBox x:Name="DeleteFilesCheck"
+                      Content="{DynamicResource Server.Delete.WithFiles}" />
+
+            <!-- Danger note (only visible when checkbox is checked) -->
+            <Border CornerRadius="6"
+                    Background="{DynamicResource BrandErrorBrush}"
+                    Padding="10,8"
+                    IsVisible="{Binding #DeleteFilesCheck.IsChecked}">
+                <TextBlock Classes="caption"
+                           Foreground="White"
+                           TextWrapping="Wrap"
+                           Text="{DynamicResource Server.Delete.DangerNote}" />
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        Margin="0,4,0,0">
+                <Button Content="{DynamicResource Action.Cancel}"
+                        Click="OnCancelClick" />
+                <Button x:Name="ConfirmButton"
+                        Classes="danger"
+                        Content="{DynamicResource Server.Delete}"
+                        Click="OnConfirmClick" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

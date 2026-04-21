@@ -54,8 +54,8 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
 
     public string FilteredLinesDisplay => Loc.Format("ServerControl.LinesFormat", FilteredLog.Count);
 
-    public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
-                                    && Directory.Exists(_settings.Current.ServerInstallDir);
+    public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.ActiveServerDir)
+                                    && Directory.Exists(_settings.ActiveServerDir);
 
     public bool CanOpenServerDescription
     {
@@ -252,7 +252,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private void OpenServerDir()
     {
-        var path = _settings.Current.ServerInstallDir;
+        var path = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
         try { Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true }); } catch { }
     }
@@ -422,7 +422,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private void OpenLogFolder()
     {
-        var installDir = _settings.Current.ServerInstallDir;
+        var installDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(installDir)) { _toasts.Warning(Loc.Get("Toast.InstallPathUnset")); return; }
 
         var logDir = Path.Combine(installDir, "R5", "Saved", "Logs");

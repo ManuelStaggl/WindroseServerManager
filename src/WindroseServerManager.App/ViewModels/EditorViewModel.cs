@@ -41,7 +41,7 @@ public partial class EditorViewModel : ViewModelBase
     [RelayCommand]
     public async Task LoadAsync()
     {
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
 
         IsLoading = true;
@@ -99,7 +99,7 @@ public partial class EditorViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanExecuteSave))]
     private async Task SaveAsync()
     {
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
         if (HasAnyError)
         {

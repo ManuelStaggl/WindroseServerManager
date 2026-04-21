@@ -26,20 +26,27 @@ public static class EventsLogParser
             if (type is null || !ValidTypes.Contains(type))
                 return null;
 
+            // WindrosePlus events.log has no steamId field
             string? steamId = null;
-            if (root.TryGetProperty("steamId", out var steamIdEl) && steamIdEl.ValueKind == JsonValueKind.String)
-                steamId = steamIdEl.GetString();
 
+            // WindrosePlus writes "player" for the name field
             var name = "Unknown";
-            if (root.TryGetProperty("name", out var nameEl) && nameEl.ValueKind == JsonValueKind.String)
+            foreach (var field in new[] { "player", "name" })
             {
-                var parsedName = nameEl.GetString();
-                if (!string.IsNullOrEmpty(parsedName))
-                    name = parsedName;
+                if (root.TryGetProperty(field, out var nameEl) && nameEl.ValueKind == JsonValueKind.String)
+                {
+                    var parsedName = nameEl.GetString();
+                    if (!string.IsNullOrEmpty(parsedName)) { name = parsedName; break; }
+                }
             }
 
+            // WindrosePlus writes "ts" as a Unix timestamp integer
             var timestamp = DateTime.UtcNow;
-            if (root.TryGetProperty("timestamp", out var tsEl) && tsEl.ValueKind == JsonValueKind.String)
+            if (root.TryGetProperty("ts", out var tsUnixEl) && tsUnixEl.TryGetInt64(out var unixSec))
+            {
+                timestamp = DateTimeOffset.FromUnixTimeSeconds(unixSec).UtcDateTime;
+            }
+            else if (root.TryGetProperty("timestamp", out var tsEl) && tsEl.ValueKind == JsonValueKind.String)
             {
                 var tsStr = tsEl.GetString();
                 if (!string.IsNullOrEmpty(tsStr) &&

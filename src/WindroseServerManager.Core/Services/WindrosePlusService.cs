@@ -11,60 +11,42 @@ namespace WindroseServerManager.Core.Services;
 public sealed class WindrosePlusService : IWindrosePlusService
 {
     private const string WindrosePlusApiUrl = "https://api.github.com/repos/HumanGenome/WindrosePlus/releases/latest";
-    private const string Ue4ssApiUrl       = "https://api.github.com/repos/UE4SS-RE/RE-UE4SS/releases/latest";
     private const string WindrosePlusAssetName = "WindrosePlus.zip";
-    private const string Ue4ssAssetNamePrefix = "UE4SS_";
     private const string UserAgent = "WindroseServerManager-WindrosePlus";
     private const string HttpClientName = "github";
-    private const string BundledLicenseFileName = "WindrosePlus-LICENSE.txt";
     private const string VersionMarkerFileName = ".wplus-version";
-
-    private static readonly string[] UserOwnedRelativePaths =
-    {
-        "windrose_plus.json",
-        "windrose_plus.ini",
-        Path.Combine("WindrosePlus", "config", "windrose_plus.ini"),
-    };
 
     private readonly ILogger<WindrosePlusService> _logger;
     private readonly IHttpClientFactory _httpFactory;
+    private readonly IAppSettingsService _settings;
     private readonly string _cacheDir;
     private readonly string _metadataCachePath;
     private readonly string _archiveCachePath;
-    private readonly string _ue4ssMetadataCachePath;
-    private readonly string _ue4ssArchiveCachePath;
     private readonly SemaphoreSlim _installLock = new(1, 1);
+    private readonly Dictionary<string, System.Diagnostics.Process> _dashboardProcesses = new();
 
     public WindrosePlusService(
         ILogger<WindrosePlusService> logger,
         IHttpClientFactory httpFactory,
+        IAppSettingsService settings,
         string? cacheDir = null)
     {
         _logger = logger;
         _httpFactory = httpFactory;
+        _settings = settings;
         _cacheDir = cacheDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "WindroseServerManager", "cache", "windroseplus");
         _metadataCachePath = Path.Combine(_cacheDir, "latest.json");
         _archiveCachePath = Path.Combine(_cacheDir, "WindrosePlus.zip");
-        _ue4ssMetadataCachePath = Path.Combine(_cacheDir, "ue4ss-latest.json");
-        _ue4ssArchiveCachePath = Path.Combine(_cacheDir, "UE4SS.zip");
     }
 
     public Task<WindrosePlusRelease> FetchLatestAsync(CancellationToken ct = default) =>
         FetchReleaseAsync(
-            apiUrl: WindrosePlusApiUrl,
+            apiUrl: "https://api.github.com/repos/HumanGenome/WindrosePlus/releases/latest",
             metadataCachePath: _metadataCachePath,
             selectAsset: assets => SelectAssetByExactName(assets, WindrosePlusAssetName),
             logLabel: "WindrosePlus",
-            ct: ct);
-
-    private Task<WindrosePlusRelease> FetchUe4ssLatestAsync(CancellationToken ct) =>
-        FetchReleaseAsync(
-            apiUrl: Ue4ssApiUrl,
-            metadataCachePath: _ue4ssMetadataCachePath,
-            selectAsset: SelectUe4ssAsset,
-            logLabel: "UE4SS",
             ct: ct);
 
     private async Task<WindrosePlusRelease> FetchReleaseAsync(
@@ -72,7 +54,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
         string metadataCachePath,
         Func<JsonElement, (string Name, string Url, long Size, string? Digest)?> selectAsset,
         string logLabel,
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
         try
         {
@@ -164,21 +146,6 @@ public sealed class WindrosePlusService : IWindrosePlusService
         return null;
     }
 
-    private static (string Name, string Url, long Size, string? Digest)? SelectUe4ssAsset(JsonElement assets)
-    {
-        foreach (var asset in assets.EnumerateArray())
-        {
-            var name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
-            if (name is null) continue;
-            if (name.StartsWith(Ue4ssAssetNamePrefix, StringComparison.OrdinalIgnoreCase)
-                && name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                return ReadAssetTuple(asset);
-            }
-        }
-        return null;
-    }
-
     private static (string Name, string Url, long Size, string? Digest) ReadAssetTuple(JsonElement asset)
     {
         var name = asset.GetProperty("name").GetString()!;
@@ -206,7 +173,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
             Directory.CreateDirectory(_cacheDir);
             Directory.CreateDirectory(serverInstallDir);
 
-            // -------- Fetch release metadata (WindrosePlus) --------
+            // -------- Fetch + download WindrosePlus release --------
             Report(progress, InstallPhase.FetchingRelease, "Lade WindrosePlus-Release-Info...");
             WindrosePlusRelease wplusRelease;
             try
@@ -215,7 +182,6 @@ public sealed class WindrosePlusService : IWindrosePlusService
             }
             catch (WindrosePlusOfflineException ex) when (File.Exists(_archiveCachePath))
             {
-                // API offline but cached archive exists — synthesize a minimal release from the cache.
                 _logger.LogWarning(ex, "WindrosePlus API offline; proceeding from cached archive at {Path}", _archiveCachePath);
                 wplusRelease = new WindrosePlusRelease(
                     Tag: "cached",
@@ -225,53 +191,16 @@ public sealed class WindrosePlusService : IWindrosePlusService
                     DigestSha256: null);
             }
 
-            // -------- Fetch release metadata (UE4SS) --------
-            Report(progress, InstallPhase.FetchingRelease, "Lade UE4SS-Release-Info...");
-            WindrosePlusRelease? ue4ssRelease = null;
-            try
-            {
-                ue4ssRelease = await FetchUe4ssLatestAsync(ct).ConfigureAwait(false);
-            }
-            catch (WindrosePlusOfflineException ex)
-            {
-                _logger.LogWarning(ex, "UE4SS API offline and no UE4SS cache — continuing without UE4SS payload");
-            }
-
-            // -------- Download / cache archives --------
             Report(progress, InstallPhase.DownloadingArchive, "Lade WindrosePlus-Archiv...");
             var wplusZip = await EnsureArchiveCachedAsync(wplusRelease, _archiveCachePath, "WindrosePlus", ct).ConfigureAwait(false);
 
-            string? ue4ssZip = null;
-            if (ue4ssRelease is not null)
-            {
-                Report(progress, InstallPhase.DownloadingArchive, "Lade UE4SS-Archiv...");
-                try
-                {
-                    ue4ssZip = await EnsureArchiveCachedAsync(ue4ssRelease, _ue4ssArchiveCachePath, "UE4SS", ct).ConfigureAwait(false);
-                }
-                catch (WindrosePlusOfflineException ex)
-                {
-                    _logger.LogWarning(ex, "UE4SS archive unavailable — continuing without UE4SS payload");
-                    ue4ssZip = null;
-                    ue4ssRelease = null;
-                }
-            }
-
-            // -------- Verify digests --------
-            Report(progress, InstallPhase.VerifyingDigest, "Verifiziere SHA-256 (WindrosePlus)...");
+            Report(progress, InstallPhase.VerifyingDigest, "Verifiziere SHA-256...");
             var wplusSha = await VerifyDigestAsync(wplusZip, wplusRelease.DigestSha256, ct).ConfigureAwait(false);
 
-            if (ue4ssZip is not null && ue4ssRelease is not null)
-            {
-                Report(progress, InstallPhase.VerifyingDigest, "Verifiziere SHA-256 (UE4SS)...");
-                _ = await VerifyDigestAsync(ue4ssZip, ue4ssRelease.DigestSha256, ct).ConfigureAwait(false);
-            }
-
-            // -------- Extract + atomic merge on same volume --------
+            // -------- Extract ZIP to temp, then run official install.ps1 --------
             var serverDirFull = Path.GetFullPath(serverInstallDir);
-            var parentDir = Path.GetDirectoryName(serverDirFull);
-            if (string.IsNullOrEmpty(parentDir))
-                throw new InvalidOperationException($"Cannot resolve parent of {serverDirFull}.");
+            var parentDir = Path.GetDirectoryName(serverDirFull)
+                ?? throw new InvalidOperationException($"Cannot resolve parent of {serverDirFull}.");
 
             var tempRoot = Path.Combine(parentDir, ".wplus-install-temp-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(tempRoot);
@@ -280,19 +209,8 @@ public sealed class WindrosePlusService : IWindrosePlusService
                 Report(progress, InstallPhase.Extracting, "Entpacke WindrosePlus...");
                 ZipFile.ExtractToDirectory(wplusZip, tempRoot, overwriteFiles: true);
 
-                if (ue4ssZip is not null)
-                {
-                    Report(progress, InstallPhase.Extracting, "Entpacke UE4SS...");
-                    var ue4ssTarget = Path.Combine(tempRoot, "R5", "Binaries", "Win64");
-                    Directory.CreateDirectory(ue4ssTarget);
-                    ZipFile.ExtractToDirectory(ue4ssZip, ue4ssTarget, overwriteFiles: true);
-                }
-
-                Report(progress, InstallPhase.Installing, "Kopiere LICENSE...");
-                CopyLicense(tempRoot, serverDirFull);
-
-                Report(progress, InstallPhase.Installing, "Installiere Dateien...");
-                AtomicMergeIntoServer(tempRoot, serverDirFull, preserveUserConfig: true);
+                Report(progress, InstallPhase.Installing, "Führe install.ps1 aus...");
+                await RunInstallScriptAsync(tempRoot, serverDirFull, progress, ct).ConfigureAwait(false);
 
                 Report(progress, InstallPhase.WritingMarker, "Schreibe Versionsmarker...");
                 var installedUtc = DateTime.UtcNow;
@@ -300,20 +218,19 @@ public sealed class WindrosePlusService : IWindrosePlusService
                     Tag: wplusRelease.Tag,
                     InstalledUtc: installedUtc,
                     ArchiveSha256: wplusSha,
-                    Ue4ssTag: ue4ssRelease?.Tag);
+                    Ue4ssTag: null);
                 var markerJson = JsonSerializer.Serialize(marker, new JsonSerializerOptions { WriteIndented = true });
                 await File.WriteAllTextAsync(Path.Combine(serverDirFull, VersionMarkerFileName), markerJson, ct).ConfigureAwait(false);
 
                 Report(progress, InstallPhase.Complete, "WindrosePlus installiert.");
-                _logger.LogInformation("WindrosePlus {Tag} installed into {Dir} (UE4SS: {Ue4ssTag})",
-                    wplusRelease.Tag, serverDirFull, ue4ssRelease?.Tag ?? "<none>");
+                _logger.LogInformation("WindrosePlus {Tag} installed into {Dir}", wplusRelease.Tag, serverDirFull);
 
                 return new WindrosePlusInstallResult(
                     Tag: wplusRelease.Tag,
                     ServerInstallDir: serverDirFull,
                     InstalledUtc: installedUtc,
                     ArchiveSha256: wplusSha,
-                    Ue4ssTag: ue4ssRelease?.Tag);
+                    Ue4ssTag: null);
             }
             finally
             {
@@ -411,50 +328,87 @@ public sealed class WindrosePlusService : IWindrosePlusService
         return actualHex;
     }
 
-    private void AtomicMergeIntoServer(string tempRoot, string serverDir, bool preserveUserConfig)
+    private async Task RunInstallScriptAsync(string tempRoot, string serverDirFull, IProgress<InstallProgress>? progress, CancellationToken ct)
     {
-        foreach (var sourceFile in Directory.EnumerateFiles(tempRoot, "*", SearchOption.AllDirectories))
+        if (!File.Exists(Path.Combine(tempRoot, "install.ps1")))
+            throw new InvalidOperationException($"install.ps1 not found in WindrosePlus archive at {tempRoot}.");
+
+        // install.ps1 uses $scriptDir = $gameDir — it expects its companion folders
+        // (WindrosePlus/, server/, tools/) to live inside the server directory, not in the temp dir.
+        // Strategy: copy everything from tempRoot into the server dir, run install.ps1 from there
+        // without -GameDir (so $PSScriptRoot resolves to the server dir), then clean up.
+        CopyDirectoryContents(tempRoot, serverDirFull);
+
+        var scriptInGameDir = Path.Combine(serverDirFull, "install.ps1");
+        var serverDirArg = serverDirFull.TrimEnd('\\', '/');
+
+        // Prefer pwsh (PowerShell 7+), fall back to powershell (Windows PowerShell 5)
+        var ps = File.Exists(@"C:\Program Files\PowerShell\7\pwsh.exe") ? "pwsh" : "powershell";
+
+        var psi = new System.Diagnostics.ProcessStartInfo
         {
-            var rel = Path.GetRelativePath(tempRoot, sourceFile);
-            var dest = Path.Combine(serverDir, rel);
+            FileName = ps,
+            Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{scriptInGameDir}\"",
+            WorkingDirectory = serverDirFull,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
 
-            if (preserveUserConfig
-                && UserOwnedRelativePaths.Any(u => rel.Equals(u, StringComparison.OrdinalIgnoreCase))
-                && File.Exists(dest))
+        using var proc = new System.Diagnostics.Process { StartInfo = psi };
+        proc.Start();
+
+        // Stream output as progress messages
+        var readTask = Task.Run(async () =>
+        {
+            while (await proc.StandardOutput.ReadLineAsync(ct).ConfigureAwait(false) is { } line)
             {
-                _logger.LogInformation("Preserving user config {Rel}", rel);
-                continue;
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    _logger.LogInformation("install.ps1: {Line}", line);
+                    Report(progress, InstallPhase.Installing, line.Trim());
+                }
             }
+        }, ct);
 
-            var destDir = Path.GetDirectoryName(dest);
-            if (!string.IsNullOrEmpty(destDir))
-                Directory.CreateDirectory(destDir);
+        var errTask = proc.StandardError.ReadToEndAsync(ct);
+        await Task.WhenAll(readTask, errTask).ConfigureAwait(false);
+        await proc.WaitForExitAsync(ct).ConfigureAwait(false);
 
-            File.Move(sourceFile, dest, overwrite: true);
+        var stderr = await errTask.ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(stderr))
+            _logger.LogWarning("install.ps1 stderr: {Err}", stderr.Trim());
+
+        if (proc.ExitCode != 0)
+            throw new InvalidOperationException($"install.ps1 exited with code {proc.ExitCode}. Check the log for details.");
+
+        _logger.LogInformation("install.ps1 completed successfully for {Dir}", serverDirFull);
+
+        // Clean up files that were staged into the server dir for the script (they've been
+        // processed into windrose_plus/ by install.ps1 and are no longer needed at the root).
+        foreach (var name in new[] { "install.ps1", "WindrosePlus", "server", "tools", "README.md", "LICENSE", "UE4SS-settings.ini" })
+        {
+            var path = Path.Combine(serverDirFull, name);
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+                else if (Directory.Exists(path)) Directory.Delete(path, recursive: true);
+            }
+            catch (Exception ex) { _logger.LogWarning(ex, "Cleanup of staged file {Name} failed (non-fatal)", name); }
         }
     }
 
-    private void CopyLicense(string tempRoot, string serverDir)
+    private static void CopyDirectoryContents(string sourceDir, string destDir)
     {
-        string? sourceLicense = null;
-        foreach (var candidate in new[] { "LICENSE", "LICENSE.txt", "license", "license.txt" })
+        Directory.CreateDirectory(destDir);
+        foreach (var file in Directory.GetFiles(sourceDir))
+            File.Copy(file, Path.Combine(destDir, Path.GetFileName(file)), overwrite: true);
+        foreach (var dir in Directory.GetDirectories(sourceDir))
         {
-            var candidatePath = Path.Combine(tempRoot, candidate);
-            if (File.Exists(candidatePath))
-            {
-                sourceLicense = candidatePath;
-                break;
-            }
+            var target = Path.Combine(destDir, Path.GetFileName(dir));
+            CopyDirectoryContents(dir, target);
         }
-
-        if (sourceLicense is null)
-        {
-            _logger.LogWarning("WindrosePlus archive contained no LICENSE file at {Root}", tempRoot);
-            return;
-        }
-
-        var destPath = Path.Combine(serverDir, BundledLicenseFileName);
-        File.Copy(sourceLicense, destPath, overwrite: true);
     }
 
     public (string ExePath, string ExtraArgs) ResolveLauncher(string serverInstallDir, ServerInstallInfo info)
@@ -463,28 +417,169 @@ public sealed class WindrosePlusService : IWindrosePlusService
             throw new ArgumentException("Server install directory must be provided.", nameof(serverInstallDir));
 
         var serverDirFull = Path.GetFullPath(serverInstallDir);
+        var exe = ServerInstallService.FindServerBinary(serverDirFull)
+            ?? throw new FileNotFoundException("WindroseServer binary not found.", serverDirFull);
+        return (Path.GetFullPath(exe), string.Empty);
+    }
 
-        if (!info.WindrosePlusActive)
+    public async Task RunPreLaunchAsync(string serverInstallDir, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(serverInstallDir)) return;
+        var serverDirFull = Path.GetFullPath(serverInstallDir).TrimEnd('\\', '/');
+
+        var active = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDirFull, false)
+                  || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDirFull + "\\", false)
+                  || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverInstallDir, false);
+        if (!active) return;
+
+        // Try both install layouts (our C# installer puts tools\ at root; install.ps1 puts it under windrose_plus\tools\)
+        var buildPak = new[]
         {
-            var exe = ServerInstallService.FindServerBinary(serverDirFull)
-                ?? throw new FileNotFoundException("WindroseServer binary not found.", serverDirFull);
-            return (Path.GetFullPath(exe), string.Empty);
+            Path.Combine(serverDirFull, "tools", "WindrosePlus-BuildPak.ps1"),
+            Path.Combine(serverDirFull, "windrose_plus", "tools", "WindrosePlus-BuildPak.ps1"),
+        }.FirstOrDefault(File.Exists);
+
+        if (buildPak is null)
+        {
+            _logger.LogWarning("WindrosePlus active but BuildPak script not found in {Dir} — skipping pre-launch build", serverDirFull);
+            return;
         }
 
-        var bat = Path.Combine(serverDirFull, "StartWindrosePlusServer.bat");
-        if (File.Exists(bat))
+        _logger.LogInformation("Running WindrosePlus pre-launch BuildPak at {Script}", buildPak);
+        var psi = new System.Diagnostics.ProcessStartInfo
         {
-            return (Path.GetFullPath(bat), string.Empty);
+            FileName = "powershell",
+            Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{buildPak}\" -ServerDir \"{serverDirFull}\" -RemoveStalePak",
+            WorkingDirectory = serverDirFull,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        using var proc = new System.Diagnostics.Process { StartInfo = psi };
+        proc.Start();
+        var stdout = await proc.StandardOutput.ReadToEndAsync(ct).ConfigureAwait(false);
+        var stderr = await proc.StandardError.ReadToEndAsync(ct).ConfigureAwait(false);
+        await proc.WaitForExitAsync(ct).ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(stdout))
+            _logger.LogInformation("BuildPak output: {Output}", stdout.Trim());
+        if (!string.IsNullOrWhiteSpace(stderr))
+            _logger.LogWarning("BuildPak stderr: {Err}", stderr.Trim());
+        if (proc.ExitCode != 0)
+            _logger.LogWarning("BuildPak exited with code {Code} — server will launch anyway", proc.ExitCode);
+    }
+
+    /// <summary>Creates (or overwrites) StartWindrosePlusServer.bat in the server root.
+    /// This wrapper runs WindrosePlus-BuildPak.ps1 to apply config overrides before launching the server.</summary>
+    public static void WriteStartBat(string serverDirFull)
+    {
+        const string batContent =
+            "@echo off\r\n" +
+            "setlocal\r\n\r\n" +
+            "set \"GAMEDIR=%~dp0\"\r\n" +
+            "if \"%GAMEDIR:~-1%\"==\"\\\" set \"GAMEDIR=%GAMEDIR:~0,-1%\"\r\n\r\n" +
+            "set \"WP_BUILD=%GAMEDIR%\\tools\\WindrosePlus-BuildPak.ps1\"\r\n" +
+            "if not exist \"%WP_BUILD%\" set \"WP_BUILD=%GAMEDIR%\\windrose_plus\\tools\\WindrosePlus-BuildPak.ps1\"\r\n\r\n" +
+            "if not exist \"%WP_BUILD%\" (\r\n" +
+            "    echo [WindrosePlus] Build script not found. Reinstall WindrosePlus via the app.\r\n" +
+            "    if not \"%WP_NOPAUSE%\"==\"1\" pause\r\n" +
+            "    exit /b 1\r\n" +
+            ")\r\n\r\n" +
+            "echo [WindrosePlus] Checking config overrides...\r\n" +
+            "where pwsh >nul 2>&1\r\n" +
+            "if %ERRORLEVEL%==0 (\r\n" +
+            "    pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass ^\r\n" +
+            "      -File \"%WP_BUILD%\" ^\r\n" +
+            "      -ServerDir \"%GAMEDIR%\" ^\r\n" +
+            "      -RemoveStalePak\r\n" +
+            ") else (\r\n" +
+            "    powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass ^\r\n" +
+            "      -File \"%WP_BUILD%\" ^\r\n" +
+            "      -ServerDir \"%GAMEDIR%\" ^\r\n" +
+            "      -RemoveStalePak\r\n" +
+            ")\r\n" +
+            "set \"BUILD_EXIT=%ERRORLEVEL%\"\r\n\r\n" +
+            "if not \"%BUILD_EXIT%\"==\"0\" (\r\n" +
+            "    echo.\r\n" +
+            "    echo [WindrosePlus] Config build failed (exit %BUILD_EXIT%^).\r\n" +
+            "    echo Not launching server. Fix the error above and try again.\r\n" +
+            "    if not \"%WP_NOPAUSE%\"==\"1\" pause\r\n" +
+            "    exit /b %BUILD_EXIT%\r\n" +
+            ")\r\n\r\n" +
+            "echo.\r\n" +
+            "echo [WindrosePlus] Starting Windrose server...\r\n" +
+            "pushd \"%GAMEDIR%\"\r\n" +
+            "\"%GAMEDIR%\\WindroseServer.exe\" %*\r\n" +
+            "set \"SERVER_EXIT=%ERRORLEVEL%\"\r\n" +
+            "popd\r\n\r\n" +
+            "endlocal & exit /b %SERVER_EXIT%\r\n";
+
+        var batPath = Path.Combine(serverDirFull, "StartWindrosePlusServer.bat");
+        File.WriteAllText(batPath, batContent, System.Text.Encoding.ASCII);
+    }
+
+    public async Task StartDashboardAsync(string serverInstallDir, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(serverInstallDir)) return;
+        var serverDirFull = Path.GetFullPath(serverInstallDir).TrimEnd('\\', '/');
+
+        var active = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDirFull, false)
+                  || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDirFull + "\\", false)
+                  || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverInstallDir, false);
+        if (!active) return;
+
+        var scriptPath = Path.Combine(serverDirFull, "windrose_plus", "server", "windrose_plus_server.ps1");
+        if (!File.Exists(scriptPath))
+        {
+            _logger.LogWarning("WindrosePlus dashboard script not found at {Path} — skipping dashboard start", scriptPath);
+            return;
         }
 
-        _logger.LogWarning(
-            "WindrosePlus flagged active but StartWindrosePlusServer.bat missing at {Path} — falling back to WindroseServer.exe",
-            bat);
+        // Stop any existing dashboard for this dir
+        StopDashboard(serverInstallDir);
 
-        var fallback = ServerInstallService.FindServerBinary(serverDirFull)
-            ?? throw new FileNotFoundException(
-                "Neither StartWindrosePlusServer.bat nor WindroseServer binary found.", serverDirFull);
-        return (Path.GetFullPath(fallback), string.Empty);
+        var ps = File.Exists(@"C:\Program Files\PowerShell\7\pwsh.exe") ? "pwsh" : "powershell";
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = ps,
+            Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{scriptPath}\" -GameDir \"{serverDirFull}\"",
+            WorkingDirectory = serverDirFull,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = false,
+            RedirectStandardError = false,
+        };
+
+        _logger.LogInformation("Starting WindrosePlus dashboard server for {Dir}", serverDirFull);
+        var proc = new System.Diagnostics.Process { StartInfo = psi };
+        proc.Start();
+        _dashboardProcesses[serverDirFull] = proc;
+
+        await Task.CompletedTask;
+    }
+
+    public void StopDashboard(string serverInstallDir)
+    {
+        var serverDirFull = Path.GetFullPath(serverInstallDir).TrimEnd('\\', '/');
+        if (_dashboardProcesses.TryGetValue(serverDirFull, out var proc))
+        {
+            _dashboardProcesses.Remove(serverDirFull);
+            try
+            {
+                if (!proc.HasExited)
+                {
+                    proc.Kill(entireProcessTree: true);
+                    _logger.LogInformation("WindrosePlus dashboard server stopped for {Dir}", serverDirFull);
+                }
+                proc.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error stopping WindrosePlus dashboard server");
+            }
+        }
     }
 
     public WindrosePlusVersionMarker? ReadVersionMarker(string serverInstallDir)
@@ -506,6 +601,25 @@ public sealed class WindrosePlusService : IWindrosePlusService
             _logger.LogWarning(ex, "Failed to parse {File}", path);
             return null;
         }
+    }
+
+    public void Dispose()
+    {
+        foreach (var (dir, proc) in _dashboardProcesses)
+        {
+            try
+            {
+                if (!proc.HasExited)
+                    proc.Kill(entireProcessTree: true);
+                proc.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error disposing dashboard process for {Dir}", dir);
+            }
+        }
+        _dashboardProcesses.Clear();
+        _installLock.Dispose();
     }
 
     private static void Report(IProgress<InstallProgress>? progress, InstallPhase phase, string message)

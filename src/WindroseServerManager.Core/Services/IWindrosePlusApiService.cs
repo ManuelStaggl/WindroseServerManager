@@ -4,6 +4,7 @@ namespace WindroseServerManager.Core.Services;
 
 public interface IWindrosePlusApiService
 {
+    Task<string?> GetSessionCookieAsync(string serverDir, CancellationToken ct = default);
     Task<WindrosePlusStatusResult?> GetStatusAsync(string serverDir, CancellationToken ct = default);
     Task<WindrosePlusQueryResult?>  QueryAsync(string serverDir, CancellationToken ct = default);
     Task<string?>                   RconAsync(string serverDir, string command, CancellationToken ct = default);

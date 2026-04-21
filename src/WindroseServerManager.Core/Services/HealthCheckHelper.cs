@@ -27,7 +27,8 @@ public static class HealthCheckHelper
 
         try
         {
-            var url = $"http://localhost:{port}/api/status";
+            // /api/health requires no auth — correct endpoint for monitoring.
+            var url = $"http://localhost:{port}/api/health";
             using var resp = await httpClient.GetAsync(url, cts.Token).ConfigureAwait(false);
             return resp.IsSuccessStatusCode;
         }

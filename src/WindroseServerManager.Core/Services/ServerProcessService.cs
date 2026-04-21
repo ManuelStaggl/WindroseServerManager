@@ -18,6 +18,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
     private readonly ConcurrentQueue<ServerLogLine> _logBuffer = new();
     private Process? _process;
     private CancellationTokenSource? _monitorCts;
+    private string _startedServerDir = string.Empty;
 
     public ServerProcessService(
         ILogger<ServerProcessService> logger,
@@ -43,7 +44,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
     public string? ValidateCanStart()
     {
-        var dir = _settings.Current.ServerInstallDir;
+        var dir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(dir))
             return "Server-Installationspfad ist nicht gesetzt. Erst auf der Installationsseite installieren.";
         try
@@ -58,24 +59,53 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         }
     }
 
-    public Task<bool> StartAsync(CancellationToken ct = default)
+    public async Task<bool> StartAsync(CancellationToken ct = default)
     {
+        // Phase 1: validate under lock (synchronous, fast)
+        string dir;
         lock (_lock)
         {
             if (Status is ServerStatus.Running or ServerStatus.Starting)
             {
                 _logger.LogDebug("Start requested but server is already {Status}", Status);
-                return Task.FromResult(false);
+                return false;
             }
 
             var err = ValidateCanStart();
             if (err is not null)
             {
                 AppendSystem($"[FEHLER] {err}");
-                return Task.FromResult(false);
+                return false;
             }
 
-            var dir = _settings.Current.ServerInstallDir;
+            dir = _settings.ActiveServerDir;
+            _startedServerDir = dir;
+        }
+
+        // Phase 2: WindrosePlus pre-launch hook (async, outside lock)
+        try
+        {
+            await _windrosePlus.RunPreLaunchAsync(dir, ct).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "RunPreLaunchAsync failed — continuing with server start");
+            AppendSystem($"[WARNUNG] WindrosePlus Pre-Launch fehlgeschlagen: {ex.Message}");
+        }
+
+        // Phase 3: start process under lock
+        lock (_lock)
+        {
+            if (Status is ServerStatus.Running or ServerStatus.Starting)
+            {
+                _logger.LogDebug("Start requested but server is already {Status} (post pre-launch)", Status);
+                return false;
+            }
+
             var info = BuildInstallInfo(dir);
             var (exe, wplusArgs) = _windrosePlus.ResolveLauncher(dir, info);
             var args = CombineArgs(BuildLaunchArgs(_settings.Current), wplusArgs);
@@ -112,7 +142,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
                     AppendSystem("[FEHLER] Prozess konnte nicht gestartet werden.");
                     CleanupProcess();
                     TransitionTo(ServerStatus.Stopped);
-                    return Task.FromResult(false);
+                    return false;
                 }
             }
             catch (Exception ex)
@@ -121,7 +151,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
                 AppendSystem($"[FEHLER] {ex.Message}");
                 CleanupProcess();
                 TransitionTo(ServerStatus.Stopped);
-                return Task.FromResult(false);
+                return false;
             }
 
             _process.BeginOutputReadLine();
@@ -154,7 +184,21 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
             _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, ServerEventType.Started, $"Start via App (pid={ProcessId})"));
 
-            return Task.FromResult(true);
+            // Start WindrosePlus dashboard server after game server starts (fire-and-forget, 2s delay)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(2000).ConfigureAwait(false); // short delay for server process to stabilize
+                    await _windrosePlus.StartDashboardAsync(dir).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to start WindrosePlus dashboard server");
+                }
+            });
+
+            return true;
         }
     }
 
@@ -251,7 +295,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
     private void KillOrphanServerProcesses()
     {
-        var installDir = _settings.Current.ServerInstallDir;
+        var installDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(installDir) || !Directory.Exists(installDir)) return;
 
         // Sowohl Bootstrap (WindroseServer.exe) als auch echten UE5-Prozess (WindroseServer-Win64-Shipping.exe)
@@ -304,6 +348,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             try { code = _process?.ExitCode; } catch { /* ignore */ }
             LastExitCode = code;
             CleanupProcess();
+            _windrosePlus.StopDashboard(_startedServerDir);
 
             // Determine crashed vs clean stop
             var expected = previous == ServerStatus.Stopping;

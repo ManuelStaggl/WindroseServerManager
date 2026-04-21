@@ -14,111 +14,138 @@
         <!-- ================================================================ -->
         <!-- SERVER LIST (IsAddingServer = false)                             -->
         <!-- ================================================================ -->
-        <Grid RowDefinitions="Auto,Auto,*"
+        <Grid RowDefinitions="Auto,*"
               IsVisible="{Binding !IsAddingServer}">
 
-            <!-- Page header -->
-            <TextBlock Grid.Row="0"
-                       Classes="page-title"
-                       Text="{DynamicResource Nav.Server}" />
-            <TextBlock Grid.Row="1"
-                       Classes="caption"
-                       Margin="0,4,0,20"
-                       Text="{DynamicResource Installation.Subtitle}" />
-
-            <Grid Grid.Row="2" RowDefinitions="Auto,*">
-
-                <!-- "Neuer Server" button -->
-                <Button Grid.Row="0"
+            <!-- Page header row: title+subtitle left, add button right -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*,Auto"
+                  Margin="0,0,0,20">
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Classes="page-title"
+                               Text="{DynamicResource Nav.Server}" />
+                    <TextBlock Classes="caption"
+                               Text="{DynamicResource Installation.Subtitle}" />
+                </StackPanel>
+                <!-- Only shown when list has items; empty state has its own button -->
+                <Button Grid.Column="1"
                         Classes="primary"
+                        VerticalAlignment="Bottom"
                         Content="{DynamicResource Server.AddNew}"
                         Command="{Binding AddServerCommand}"
-                        Margin="0,0,0,16" />
-
-                <!-- Empty state -->
-                <Border Grid.Row="1"
-                        Classes="card"
                         IsVisible="{Binding ServerCards.Count,
-                                   Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
-                    <StackPanel HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Spacing="12"
-                                Margin="0,40">
-                        <TextBlock Classes="section-header"
-                                   HorizontalAlignment="Center"
-                                   Text="{DynamicResource Server.Empty}" />
-                        <TextBlock Classes="body muted"
-                                   HorizontalAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   MaxWidth="360"
-                                   TextAlignment="Center"
-                                   Text="{DynamicResource Server.Empty.Hint}" />
-                        <Button Classes="primary"
-                                HorizontalAlignment="Center"
-                                Content="{DynamicResource Server.AddNew}"
-                                Command="{Binding AddServerCommand}"
-                                Margin="0,8,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Server cards list -->
-                <ScrollViewer Grid.Row="1"
-                              IsVisible="{Binding ServerCards.Count,
-                                         Converter={x:Static vm:IntToBoolConverter.Instance}}"
-                              HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding ServerCards}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="vm:ServerCardViewModel">
-                                <Border Classes="card"
-                                        Margin="0,0,0,10">
-                                    <Grid ColumnDefinitions="*,Auto">
-
-                                        <!-- Left: name + path + active badge -->
-                                        <StackPanel Grid.Column="0"
-                                                    Spacing="6"
-                                                    VerticalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                                <TextBlock Classes="section-header"
-                                                           Text="{Binding Name}" />
-                                                <!-- Active badge -->
-                                                <Border CornerRadius="4"
-                                                        Background="{DynamicResource BrandAmberBrush}"
-                                                        Padding="6,2"
-                                                        IsVisible="{Binding IsActive}">
-                                                    <TextBlock Classes="caption"
-                                                               Foreground="{DynamicResource BrandTextPrimaryBrush}"
-                                                               Text="{DynamicResource Server.Active}" />
-                                                </Border>
-                                            </StackPanel>
-                                            <TextBlock Classes="body muted"
-                                                       Text="{Binding InstallDir}"
-                                                       TextWrapping="NoWrap"
-                                                       TextTrimming="CharacterEllipsis" />
-                                        </StackPanel>
-
-                                        <!-- Right: action buttons -->
-                                        <StackPanel Grid.Column="1"
-                                                    Orientation="Horizontal"
-                                                    Spacing="8"
-                                                    VerticalAlignment="Center">
-                                            <Button Classes="subtle"
-                                                    Content="{DynamicResource Server.SetActive}"
-                                                    IsVisible="{Binding !IsActive}"
-                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).SelectServerCommand}"
-                                                    CommandParameter="{Binding Id}" />
-                                            <Button Classes="danger"
-                                                    Content="{DynamicResource Server.Delete}"
-                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).DeleteServerCommand}"
-                                                    CommandParameter="{Binding Id}" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                   Converter={x:Static vm:IntToBoolConverter.Instance}}" />
             </Grid>
+
+            <!-- Empty state -->
+            <Border Grid.Row="1"
+                    Classes="card"
+                    IsVisible="{Binding ServerCards.Count,
+                               Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="12"
+                            Margin="0,48">
+                    <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="40"
+                               Text="&#xE8C8;"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource BrandTextMutedBrush}" />
+                    <TextBlock Classes="section-header"
+                               HorizontalAlignment="Center"
+                               Text="{DynamicResource Server.Empty}" />
+                    <TextBlock Classes="body muted"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               MaxWidth="360"
+                               TextAlignment="Center"
+                               Text="{DynamicResource Server.Empty.Hint}" />
+                    <Button Classes="primary"
+                            HorizontalAlignment="Center"
+                            Content="{DynamicResource Server.AddNew}"
+                            Command="{Binding AddServerCommand}"
+                            Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Server cards list -->
+            <ScrollViewer Grid.Row="1"
+                          IsVisible="{Binding ServerCards.Count,
+                                     Converter={x:Static vm:IntToBoolConverter.Instance}}"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding ServerCards}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:ServerCardViewModel">
+                            <Border Classes="card"
+                                    Margin="0,0,0,10">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                    <!-- Server icon -->
+                                    <Border Grid.Column="0"
+                                            Width="40" Height="40"
+                                            CornerRadius="8"
+                                            Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                                            Margin="0,0,14,0"
+                                            VerticalAlignment="Center">
+                                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                                   FontSize="20"
+                                                   Text="&#xE8C8;"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource BrandAlpineBlueBrush}" />
+                                    </Border>
+
+                                    <!-- Name + path + active badge -->
+                                    <StackPanel Grid.Column="1"
+                                                Spacing="4"
+                                                VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="body-emphasis"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Name}" />
+                                            <Border CornerRadius="4"
+                                                    Background="{DynamicResource BrandAmberBrush}"
+                                                    Padding="6,2"
+                                                    VerticalAlignment="Center"
+                                                    IsVisible="{Binding IsActive}">
+                                                <TextBlock Classes="caption"
+                                                           Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                                           Text="{DynamicResource Server.Active}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Classes="caption muted"
+                                                   Text="{Binding InstallDir}"
+                                                   TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+
+                                    <!-- Action buttons -->
+                                    <StackPanel Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                VerticalAlignment="Center">
+                                        <Button Classes="subtle"
+                                                Content="{DynamicResource Server.SetActive}"
+                                                IsVisible="{Binding !IsActive}"
+                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).SelectServerCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                        <Button Classes="subtle"
+                                                Content="{DynamicResource Server.InstallWindrosePlus}"
+                                                IsVisible="{Binding !WindrosePlusActive}"
+                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).InstallWindrosePlusCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                        <Button Classes="danger"
+                                                Content="{DynamicResource Server.Delete}"
+                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).DeleteServerCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
 
         <!-- ================================================================ -->
@@ -375,8 +402,7 @@
                         Classes="primary"
                         Content="{DynamicResource Server.StartInstall}"
                         Command="{Binding InstallCommand}"
-                        IsVisible="{Binding WizardStep,
-                                   Converter={StaticResource IntEquals}, ConverterParameter=3}"
+                        IsVisible="{Binding ShowInstallButton}"
                         IsEnabled="{Binding !IsInstalling}" />
 
                 <!-- Done (after success) -->

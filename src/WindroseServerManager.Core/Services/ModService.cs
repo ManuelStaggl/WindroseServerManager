@@ -38,7 +38,7 @@ public sealed class ModService : IModService
 
     public string? GetModsDir()
     {
-        var install = _settings.Current.ServerInstallDir;
+        var install = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(install)) return null;
         var dir = Path.Combine(install, ModsRelativeDir);
         Directory.CreateDirectory(dir);
@@ -47,7 +47,7 @@ public sealed class ModService : IModService
 
     public string? ValidateReady()
     {
-        if (string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir))
+        if (string.IsNullOrWhiteSpace(_settings.ActiveServerDir))
             return "Server-Installationspfad ist nicht gesetzt. Zuerst Installation einrichten.";
 
         if (_process.Status is ServerStatus.Running or ServerStatus.Starting)

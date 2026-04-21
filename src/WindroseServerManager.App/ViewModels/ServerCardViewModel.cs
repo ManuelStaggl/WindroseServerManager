@@ -9,12 +9,14 @@ public sealed partial class ServerCardViewModel : ObservableObject
     public string Id { get; }
     public string Name { get; }
     public string InstallDir { get; }
+    public bool WindrosePlusActive { get; }
 
-    public ServerCardViewModel(string id, string name, string installDir, bool isActive)
+    public ServerCardViewModel(string id, string name, string installDir, bool isActive, bool windrosePlusActive)
     {
         Id = id;
         Name = name;
         InstallDir = installDir;
         _isActive = isActive;
+        WindrosePlusActive = windrosePlusActive;
     }
 }

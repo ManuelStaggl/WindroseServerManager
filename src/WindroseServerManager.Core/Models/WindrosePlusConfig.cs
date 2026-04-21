@@ -4,9 +4,12 @@ namespace WindroseServerManager.Core.Models;
 
 public sealed class WindrosePlusConfig
 {
-    [JsonPropertyName("Server")]
+    [JsonPropertyName("server")]
     public Dictionary<string, object?> Server { get; set; } = new();
 
-    [JsonPropertyName("Multipliers")]
+    [JsonPropertyName("rcon")]
+    public Dictionary<string, object?> Rcon { get; set; } = new();
+
+    [JsonPropertyName("multipliers")]
     public Dictionary<string, object?> Multipliers { get; set; } = new();
 }

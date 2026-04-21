@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
@@ -217,7 +218,7 @@ public partial class SettingsViewModel : ViewModelBase
     }
 
     private string? ResolveServerBinary()
-        => ServerInstallService.FindServerBinary(_settings.Current.ServerInstallDir);
+        => ServerInstallService.FindServerBinary(_settings.ActiveServerDir);
 
     partial void OnAutoStartEnabledChanged(bool value)
     {
@@ -333,13 +334,51 @@ public partial class SettingsViewModel : ViewModelBase
 
     // ── WindrosePlus ────────────────────────────────────────────
     public bool HasServerConfigured =>
-        !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir);
+        !string.IsNullOrWhiteSpace(_settings.ActiveServerDir);
+
+    public string RconPassword
+    {
+        get
+        {
+            var dir = _settings.ActiveServerDir;
+            if (string.IsNullOrWhiteSpace(dir)) return string.Empty;
+
+            // Try windrose_plus.json first (JsonElement-safe extraction)
+            var config = _wplusApi.ReadConfig(dir);
+            if (config?.Rcon.TryGetValue("password", out var pw) == true && pw is not null)
+            {
+                var s = pw is System.Text.Json.JsonElement el ? el.GetString() : pw as string;
+                if (!string.IsNullOrWhiteSpace(s)) return s;
+            }
+
+            // Fallback: password stored in app settings (set via install wizard)
+            return _settings.Current.WindrosePlusRconPasswordByServer
+                .GetValueOrDefault(dir, string.Empty);
+        }
+    }
+
+    [ObservableProperty] private bool _showRconPassword;
+
+    [RelayCommand]
+    private void ToggleShowRconPassword() => ShowRconPassword = !ShowRconPassword;
+
+    [RelayCommand]
+    private async Task CopyRconPasswordAsync()
+    {
+        var pw = RconPassword;
+        if (string.IsNullOrEmpty(pw)) return;
+        var top = Avalonia.Application.Current?.ApplicationLifetime
+            is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d ? d.MainWindow : null;
+        if (top?.Clipboard is null) return;
+        await top.Clipboard.SetTextAsync(pw);
+        _toasts.Success(Loc.Get("Settings.WindrosePlus.RconPasswordCopied"));
+    }
 
     public string WindrosePlusStatusText
     {
         get
         {
-            var dir = _settings.Current.ServerInstallDir;
+            var dir = _settings.ActiveServerDir;
             if (string.IsNullOrWhiteSpace(dir)) return Loc.Get("Settings.WindrosePlus.StatusNoServer");
             var active = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(dir, false);
             if (active) return Loc.Get("Settings.WindrosePlus.StatusActive");
@@ -353,7 +392,7 @@ public partial class SettingsViewModel : ViewModelBase
     [RelayCommand]
     private async Task OpenWindrosePlusDialogAsync()
     {
-        var dir = _settings.Current.ServerInstallDir;
+        var dir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(dir)) return;
 
         var top = Avalonia.Application.Current?.ApplicationLifetime

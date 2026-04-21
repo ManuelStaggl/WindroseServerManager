@@ -23,6 +23,9 @@
                                    Foreground="{DynamicResource BrandTextMutedBrush}"
                                    TextWrapping="Wrap"
                                    Text="{DynamicResource Health.Banner.Body}" />
+                        <TextBlock Classes="caption"
+                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                   Text="{Binding HealthBanner.DashboardPort, StringFormat='Port: {0}'}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
                                 VerticalAlignment="Center">

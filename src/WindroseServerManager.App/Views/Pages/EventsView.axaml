@@ -1,40 +1,93 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
+             xmlns:m="using:WindroseServerManager.Core.Models"
              x:Class="WindroseServerManager.App.Views.Pages.EventsView"
              x:DataType="vm:EventsViewModel">
     <Grid Margin="24" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
         <StackPanel Grid.Row="0" Spacing="4">
             <TextBlock Text="{DynamicResource Events.Title}" Classes="page-title" />
         </StackPanel>
+
         <TextBox Grid.Row="1"
                  Text="{Binding FilterText, Mode=TwoWay}"
-                 Watermark="{DynamicResource Events.Filter.Placeholder}" />
-        <Border Grid.Row="2" BorderBrush="{DynamicResource BrandNavyBorderBrush}" BorderThickness="1" CornerRadius="6">
+                 PlaceholderText="{DynamicResource Events.Filter.Placeholder}" />
+
+        <Border Grid.Row="2" Classes="card" Padding="0">
             <Grid>
-                <!-- Avalonia DataGrid enables row virtualization by default (no EnableRowVirtualization property needed) -->
-                <DataGrid ItemsSource="{Binding FilteredEvents}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          GridLinesVisibility="Horizontal">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="{DynamicResource Events.Column.Time}"
-                                            Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
-                                            Width="Auto" />
-                        <DataGridTextColumn Header="{DynamicResource Events.Column.Type}"
-                                            Binding="{Binding Type}"
-                                            Width="Auto" />
-                        <DataGridTextColumn Header="{DynamicResource Events.Column.Player}"
-                                            Binding="{Binding Name}"
-                                            Width="*" />
-                        <DataGridTextColumn Header="{DynamicResource Events.Column.SteamId}"
-                                            Binding="{Binding SteamId}"
-                                            Width="Auto" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                <ProgressBar IsIndeterminate="True" Height="3"
+                             VerticalAlignment="Top" CornerRadius="8,8,0,0"
+                             IsVisible="{Binding IsLoading}" />
+
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              IsVisible="{Binding HasEvents}">
+                    <ItemsControl ItemsSource="{Binding FilteredEvents}">
+                        <ItemsControl.Styles>
+                            <Style Selector="Border.event-row">
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Background" Duration="0:0:0.12" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border.event-row:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+                            </Style>
+                        </ItemsControl.Styles>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:WindrosePlusEvent">
+                                <Border Classes="event-row"
+                                        Background="Transparent"
+                                        BorderBrush="{DynamicResource BrandNavyBorderBrush}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="16,10">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                        <!-- Type Badge -->
+                                        <Border Grid.Column="0"
+                                                CornerRadius="4" Padding="7,3"
+                                                Margin="0,0,14,0"
+                                                VerticalAlignment="Center"
+                                                Background="{Binding Type, Converter={x:Static vm:EventTypeToBrushConverter.Instance}}">
+                                            <TextBlock Text="{Binding Type, Converter={x:Static vm:EventTypeToLabelConverter.Instance}}"
+                                                       FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="#FFFFFF"
+                                                       LetterSpacing="1" />
+                                        </Border>
+
+                                        <!-- Player Name -->
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Name}"
+                                                   FontSize="14" FontWeight="Medium"
+                                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+
+                                        <!-- Timestamp -->
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Timestamp, Converter={x:Static vm:TimestampToDateTimeLocalConverter.Instance}}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas,Courier New"
+                                                   Margin="16,0,0,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Empty State -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
                             IsVisible="{Binding HasNoEvents}">
-                    <TextBlock Text="{DynamicResource Events.Empty}" Opacity="0.7" />
+                    <TextBlock Text="&#xE7C3;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="48" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource BrandTextMutedBrush}" />
+                    <TextBlock Text="{DynamicResource Events.Empty}"
+                               Classes="section-header" HorizontalAlignment="Center" />
                 </StackPanel>
             </Grid>
         </Border>

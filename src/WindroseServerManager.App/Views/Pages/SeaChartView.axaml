@@ -3,68 +3,31 @@
              xmlns:vm="using:WindroseServerManager.App.ViewModels"
              x:Class="WindroseServerManager.App.Views.Pages.SeaChartView"
              x:DataType="vm:SeaChartViewModel">
-    <Grid Margin="24" RowDefinitions="Auto,*" ColumnDefinitions="*,Auto" RowSpacing="12" ColumnSpacing="12">
+    <Grid Margin="24" RowDefinitions="Auto,*" RowSpacing="12">
 
-        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="12">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
             <TextBlock Text="{DynamicResource SeaChart.Title}" Classes="page-title" VerticalAlignment="Center" />
-            <Button Content="{DynamicResource SeaChart.GenerateMap}" Command="{Binding GenerateMapCommand}" />
-            <Button Content="{DynamicResource SeaChart.Refresh}" Command="{Binding RefreshCommand}" />
+            <Button Content="{DynamicResource SeaChart.OpenLivemap}"
+                    Command="{Binding OpenLivemapCommand}" />
+            <Button Content="{DynamicResource SeaChart.Refresh}"
+                    Command="{Binding ReloadCommand}" />
         </StackPanel>
 
-        <Border Grid.Row="1" Grid.Column="0"
-                BorderBrush="{DynamicResource BrandNavyBorderBrush}" BorderThickness="1" CornerRadius="6"
-                Background="{DynamicResource BrandNavySurfaceAltBrush}">
-            <Canvas x:Name="MapCanvas" ClipToBounds="True">
-                <Image Source="{Binding MapImage}" Stretch="Uniform"
-                       Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
-                       IsVisible="{Binding HasMap}" />
-                <TextBlock Canvas.Left="16" Canvas.Top="16"
-                           Text="{DynamicResource SeaChart.NoMap}"
-                           IsVisible="{Binding !HasMap}" Opacity="0.7" />
-                <ItemsControl ItemsSource="{Binding Markers}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate><Canvas /></ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemContainerTheme>
-                        <ControlTheme TargetType="ContentPresenter" x:DataType="vm:PlayerMarkerViewModel">
-                            <Setter Property="Canvas.Left" Value="{Binding CanvasX}" />
-                            <Setter Property="Canvas.Top"  Value="{Binding CanvasY}" />
-                        </ControlTheme>
-                    </ItemsControl.ItemContainerTheme>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:PlayerMarkerViewModel">
-                            <Ellipse Width="12" Height="12"
-                                     Fill="{DynamicResource BrandAmberBrush}"
-                                     Stroke="White" StrokeThickness="1.5"
-                                     Cursor="Hand"
-                                     ToolTip.Tip="{Binding Player.Name}"
-                                     PointerPressed="OnMarkerPointerPressed" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Canvas>
-        </Border>
-
-        <!-- Detail panel — only visible when a marker is selected -->
-        <Border Grid.Row="1" Grid.Column="1"
-                Width="280"
-                BorderBrush="{DynamicResource BrandNavyBorderBrush}" BorderThickness="1" CornerRadius="6"
-                Padding="12"
-                IsVisible="{Binding SelectedMarker, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Spacing="8">
-                <TextBlock Text="{Binding SelectedMarker.Player.Name}" Classes="section-header" />
-                <TextBlock Text="{Binding SelectedMarker.Player.SteamId}" Opacity="0.7" />
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <TextBlock Text="{DynamicResource SeaChart.Detail.Alive}" />
-                    <TextBlock Text=":" />
-                    <TextBlock Text="{Binding SelectedMarker.Player.Alive}" />
+        <Border Grid.Row="1" Classes="card" Padding="0" ClipToBounds="True">
+            <Grid>
+                <NativeWebView x:Name="LiveMapWebView"
+                               Source="{Binding LivemapUrl}"
+                               IsVisible="{Binding HasLivemap}" />
+                <!-- Empty state when dashboard is not running -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
+                            IsVisible="{Binding !HasLivemap}">
+                    <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="48" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource BrandTextMutedBrush}" />
+                    <TextBlock Text="{DynamicResource SeaChart.NoMap}"
+                               Classes="section-header" HorizontalAlignment="Center" />
                 </StackPanel>
-                <TextBlock Text="{Binding SelectedMarker.Player.ShipInfo}"
-                           IsVisible="{Binding SelectedMarker.Player.ShipInfo, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                <Button Content="{DynamicResource SeaChart.Detail.Close}"
-                        Command="{Binding ClearSelectionCommand}"
-                        HorizontalAlignment="Right" />
-            </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

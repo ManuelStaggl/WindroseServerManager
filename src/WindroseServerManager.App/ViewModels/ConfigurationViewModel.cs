@@ -117,7 +117,7 @@ public partial class ConfigurationViewModel : ViewModelBase
     [RelayCommand]
     private void OpenInstallDir()
     {
-        var p = _settings.Current.ServerInstallDir;
+        var p = _settings.ActiveServerDir;
         if (!CanOpenInstallDir) return;
         try { Process.Start(new ProcessStartInfo { FileName = p, UseShellExecute = true }); } catch { }
     }

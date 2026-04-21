@@ -5,7 +5,11 @@ public sealed class AppSettings
     /// <summary>UI-Sprache: "auto" (Windows-Sprache) | "de" | "en".</summary>
     public string Language { get; set; } = "auto";
 
-    // Server paths
+    // Multi-server list (v1.2+)
+    public List<ServerEntry> Servers { get; set; } = new();
+    public string? ActiveServerId { get; set; }
+
+    // Legacy — kept for migration only; new code uses Servers + ActiveServerId
     public string ServerInstallDir { get; set; } = string.Empty;
     public string SteamCmdDir { get; set; } = string.Empty;
 

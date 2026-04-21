@@ -57,6 +57,22 @@ public sealed class AppSettingsService : IAppSettingsService
     public AppSettings Current => _current;
     public event Action<AppSettings>? Changed;
 
+    public string ActiveServerDir =>
+        _current.Servers.FirstOrDefault(s => s.Id == _current.ActiveServerId)?.InstallDir.TrimEnd('\\', '/')
+        ?? string.Empty;
+
+    public async Task SelectServerAsync(string serverId)
+    {
+        await _lock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            _current.ActiveServerId = serverId;
+        }
+        finally { _lock.Release(); }
+        await SaveAsync().ConfigureAwait(false);
+        Changed?.Invoke(_current);
+    }
+
     public async Task LoadAsync(CancellationToken ct = default)
     {
         var needsResave = false;
@@ -85,6 +101,9 @@ public sealed class AppSettingsService : IAppSettingsService
                     _current.GracefulShutdownSeconds = 5;
                     needsResave = true;
                 }
+
+                // Normalize trailing backslashes from all path keys/values (can happen from old saves).
+                NormalizePathKeys(_current);
 
                 // Phase 9 (v1.2): seed OptInState für alle bekannten Server.
                 MigrateToV12(_current);
@@ -142,17 +161,67 @@ public sealed class AppSettingsService : IAppSettingsService
     }
 
     /// <summary>
+    /// Trim trailing backslashes/slashes from all path-keyed dictionaries and server entries.
+    /// Guards against stale settings.json files that were saved with trailing backslashes.
+    /// </summary>
+    private static void NormalizePathKeys(AppSettings s)
+    {
+        static string Norm(string p) => p.TrimEnd('\\', '/');
+
+        foreach (var entry in s.Servers)
+            entry.InstallDir = Norm(entry.InstallDir);
+
+        if (!string.IsNullOrEmpty(s.ServerInstallDir))
+            s.ServerInstallDir = Norm(s.ServerInstallDir);
+
+        NormalizeDictKeys(s.WindrosePlusActiveByServer);
+        NormalizeDictKeys(s.WindrosePlusOptInStateByServer);
+        NormalizeDictKeys(s.WindrosePlusRconPasswordByServer);
+        NormalizeDictKeys(s.WindrosePlusDashboardPortByServer);
+        NormalizeDictKeys(s.WindrosePlusAdminSteamIdByServer);
+    }
+
+    private static void NormalizeDictKeys<TVal>(Dictionary<string, TVal> dict)
+    {
+        var keysToNorm = dict.Keys.Where(k => k.EndsWith('\\') || k.EndsWith('/')).ToList();
+        foreach (var key in keysToNorm)
+        {
+            var normed = key.TrimEnd('\\', '/');
+            if (!dict.ContainsKey(normed))
+                dict[normed] = dict[key];
+            dict.Remove(key);
+        }
+    }
+
+    /// <summary>
     /// Phase 9 (v1.2): seed <see cref="OptInState.NeverAsked"/> für jeden bekannten Server,
     /// der noch keinen expliziten Opt-in-Eintrag hat. Idempotent — überschreibt niemals
     /// existierende <c>OptedIn</c>/<c>OptedOut</c>-Entscheidungen und entfernt keine Orphan-Keys.
     /// </summary>
     private static void MigrateToV12(AppSettings s)
     {
-        // Copy to list to avoid concurrent-modification edge cases on dictionary views.
+        // Seed OptInState for all known servers that have no explicit entry.
         foreach (var serverDir in s.WindrosePlusActiveByServer.Keys.ToList())
         {
             if (!s.WindrosePlusOptInStateByServer.ContainsKey(serverDir))
                 s.WindrosePlusOptInStateByServer[serverDir] = OptInState.NeverAsked;
+        }
+
+        // Migrate legacy single-server to multi-server list.
+        if (s.Servers.Count == 0 && !string.IsNullOrWhiteSpace(s.ServerInstallDir))
+        {
+            var entry = new ServerEntry
+            {
+                Id = Guid.NewGuid().ToString("N")[..8],
+                Name = Path.GetFileName(s.ServerInstallDir.TrimEnd('/', '\\')) is { Length: > 0 } n ? n : "Server",
+                InstallDir = s.ServerInstallDir,
+            };
+            s.Servers.Add(entry);
+            s.ActiveServerId = entry.Id;
+        }
+        else if (s.Servers.Count > 0 && string.IsNullOrEmpty(s.ActiveServerId))
+        {
+            s.ActiveServerId = s.Servers[0].Id;
         }
     }
 }

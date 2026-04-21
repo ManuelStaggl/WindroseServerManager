@@ -152,6 +152,8 @@ public class WindrosePlusApiServiceTests : IDisposable
     {
         public AppSettings Current { get; } = new();
         public event Action<AppSettings>? Changed;
+        public string ActiveServerDir => Current.ServerInstallDir;
+        public Task SelectServerAsync(string id) => Task.CompletedTask;
         public Task LoadAsync(CancellationToken ct = default) => Task.CompletedTask;
         public Task SaveAsync(CancellationToken ct = default) => Task.CompletedTask;
         public Task UpdateAsync(Action<AppSettings> mutate, CancellationToken ct = default)

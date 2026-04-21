@@ -63,7 +63,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     public async Task RefreshAsync()
     {
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
 
         _cts?.Cancel();
@@ -106,13 +106,14 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
 
     private void DiffUpdate(System.Collections.Generic.IReadOnlyList<WindrosePlusPlayer> next)
     {
+        // WindrosePlus doesn't provide SteamIds — use Name as identifier
         for (int i = Players.Count - 1; i >= 0; i--)
-            if (!next.Any(p => p.SteamId == Players[i].SteamId)) Players.RemoveAt(i);
+            if (!next.Any(p => p.Name == Players[i].Name)) Players.RemoveAt(i);
         foreach (var p in next)
         {
             var idx = -1;
             for (int i = 0; i < Players.Count; i++)
-                if (Players[i].SteamId == p.SteamId) { idx = i; break; }
+                if (Players[i].Name == p.Name) { idx = i; break; }
             if (idx >= 0) Players[idx] = p;
             else Players.Add(p);
         }
@@ -122,7 +123,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
     private async Task KickAsync(WindrosePlusPlayer? player)
     {
         if (player is null) return;
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
 
         var window = GetMainWindow();
@@ -135,7 +136,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
             danger: true);
         if (!ok) return;
 
-        var resp = await _api.RconAsync(serverDir, _api.BuildKickCommand(player.SteamId));
+        var resp = await _api.RconAsync(serverDir, _api.BuildKickCommand(player.Name));
         if (resp is null) _toasts.Error(Loc.Get("Players.Error"));
         else _toasts.Success(Loc.Format("Players.Kicked", player.Name));
         _ = RefreshAsync();
@@ -145,7 +146,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
     private async Task BanAsync(WindrosePlusPlayer? player)
     {
         if (player is null) return;
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
 
         var window = GetMainWindow();
@@ -157,7 +158,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
             Loc.Format("Players.Ban.Message", player.Name));
         if (result is null) return; // abgebrochen
 
-        var resp = await _api.RconAsync(serverDir, _api.BuildBanCommand(player.SteamId, result.Minutes));
+        var resp = await _api.RconAsync(serverDir, _api.BuildBanCommand(player.Name, result.Minutes));
         if (resp is null)
         {
             _toasts.Error(Loc.Get("Players.Error"));
@@ -177,7 +178,7 @@ public partial class PlayersViewModel : ViewModelBase, IDisposable
     {
         var msg = BroadcastMessage?.Trim();
         if (string.IsNullOrWhiteSpace(msg)) return;
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
 
         var resp = await _api.RconAsync(serverDir, _api.BuildBroadcastCommand(msg));

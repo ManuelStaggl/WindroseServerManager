@@ -29,7 +29,7 @@ public sealed partial class UpdateCheckService : IUpdateCheckService
 
     public async Task<UpdateCheckResult> CheckAsync(string? installDir, CancellationToken ct = default)
     {
-        var dir = installDir ?? _settings.Current.ServerInstallDir;
+        var dir = installDir ?? _settings.ActiveServerDir;
         var installed = ReadInstalledBuildId(dir);
 
         string? latest = null;

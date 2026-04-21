@@ -45,7 +45,7 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
 
     public void Start()
     {
-        var serverDir = _settings.Current.ServerInstallDir;
+        var serverDir = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(serverDir)) return;
         var dir = Path.Combine(serverDir, "windrose_plus_data");
         _logPath = Path.Combine(dir, "events.log");
@@ -98,7 +98,12 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
 
     private async Task InitialLoadAsync()
     {
-        if (_logPath is null || !File.Exists(_logPath)) return;
+        await Dispatcher.UIThread.InvokeAsync(() => IsLoading = true);
+        if (_logPath is null || !File.Exists(_logPath))
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
+            return;
+        }
         try
         {
             await _readLock.WaitAsync().ConfigureAwait(false);
@@ -122,7 +127,11 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
         {
             Log.Warning(ex, "Initial events.log read failed");
         }
-        finally { _readLock.Release(); }
+        finally
+        {
+            _readLock.Release();
+            await Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
+        }
     }
 
     private void OnLogChanged(object sender, FileSystemEventArgs e)

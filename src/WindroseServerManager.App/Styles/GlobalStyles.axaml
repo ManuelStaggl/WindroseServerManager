@@ -33,6 +33,13 @@
         <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
     </Style>
 
+    <Style Selector="TextBlock.group-label">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
+        <Setter Property="Margin" Value="2,20,0,6" />
+    </Style>
+
     <Style Selector="Border.card">
         <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />

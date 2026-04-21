@@ -140,8 +140,8 @@ public partial class RetrofitBannerViewModel : ViewModelBase, IWindrosePlusOptIn
                 // Write windrose_plus.json so WindrosePlus uses the configured port/password.
                 var cfg = _wplusApi.ReadConfig(ServerInstallDir) ?? new WindroseServerManager.Core.Models.WindrosePlusConfig();
                 cfg.Server["http_port"] = DashboardPort;
-                cfg.Server["rcon_enabled"] = true;
-                cfg.Server["rcon_password"] = RconPassword;
+                cfg.Rcon["enabled"] = true;
+                cfg.Rcon["password"] = RconPassword;
                 await _wplusApi.WriteConfigAsync(ServerInstallDir, cfg, CancellationToken.None);
             }
 

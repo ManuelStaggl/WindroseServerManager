@@ -5,6 +5,7 @@ using System.Threading;
 using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
@@ -61,8 +62,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private ServerStatus _lastObservedStatus = ServerStatus.Stopped;
     private HttpClient? _healthHttpClient;
 
-    public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.Current.ServerInstallDir)
-                                    && Directory.Exists(_settings.Current.ServerInstallDir);
+    public bool CanOpenServerDir => !string.IsNullOrWhiteSpace(_settings.ActiveServerDir)
+                                    && Directory.Exists(_settings.ActiveServerDir);
 
     public bool CanOpenServerDescription
     {
@@ -95,7 +96,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(ShowActiveWorldIdSubtitle));
     }
 
-    public bool IsFirstRun => InstallInfo?.IsInstalled != true || string.IsNullOrEmpty(InviteCode);
+    public bool IsFirstRun => InstallInfo?.IsInstalled != true;
 
     public string LastCrashPathDisplay => string.IsNullOrEmpty(LastCrashPath)
         ? string.Empty
@@ -239,6 +240,19 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     private void DismissCrashWarning()
     {
         HasRecentCrash = false;
+        // Mark ALL recent crash files as seen so no stale file triggers the banner next start.
+        try
+        {
+            var dir = Program.CrashDirectory;
+            if (!Directory.Exists(dir)) return;
+            var cutoff = DateTime.Now.AddDays(-7);
+            foreach (var f in new DirectoryInfo(dir).GetFiles("crash-*.txt").Where(f => f.LastWriteTime >= cutoff))
+            {
+                try { File.Move(f.FullName, f.FullName + ".seen", overwrite: true); }
+                catch { }
+            }
+        }
+        catch { }
     }
 
     private void OnServerStatusChanged(ServerStatus s) =>
@@ -247,13 +261,13 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private async Task RefreshAsync(CancellationToken ct = default)
     {
-        var cfg = _settings.Current;
+        var serverDir = _settings.ActiveServerDir;
         try
         {
-            if (!string.IsNullOrWhiteSpace(cfg.ServerInstallDir))
-                InstallInfo = await _install.GetInstallInfoAsync(cfg.ServerInstallDir, ct);
+            if (!string.IsNullOrWhiteSpace(serverDir))
+                InstallInfo = await _install.GetInstallInfoAsync(serverDir, ct);
 
-            var host = await _metrics.GetHostMetricsAsync(cfg.ServerInstallDir, ct);
+            var host = await _metrics.GetHostMetricsAsync(serverDir, ct);
             HostCpu = host.CpuPercent;
             HostRamPercent = host.RamTotalBytes > 0 ? host.RamUsedBytes * 100.0 / host.RamTotalBytes : 0;
             HostRamText = $"{FormatGb(host.RamUsedBytes)} / {FormatGb(host.RamTotalBytes)}";
@@ -312,14 +326,15 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(CanOpenServerDescription));
 
             // Retrofit banner: show when active server has OptInState=NeverAsked and no WP active
-            var serverDir = _settings.Current.ServerInstallDir;
             if (!string.IsNullOrWhiteSpace(serverDir))
             {
                 var optState = _settings.Current.WindrosePlusOptInStateByServer
                     .GetValueOrDefault(serverDir, OptInState.NeverAsked);
                 var wpActive = _settings.Current.WindrosePlusActiveByServer
                     .GetValueOrDefault(serverDir, false);
-                var shouldShow = optState == OptInState.NeverAsked && !wpActive;
+                // Also check physical marker — settings can be stale if another install wrote with trailing backslash
+                var wpPhysicallyInstalled = !string.IsNullOrWhiteSpace(serverDir) && File.Exists(Path.Combine(serverDir, ".wplus-version"));
+                var shouldShow = optState == OptInState.NeverAsked && !wpActive && !wpPhysicallyInstalled;
 
                 // Hide while an install is in progress (Pitfall 7: banner hidden during active install)
                 if (shouldShow && RetrofitBanner is { IsInstalling: true })
@@ -400,7 +415,11 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
                 HealthBannerVisible = false;
             }
         }
-        catch { }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Dashboard refresh error (non-critical)");
+        }
     }
 
     private void OnRetrofitStateChanged() => _ = RefreshAsync(CancellationToken.None);
@@ -434,6 +453,8 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     {
         var vm = (InstallationViewModel)App.Services.GetService(typeof(InstallationViewModel))!;
         _nav.NavigateTo(vm);
+        if (_settings.Current.Servers.Count == 0)
+            vm.AddServerCommand.Execute(null);
     }
 
     private static Avalonia.Controls.Window? GetOwnerWindow()
@@ -553,7 +574,7 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private void OpenServerDir()
     {
-        var path = _settings.Current.ServerInstallDir;
+        var path = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = path, UseShellExecute = true }); } catch { }
     }

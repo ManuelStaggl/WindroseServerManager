@@ -34,7 +34,7 @@ public sealed class BackupService : IBackupService
 
     public string? GetSavesDir()
     {
-        var install = _settings.Current.ServerInstallDir;
+        var install = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(install)) return null;
         var saves = Path.Combine(install, SavesRelativeDir);
         return Directory.Exists(saves) ? saves : null;
@@ -102,7 +102,7 @@ public sealed class BackupService : IBackupService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
         var saves = GetSavesDir();
-        var install = _settings.Current.ServerInstallDir;
+        var install = _settings.ActiveServerDir;
         if (string.IsNullOrWhiteSpace(install))
             throw new InvalidOperationException("Server-Installationspfad ist nicht gesetzt.");
 
