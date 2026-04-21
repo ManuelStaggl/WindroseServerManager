@@ -7,24 +7,19 @@
     <ScrollViewer>
         <StackPanel>
             <TextBlock Classes="page-title" Text="{DynamicResource Dashboard.Title}" />
-            <TextBlock Classes="caption" Text="{DynamicResource Dashboard.Subtitle}" Margin="0,4,0,20" />
+            <TextBlock Classes="caption muted" Text="{DynamicResource Dashboard.Subtitle}" Margin="0,4,0,20" />
 
-            <!-- Phase 10: Health banner — WindrosePlus dashboard not responding (HEALTH-01, HEALTH-02) -->
-            <Border Classes="card" Margin="0,0,0,16"
-                    IsVisible="{Binding HealthBannerVisible}"
-                    BorderBrush="{DynamicResource BrandErrorBrush}"
-                    BorderThickness="1">
+            <!-- Health banner — WindrosePlus dashboard not responding -->
+            <Border Classes="alert-error" Margin="0,0,0,16" Padding="16,12"
+                    IsVisible="{Binding HealthBannerVisible}">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="6">
                         <TextBlock Classes="section-header"
                                    Foreground="{DynamicResource BrandErrorBrush}"
                                    Text="{DynamicResource Health.Banner.Title}" />
-                        <TextBlock Classes="body"
-                                   Foreground="{DynamicResource BrandTextMutedBrush}"
-                                   TextWrapping="Wrap"
+                        <TextBlock Classes="body muted" TextWrapping="Wrap"
                                    Text="{DynamicResource Health.Banner.Body}" />
-                        <TextBlock Classes="caption"
-                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                        <TextBlock Classes="caption muted"
                                    Text="{Binding HealthBanner.DashboardPort, StringFormat='Port: {0}'}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
@@ -40,15 +35,12 @@
             </Border>
 
             <!-- Retrofit Banner (WindrosePlus available for existing v1.1 servers) -->
-            <Border Classes="card" Margin="0,0,0,16"
-                    IsVisible="{Binding RetrofitBannerVisible}"
-                    BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
+            <Border Classes="alert-warning" Margin="0,0,0,16" Padding="16,12"
+                    IsVisible="{Binding RetrofitBannerVisible}">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="6">
                         <TextBlock Classes="section-header" Text="{DynamicResource Retrofit.Banner.Title}" />
-                        <TextBlock Classes="body"
-                                   Foreground="{DynamicResource BrandTextMutedBrush}"
-                                   TextWrapping="Wrap"
+                        <TextBlock Classes="body muted" TextWrapping="Wrap"
                                    Text="{DynamicResource Retrofit.Banner.Body}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
@@ -64,17 +56,17 @@
             </Border>
 
             <!-- Crash Warning -->
-            <Border Classes="card" Margin="0,0,0,16" IsVisible="{Binding HasRecentCrash}"
-                    BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
+            <Border Classes="alert-warning" Margin="0,0,0,16" Padding="16,12"
+                    IsVisible="{Binding HasRecentCrash}">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="6">
                         <TextBlock Classes="section-header" Text="{DynamicResource Dashboard.Crash.Title}" />
-                        <TextBlock Classes="caption" Text="{Binding LastCrashPathDisplay}" TextWrapping="Wrap" />
+                        <TextBlock Classes="caption muted" Text="{Binding LastCrashPathDisplay}" TextWrapping="Wrap" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <Button Classes="subtle" Content="{DynamicResource Dashboard.Crash.CopyPath}" Command="{Binding CopyCrashPathCommand}" />
                         <Button Classes="subtle" Content="{DynamicResource Dashboard.Crash.OpenLog}" Command="{Binding OpenCrashLogCommand}" />
-                        <Button Classes="subtle" Content="✕" Command="{Binding DismissCrashWarningCommand}" />
+                        <Button Classes="icon-btn" Content="&#xE8BB;" Command="{Binding DismissCrashWarningCommand}" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -131,7 +123,8 @@
                         <TextBlock Text="{Binding InviteCode, FallbackValue='—'}"
                                    FontFamily="Consolas,Courier New"
                                    FontSize="22"
-                                   FontWeight="SemiBold" />
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandTextPrimaryBrush}" />
                     </StackPanel>
                     <Button Grid.Column="1"
                             Classes="subtle"
@@ -148,7 +141,7 @@
                         <StackPanel Grid.Column="0" Spacing="4">
                             <TextBlock Classes="caption" Text="{DynamicResource Dashboard.ServerStatus}" />
                             <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                <Ellipse Width="12" Height="12"
+                                <Ellipse Classes="status-dot" Width="12" Height="12"
                                          Fill="{Binding Status, Converter={x:Static vm:ServerStatusToBrushConverter.Instance}}" />
                                 <TextBlock Classes="section-header" Text="{Binding Status, Converter={x:Static vm:ServerStatusToLocalizedTextConverter.Instance}}" />
                             </StackPanel>
@@ -226,8 +219,7 @@
                         <StackPanel IsVisible="{Binding HasActiveWorld}" Spacing="2">
                             <TextBlock Classes="section-header"
                                        Text="{Binding ActiveWorldDisplayName}" />
-                            <TextBlock Classes="body muted"
-                                       FontFamily="Consolas,Courier New" FontSize="12"
+                            <TextBlock Classes="mono-sm"
                                        Text="{Binding ActiveWorldId}"
                                        IsVisible="{Binding ShowActiveWorldIdSubtitle}" />
                         </StackPanel>

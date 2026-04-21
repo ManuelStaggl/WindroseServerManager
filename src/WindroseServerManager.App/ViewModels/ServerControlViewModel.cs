@@ -379,6 +379,14 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
+    private async Task ClearSessionHistoryAsync()
+    {
+        await _eventLog.ClearAsync().ConfigureAwait(false);
+        Avalonia.Threading.Dispatcher.UIThread.Post(() => Events.Clear());
+        _toasts.Info(Loc.Get("Toast.SessionHistoryCleared"));
+    }
+
+    [RelayCommand]
     private void ClearLog()
     {
         Log.Clear();

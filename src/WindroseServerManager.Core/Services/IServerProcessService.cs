@@ -26,4 +26,10 @@ public interface IServerProcessService
 
     /// <summary>Validates that a server binary exists at the configured install dir. Returns error message or null.</summary>
     string? ValidateCanStart();
+
+    /// <summary>
+    /// Scans for an already-running Windrose server process in the active install dir and attaches to it.
+    /// Returns true if a process was found and attached, false otherwise.
+    /// </summary>
+    bool TryAttachToExistingProcess();
 }

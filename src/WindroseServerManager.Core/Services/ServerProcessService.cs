@@ -293,6 +293,63 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         }
     }
 
+    public bool TryAttachToExistingProcess()
+    {
+        var installDir = _settings.ActiveServerDir;
+        if (string.IsNullOrWhiteSpace(installDir) || !Directory.Exists(installDir)) return false;
+
+        lock (_lock)
+        {
+            if (Status != ServerStatus.Stopped) return false;
+        }
+
+        string[] names = { "WindroseServer-Win64-Shipping", "WindroseServer" };
+        var normalizedDir = Path.GetFullPath(installDir);
+
+        foreach (var name in names)
+        {
+            foreach (var proc in Process.GetProcessesByName(name))
+            {
+                try
+                {
+                    if (proc.HasExited) { proc.Dispose(); continue; }
+
+                    string? procPath = null;
+                    try { procPath = proc.MainModule?.FileName; } catch { /* access denied on 32/64 mismatch */ }
+
+                    if (procPath is not null
+                        && !procPath.StartsWith(normalizedDir, StringComparison.OrdinalIgnoreCase))
+                    {
+                        proc.Dispose();
+                        continue;
+                    }
+
+                    lock (_lock)
+                    {
+                        if (Status != ServerStatus.Stopped) { proc.Dispose(); return false; }
+                        _process = proc;
+                        ProcessId = proc.Id;
+                        _startedServerDir = installDir;
+                        try { StartedAtUtc = proc.StartTime.ToUniversalTime(); } catch { StartedAtUtc = DateTime.UtcNow; }
+                        proc.EnableRaisingEvents = true;
+                        proc.Exited += OnExited;
+                    }
+
+                    TransitionTo(ServerStatus.Running);
+                    _logger.LogInformation("Attached to existing server process pid={Pid} name={Name}", proc.Id, name);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "TryAttach: could not inspect process {Name}", name);
+                    try { proc.Dispose(); } catch { }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void KillOrphanServerProcesses()
     {
         var installDir = _settings.ActiveServerDir;

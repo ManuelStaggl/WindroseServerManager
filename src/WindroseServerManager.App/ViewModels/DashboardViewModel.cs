@@ -177,6 +177,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
         _proc.StatusChanged += OnServerStatusChanged;
         _status = _proc.Status;
 
+        if (_proc.Status == ServerStatus.Stopped)
+            _proc.TryAttachToExistingProcess();
+
         localization.LanguageChanged += RaiseLocalizedDisplayBindings;
 
         _timer = new System.Timers.Timer(2000);

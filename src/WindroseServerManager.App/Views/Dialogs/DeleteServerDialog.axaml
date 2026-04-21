@@ -25,19 +25,17 @@
                        TextWrapping="Wrap" />
 
             <!-- Separator -->
-            <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" />
+            <Border Classes="divider" />
 
             <!-- Delete files checkbox -->
             <CheckBox x:Name="DeleteFilesCheck"
                       Content="{DynamicResource Server.Delete.WithFiles}" />
 
             <!-- Danger note (only visible when checkbox is checked) -->
-            <Border CornerRadius="6"
-                    Background="{DynamicResource BrandErrorBrush}"
-                    Padding="10,8"
+            <Border Classes="alert-error"
                     IsVisible="{Binding #DeleteFilesCheck.IsChecked}">
                 <TextBlock Classes="caption"
-                           Foreground="White"
+                           Foreground="{DynamicResource BrandErrorBrush}"
                            TextWrapping="Wrap"
                            Text="{DynamicResource Server.Delete.DangerNote}" />
             </Border>

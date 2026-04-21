@@ -45,8 +45,7 @@
                                Text="{DynamicResource Wizard.Step1.Label}" />
                 </StackPanel>
 
-                <Border Grid.Column="1" Height="1" VerticalAlignment="Top" Margin="4,11,4,0"
-                        Background="{DynamicResource BrandNavyBorderBrush}" />
+                <Border Grid.Column="1" Classes="divider" VerticalAlignment="Top" Margin="4,11,4,0" />
 
                 <!-- Step 2 -->
                 <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="6" HorizontalAlignment="Center">
@@ -102,7 +101,7 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBox Grid.Column="0"
                              Text="{Binding InstallDir, Mode=TwoWay}"
-                             Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
+                             PlaceholderText="{DynamicResource Installation.InstallDir.Placeholder}" />
                     <Button Grid.Column="1"
                             Margin="8,0,0,0"
                             Content="{DynamicResource Action.Browse}"

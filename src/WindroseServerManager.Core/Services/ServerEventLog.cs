@@ -53,6 +53,24 @@ public sealed class ServerEventLog : IServerEventLog
         catch (Exception ex) { _logger.LogDebug(ex, "Event subscriber threw"); }
     }
 
+    public async Task ClearAsync(CancellationToken ct = default)
+    {
+        await _lock.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            if (File.Exists(_filePath))
+                await File.WriteAllTextAsync(_filePath, string.Empty, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cannot clear event log {Path}", _filePath);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
     public async Task<IReadOnlyList<ServerEvent>> ReadRecentAsync(int maxCount = 100, CancellationToken ct = default)
     {
         await _lock.WaitAsync(ct).ConfigureAwait(false);

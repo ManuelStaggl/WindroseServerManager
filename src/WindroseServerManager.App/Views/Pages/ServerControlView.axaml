@@ -10,7 +10,7 @@
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Spacing="0">
         <TextBlock Classes="page-title" Text="{DynamicResource ServerControl.Title}" />
-        <TextBlock Classes="caption" Text="{DynamicResource ServerControl.Subtitle}" Margin="0,4,0,20" />
+        <TextBlock Classes="caption muted" Text="{DynamicResource ServerControl.Subtitle}" Margin="0,4,0,20" />
 
         <Border Classes="card" Margin="0,0,0,16">
             <StackPanel Spacing="16">
@@ -36,7 +36,7 @@
                     </StackPanel>
                 </StackPanel>
 
-                <Border Height="1" Background="{DynamicResource BrandNavyBorderBrush}" />
+                <Border Classes="divider" />
 
                 <TextBlock Classes="section-header" Text="{DynamicResource ServerControl.AutoThresholds}" />
                 <StackPanel Spacing="8">
@@ -62,7 +62,17 @@
 
         <Border Classes="card" Margin="0,0,0,16">
             <Grid RowDefinitions="Auto,*" MaxHeight="260">
-                <TextBlock Grid.Row="0" Classes="section-header" Text="{DynamicResource ServerControl.SessionHistory}" Margin="0,0,0,12" />
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                    <TextBlock Classes="section-header" Text="{DynamicResource ServerControl.SessionHistory}" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Classes="subtle"
+                            Command="{Binding ClearSessionHistoryCommand}"
+                            ToolTip.Tip="{DynamicResource ServerControl.ClearHistory.Tip}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="14" />
+                            <TextBlock Text="{DynamicResource ServerControl.Clear}" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding Events}">
                         <ItemsControl.ItemTemplate>
@@ -107,7 +117,7 @@
                 </Grid>
                 <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
                     <TextBox Grid.Column="0" Text="{Binding SearchQuery}"
-                             Watermark="{DynamicResource ServerControl.SearchLog}" />
+                             PlaceholderText="{DynamicResource ServerControl.SearchLog}" />
                     <TextBlock Grid.Column="1" Classes="caption" VerticalAlignment="Center" Margin="10,0,0,0"
                                Text="{Binding FilteredLinesDisplay}" />
                 </Grid>

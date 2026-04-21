@@ -42,29 +42,17 @@
                     Classes="card"
                     IsVisible="{Binding ServerCards.Count,
                                Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
-                <StackPanel HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Spacing="12"
-                            Margin="0,48">
-                    <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                               FontSize="40"
-                               Text="&#xE8C8;"
-                               HorizontalAlignment="Center"
-                               Foreground="{DynamicResource BrandTextMutedBrush}" />
-                    <TextBlock Classes="section-header"
-                               HorizontalAlignment="Center"
+                <StackPanel Classes="empty-state">
+                    <TextBlock Classes="empty-state-icon" Text="&#xE8C8;" />
+                    <TextBlock Classes="empty-state-title"
                                Text="{DynamicResource Server.Empty}" />
-                    <TextBlock Classes="body muted"
-                               HorizontalAlignment="Center"
-                               TextWrapping="Wrap"
-                               MaxWidth="360"
-                               TextAlignment="Center"
+                    <TextBlock Classes="empty-state-body"
                                Text="{DynamicResource Server.Empty.Hint}" />
                     <Button Classes="primary"
                             HorizontalAlignment="Center"
                             Content="{DynamicResource Server.AddNew}"
                             Command="{Binding AddServerCommand}"
-                            Margin="0,8,0,0" />
+                            Margin="0,4,0,0" />
                 </StackPanel>
             </Border>
 
@@ -93,7 +81,7 @@
                                                    Text="&#xE8C8;"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   Foreground="{DynamicResource BrandAlpineBlueBrush}" />
+                                                   Foreground="{DynamicResource BrandAmberBrush}" />
                                     </Border>
 
                                     <!-- Name + path + active badge -->
@@ -104,14 +92,9 @@
                                             <TextBlock Classes="body-emphasis"
                                                        VerticalAlignment="Center"
                                                        Text="{Binding Name}" />
-                                            <Border CornerRadius="4"
-                                                    Background="{DynamicResource BrandAmberBrush}"
-                                                    Padding="6,2"
-                                                    VerticalAlignment="Center"
+                                            <Border Classes="badge-accent"
                                                     IsVisible="{Binding IsActive}">
-                                                <TextBlock Classes="caption"
-                                                           Foreground="{DynamicResource BrandTextPrimaryBrush}"
-                                                           Text="{DynamicResource Server.Active}" />
+                                                <TextBlock Text="{DynamicResource Server.Active}" />
                                             </Border>
                                         </StackPanel>
                                         <TextBlock Classes="caption muted"
@@ -266,7 +249,7 @@
                                 <TextBlock Classes="body"
                                            Text="{DynamicResource Server.Name.Label}" />
                                 <TextBox Text="{Binding NewServerName, Mode=TwoWay}"
-                                         Watermark="{DynamicResource Server.Name.Hint}" />
+                                         PlaceholderText="{DynamicResource Server.Name.Hint}" />
                             </StackPanel>
 
                             <!-- Install dir -->
@@ -276,7 +259,7 @@
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBox Grid.Column="0"
                                              Text="{Binding NewInstallDir, Mode=TwoWay}"
-                                             Watermark="{DynamicResource Installation.InstallDir.Placeholder}" />
+                                             PlaceholderText="{DynamicResource Installation.InstallDir.Placeholder}" />
                                     <Button Grid.Column="1"
                                             Content="{DynamicResource Action.Browse}"
                                             Command="{Binding BrowseDirCommand}"

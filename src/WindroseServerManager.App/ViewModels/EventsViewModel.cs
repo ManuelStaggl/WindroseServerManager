@@ -219,6 +219,35 @@ public partial class EventsViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
+    private async Task ClearEventsAsync()
+    {
+        if (_logPath is null) return;
+        try
+        {
+            await _readLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (File.Exists(_logPath))
+                    await File.WriteAllTextAsync(_logPath, string.Empty).ConfigureAwait(false);
+                _lastReadPosition = 0;
+            }
+            finally { _readLock.Release(); }
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Events.Clear();
+                FilteredEvents.Clear();
+            });
+            _toasts.Info(Loc.Get("Toast.EventsCleared"));
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "ClearEvents failed");
+            _toasts.Error(ex.Message);
+        }
+    }
+
+    [RelayCommand]
     private async Task InstallWindrosePlusAsync()
     {
         var dir = _settings.ActiveServerDir;

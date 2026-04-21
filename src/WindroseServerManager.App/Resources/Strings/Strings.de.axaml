@@ -164,17 +164,26 @@
     <sys:String x:Key="Configuration.CombatDifficulty">Kampf-Schwierigkeit</sys:String>
     <sys:String x:Key="Configuration.CombatDifficulty.Tip">Beeinflusst Aggression und Taktik von Gegnern.</sys:String>
     <sys:String x:Key="Configuration.Parameters">Parameter</sys:String>
-    <sys:String x:Key="Configuration.MobHealth">Gegner-HP (0.2 – 5.0)</sys:String>
-    <sys:String x:Key="Configuration.MobDamage">Gegner-Schaden (0.2 – 5.0)</sys:String>
-    <sys:String x:Key="Configuration.ShipsHealth">Schiffs-HP Feind (0.4 – 5.0)</sys:String>
-    <sys:String x:Key="Configuration.ShipsDamage">Schiffs-Schaden Feind (0.2 – 2.5)</sys:String>
-    <sys:String x:Key="Configuration.BoardingDifficulty">Enter-Schwierigkeit (0.2 – 5.0)</sys:String>
-    <sys:String x:Key="Configuration.CoopMobScaling">Gegner-Skalierung Coop (0.0 – 2.0)</sys:String>
-    <sys:String x:Key="Configuration.CoopShipScaling">Schiffs-Skalierung Coop (0.0 – 2.0)</sys:String>
+    <sys:String x:Key="Configuration.MobHealth">Gegner-HP</sys:String>
+    <sys:String x:Key="Configuration.MobHealth.Desc">Trefferpunkte aller Gegner (Boote, Banden). 1,0 = Standard, höher = zähere Feinde.</sys:String>
+    <sys:String x:Key="Configuration.MobDamage">Gegner-Schaden</sys:String>
+    <sys:String x:Key="Configuration.MobDamage.Desc">Schaden aller Gegner. 1,0 = Standard, höher = gefährlichere Feinde.</sys:String>
+    <sys:String x:Key="Configuration.ShipsHealth">Schiffs-HP Feind</sys:String>
+    <sys:String x:Key="Configuration.ShipsHealth.Desc">Trefferpunkte feindlicher Schiffe. 1,0 = Standard, höher = härtere Seeschlachten.</sys:String>
+    <sys:String x:Key="Configuration.ShipsDamage">Schiffs-Schaden Feind</sys:String>
+    <sys:String x:Key="Configuration.ShipsDamage.Desc">Schaden feindlicher Schiffe. 1,0 = Standard, höher = gefährlichere Kanonenkugeln.</sys:String>
+    <sys:String x:Key="Configuration.BoardingDifficulty">Enter-Schwierigkeit</sys:String>
+    <sys:String x:Key="Configuration.BoardingDifficulty.Desc">Schwierigkeit beim Entern feindlicher Schiffe. 1,0 = Standard, höher = härtere Boardingkämpfe.</sys:String>
+    <sys:String x:Key="Configuration.CoopMobScaling">Gegner-Skalierung Coop</sys:String>
+    <sys:String x:Key="Configuration.CoopMobScaling.Desc">Wie stark Gegner mit jedem zusätzlichen Spieler stärker werden. 0,0 = keine Skalierung.</sys:String>
+    <sys:String x:Key="Configuration.CoopShipScaling">Schiffs-Skalierung Coop</sys:String>
+    <sys:String x:Key="Configuration.CoopShipScaling.Desc">Wie stark feindliche Schiffe mit jedem zusätzlichen Spieler stärker werden. 0,0 = keine Skalierung.</sys:String>
     <sys:String x:Key="Configuration.ValueFormat">Aktuell: {0:0.00} (1,0 = Standard)</sys:String>
     <sys:String x:Key="Configuration.CoopExploration">Coop / Exploration</sys:String>
     <sys:String x:Key="Configuration.CoopSharedQuests">Geteilte Quests (Coop)</sys:String>
+    <sys:String x:Key="Configuration.CoopSharedQuests.Desc">Alle Spieler teilen denselben Questfortschritt — Quests müssen nicht mehrfach abgeschlossen werden.</sys:String>
     <sys:String x:Key="Configuration.EasyExplore">Karte ohne Marker (schwerer)</sys:String>
+    <sys:String x:Key="Configuration.EasyExplore.Desc">Wenn aktiv, werden auf der Karte keine Landmarken-Marker angezeigt — erhöht die Erkundungs-Herausforderung.</sys:String>
     <sys:String x:Key="Configuration.SaveWorld">Welt speichern</sys:String>
     <sys:String x:Key="Configuration.OpenWorldDir">Welt-Ordner öffnen</sys:String>
     <sys:String x:Key="Configuration.NoWorldsHint">Keine Welten vorhanden — 'Neue Welt' erstellt eine mit Default-Werten.</sys:String>
@@ -210,6 +219,8 @@
     <sys:String x:Key="ServerControl.LogFolder">Log-Ordner</sys:String>
     <sys:String x:Key="ServerControl.Export">Export</sys:String>
     <sys:String x:Key="ServerControl.Clear">Leeren</sys:String>
+    <sys:String x:Key="ServerControl.ClearHistory.Tip">Sitzungsverlauf löschen</sys:String>
+    <sys:String x:Key="Toast.SessionHistoryCleared">Sitzungsverlauf geleert.</sys:String>
     <sys:String x:Key="ServerControl.SearchLog">Log durchsuchen...</sys:String>
     <sys:String x:Key="ServerControl.LinesFormat">{0} Zeilen</sys:String>
     <sys:String x:Key="ServerControl.Filter.All">Alle</sys:String>
@@ -576,6 +587,9 @@
     <sys:String x:Key="Events.Column.SteamId">Steam-ID</sys:String>
     <sys:String x:Key="Events.Filter.Placeholder">Filtern nach Name oder Typ…</sys:String>
     <sys:String x:Key="Events.Empty">Noch keine Ereignisse aufgezeichnet.</sys:String>
+    <sys:String x:Key="Events.Clear.Label">Leeren</sys:String>
+    <sys:String x:Key="Events.Clear.Tip">Gesamten Ereignisverlauf löschen</sys:String>
+    <sys:String x:Key="Toast.EventsCleared">Ereignisverlauf geleert.</sys:String>
     <sys:String x:Key="Events.OptOut.Title">WindrosePlus nicht aktiv</sys:String>
     <sys:String x:Key="Events.OptOut.Desc">Das Ereignislog benötigt WindrosePlus.</sys:String>
     <sys:String x:Key="Events.Badge.Join">BEITRITT</sys:String>
@@ -631,6 +645,9 @@
     <sys:String x:Key="Editor.Title">WindrosePlus-Konfiguration</sys:String>
     <sys:String x:Key="Editor.Subtitle">Einstellungen für das WindrosePlus-Mod (windrose_plus.json)</sys:String>
     <sys:String x:Key="Editor.Save">Speichern</sys:String>
+    <sys:String x:Key="Editor.ResetAll">Alle zurücksetzen</sys:String>
+    <sys:String x:Key="Editor.Reset.Tip">Auf Standardwert zurücksetzen</sys:String>
+    <sys:String x:Key="Editor.Password.ToggleTip">Passwort anzeigen / verbergen</sys:String>
     <sys:String x:Key="Editor.Saved">Konfiguration gespeichert.</sys:String>
     <sys:String x:Key="Editor.RestartRequired">Server muss neu gestartet werden, damit Änderungen wirksam werden.</sys:String>
     <sys:String x:Key="Editor.ValidationError">Ein oder mehrere Werte sind ungültig.</sys:String>

@@ -4,113 +4,102 @@
              xmlns:m="using:WindroseServerManager.Core.Models"
              x:Class="WindroseServerManager.App.Views.Pages.EventsView"
              x:DataType="vm:EventsViewModel">
-    <Panel Margin="24">
+    <Panel>
 
         <!-- Opt-out empty state -->
-        <StackPanel IsVisible="{Binding !IsWindrosePlusActive}"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-            <TextBlock Text="&#xE7C3;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                       FontSize="48" HorizontalAlignment="Center"
-                       Foreground="{DynamicResource BrandTextMutedBrush}" />
-            <TextBlock Text="{DynamicResource Events.OptOut.Title}"
-                       Classes="section-header" HorizontalAlignment="Center" />
-            <TextBlock Text="{DynamicResource Events.OptOut.Desc}"
-                       Classes="body" HorizontalAlignment="Center" TextAlignment="Center"
-                       Foreground="{DynamicResource BrandTextMutedBrush}" />
-            <Button Content="{DynamicResource WindrosePlus.OptOut.Cta}"
+        <StackPanel Classes="empty-state" IsVisible="{Binding !IsWindrosePlusActive}">
+            <TextBlock Classes="empty-state-icon" Text="&#xE7C3;" />
+            <TextBlock Classes="empty-state-title"
+                       Text="{DynamicResource Events.OptOut.Title}" />
+            <TextBlock Classes="empty-state-body"
+                       Text="{DynamicResource Events.OptOut.Desc}" />
+            <Button Classes="primary"
+                    Content="{DynamicResource WindrosePlus.OptOut.Cta}"
                     Command="{Binding InstallWindrosePlusCommand}"
-                    HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    HorizontalAlignment="Center"
+                    Margin="0,4,0,0" />
         </StackPanel>
 
         <!-- Normal content -->
         <Grid IsVisible="{Binding IsWindrosePlusActive}"
               RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
-        <StackPanel Grid.Row="0" Spacing="4">
-            <TextBlock Text="{DynamicResource Events.Title}" Classes="page-title" />
-        </StackPanel>
-
-        <TextBox Grid.Row="1"
-                 Text="{Binding FilterText, Mode=TwoWay}"
-                 PlaceholderText="{DynamicResource Events.Filter.Placeholder}" />
-
-        <Border Grid.Row="2" Classes="card" Padding="0">
-            <Grid>
-                <ProgressBar IsIndeterminate="True" Height="3"
-                             VerticalAlignment="Top" CornerRadius="8,8,0,0"
-                             IsVisible="{Binding IsLoading}" />
-
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Auto"
-                              IsVisible="{Binding HasEvents}">
-                    <ItemsControl ItemsSource="{Binding FilteredEvents}">
-                        <ItemsControl.Styles>
-                            <Style Selector="Border.event-row">
-                                <Setter Property="Transitions">
-                                    <Transitions>
-                                        <BrushTransition Property="Background" Duration="0:0:0.12" />
-                                    </Transitions>
-                                </Setter>
-                            </Style>
-                            <Style Selector="Border.event-row:pointerover">
-                                <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
-                            </Style>
-                        </ItemsControl.Styles>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="m:WindrosePlusEvent">
-                                <Border Classes="event-row"
-                                        Background="Transparent"
-                                        BorderBrush="{DynamicResource BrandNavyBorderBrush}"
-                                        BorderThickness="0,0,0,1"
-                                        Padding="16,10">
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
-
-                                        <!-- Type Badge -->
-                                        <Border Grid.Column="0"
-                                                CornerRadius="4" Padding="7,3"
-                                                Margin="0,0,14,0"
-                                                VerticalAlignment="Center"
-                                                Background="{Binding Type, Converter={x:Static vm:EventTypeToBrushConverter.Instance}}">
-                                            <TextBlock Text="{Binding Type, Converter={x:Static vm:EventTypeToLabelConverter.Instance}}"
-                                                       FontSize="10" FontWeight="SemiBold"
-                                                       Foreground="#FFFFFF"
-                                                       LetterSpacing="1" />
-                                        </Border>
-
-                                        <!-- Player Name -->
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Name}"
-                                                   FontSize="14" FontWeight="Medium"
-                                                   Foreground="{DynamicResource BrandTextPrimaryBrush}"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis" />
-
-                                        <!-- Timestamp -->
-                                        <TextBlock Grid.Column="2"
-                                                   Text="{Binding Timestamp, Converter={x:Static vm:TimestampToDateTimeLocalConverter.Instance}}"
-                                                   FontSize="12"
-                                                   Foreground="{DynamicResource BrandTextMutedBrush}"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Consolas,Courier New"
-                                                   Margin="16,0,0,0" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-
-                <!-- Empty State -->
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
-                            IsVisible="{Binding HasNoEvents}">
-                    <TextBlock Text="&#xE7C3;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                               FontSize="48" HorizontalAlignment="Center"
-                               Foreground="{DynamicResource BrandTextMutedBrush}" />
-                    <TextBlock Text="{DynamicResource Events.Empty}"
-                               Classes="section-header" HorizontalAlignment="Center" />
-                </StackPanel>
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <TextBlock Text="{DynamicResource Events.Title}" Classes="page-title"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="subtle"
+                        Command="{Binding ClearEventsCommand}"
+                        ToolTip.Tip="{DynamicResource Events.Clear.Tip}"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="14" VerticalAlignment="Center" />
+                        <TextBlock Text="{DynamicResource Events.Clear.Label}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </Grid>
-        </Border>
+
+            <TextBox Grid.Row="1"
+                     Text="{Binding FilterText, Mode=TwoWay}"
+                     PlaceholderText="{DynamicResource Events.Filter.Placeholder}" />
+
+            <Border Grid.Row="2" Classes="card" Padding="0">
+                <Grid>
+                    <ProgressBar IsIndeterminate="True" Height="3"
+                                 VerticalAlignment="Top" CornerRadius="8,8,0,0"
+                                 IsVisible="{Binding IsLoading}" />
+
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto"
+                                  IsVisible="{Binding HasEvents}">
+                        <ItemsControl ItemsSource="{Binding FilteredEvents}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="m:WindrosePlusEvent">
+                                    <Border Classes="list-row">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                            <!-- Type Badge: gefüllter Pill mit typbasierter Farbe -->
+                                            <Border Grid.Column="0"
+                                                    CornerRadius="4" Padding="8,3"
+                                                    Margin="0,0,14,0"
+                                                    MinWidth="72"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding Type, Converter={x:Static vm:EventTypeToBrushConverter.Instance}}">
+                                                <TextBlock Text="{Binding Type, Converter={x:Static vm:EventTypeToLabelConverter.Instance}}"
+                                                           FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="#FFFFFF"
+                                                           LetterSpacing="0.5"
+                                                           HorizontalAlignment="Center" />
+                                            </Border>
+
+                                            <!-- Player Name -->
+                                            <TextBlock Grid.Column="1"
+                                                       Classes="body"
+                                                       Text="{Binding Name}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" />
+
+                                            <!-- Timestamp -->
+                                            <TextBlock Grid.Column="2" Classes="mono-sm"
+                                                       Text="{Binding Timestamp, Converter={x:Static vm:TimestampToDateTimeLocalConverter.Instance}}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="16,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Empty State -->
+                    <StackPanel Classes="empty-state" IsVisible="{Binding HasNoEvents}">
+                        <TextBlock Classes="empty-state-icon" Text="&#xE7C3;" />
+                        <TextBlock Classes="empty-state-title"
+                                   Text="{DynamicResource Events.Empty}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid><!-- /Normal content -->
 
     </Panel>

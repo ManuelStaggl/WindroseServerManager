@@ -34,6 +34,16 @@
             <SolidColorBrush x:Key="BrandWarningBrush" Color="{StaticResource BrandWarningColor}" />
             <SolidColorBrush x:Key="BrandErrorBrush" Color="{StaticResource BrandErrorColor}" />
 
+            <!-- Subtle (translucent) variants für Alert-Banner, Hover-Tints, Selection-Bg -->
+            <SolidColorBrush x:Key="BrandAmberSubtleBrush" Color="{StaticResource BrandAmberColor}" Opacity="0.14" />
+            <SolidColorBrush x:Key="BrandSuccessSubtleBrush" Color="{StaticResource BrandSuccessColor}" Opacity="0.14" />
+            <SolidColorBrush x:Key="BrandWarningSubtleBrush" Color="{StaticResource BrandWarningColor}" Opacity="0.14" />
+            <SolidColorBrush x:Key="BrandErrorSubtleBrush" Color="{StaticResource BrandErrorColor}" Opacity="0.14" />
+
+            <!-- Info-Alert teilt sich Amber-Accent-Look, aber auf Navy-Surface-Basis -->
+            <SolidColorBrush x:Key="BrandInfoBrush" Color="{StaticResource BrandAmberColor}" />
+            <SolidColorBrush x:Key="BrandInfoSubtleBrush" Color="{StaticResource BrandAmberColor}" Opacity="0.10" />
+
             <!-- FluentAvalonia / System accent overrides (Amber) -->
             <Color x:Key="SystemAccentColor">#D97706</Color>
             <Color x:Key="SystemAccentColorDark1">#B45309</Color>

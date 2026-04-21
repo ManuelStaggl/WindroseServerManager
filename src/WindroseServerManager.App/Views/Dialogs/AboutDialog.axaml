@@ -55,8 +55,7 @@
                             Click="OnLinkClick" />
                 </StackPanel>
 
-                <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,8,0,0"
-                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                <TextBlock Classes="caption muted" TextWrapping="Wrap" Margin="0,8,0,0"
                            Text="{DynamicResource About.Disclaimer}" />
             </StackPanel>
 
@@ -84,7 +83,7 @@
                         BorderThickness="1">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <TextBlock x:Name="WindrosePlusLicenseText"
-                                   FontFamily="Consolas, 'Courier New', monospace"
+                                   Classes="mono-sm"
                                    FontSize="11"
                                    TextWrapping="Wrap" />
                     </ScrollViewer>

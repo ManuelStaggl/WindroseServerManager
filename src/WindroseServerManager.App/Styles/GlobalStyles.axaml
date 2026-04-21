@@ -24,13 +24,44 @@
         <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
     </Style>
 
+    <!-- Body SemiBold: für Listen-Einträge, Karten-Titel, Namen -->
+    <Style Selector="TextBlock.body-emphasis">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+
+    <!-- Body klein: für dichte Formulare (parameter labels, secondary meta), 13px -->
+    <Style Selector="TextBlock.body-sm">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+
     <Style Selector="TextBlock.caption">
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
     </Style>
 
+    <!-- Caption klein: für Badges, Timestamps, Helper-Text, 11px -->
+    <Style Selector="TextBlock.caption-sm">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+    </Style>
+
     <Style Selector="TextBlock.muted">
         <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
+    </Style>
+
+    <!-- Monospace: für Log-Zeilen, Timestamps in Listen, Invite-Codes -->
+    <Style Selector="TextBlock.mono">
+        <Setter Property="FontFamily" Value="Consolas,Courier New" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.mono-sm">
+        <Setter Property="FontFamily" Value="Consolas,Courier New" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
     </Style>
 
     <Style Selector="TextBlock.group-label">
@@ -46,6 +77,23 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <!-- Card mit Hover-Tint: für interaktive Listenelemente (Mod-Cards, Server-Cards) -->
+    <Style Selector="Border.card-hover">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Border.card-hover:pointerover">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
     </Style>
 
     <!-- ==================== BUTTONS ==================== -->
@@ -351,8 +399,308 @@
         <Setter Property="Opacity" Value="0.6" />
     </Style>
     <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-        <Setter Property="Fill" Value="#2AD97706" />
+        <Setter Property="Fill" Value="{DynamicResource BrandAmberSubtleBrush}" />
         <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- ==================== PAGE ROOT ==================== -->
+
+    <!-- Einheitliches Outer-Padding aller Pages: auf den Panel/Grid/ScrollViewer anwenden,
+         der direkter Content-Root der View ist. Shell fügt bereits 24/12/24/24 ContentControl-Margin hinzu,
+         daher ist das interne Page-Padding bewusst "0" — Pages steuern Innenabstand über Sections. -->
+    <Style Selector="UserControl">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+
+    <!-- ==================== BADGES ==================== -->
+
+    <!-- Neutral-Badge: für Metadaten (Zeitstempel-Pill, Nexus-Status, Backup-Tag) -->
+    <Style Selector="Border.badge">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge > TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+    </Style>
+
+    <!-- Akzent-Badge: gefülltes Amber (aktiver Server, Primary-Tag) -->
+    <Style Selector="Border.badge-accent">
+        <Setter Property="Background" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge-accent > TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <!-- Status-Badges: subtiler Hintergrund + kräftige Schrift -->
+    <Style Selector="Border.badge-success">
+        <Setter Property="Background" Value="{DynamicResource BrandSuccessSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandSuccessBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge-success > TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandSuccessBrush}" />
+    </Style>
+
+    <Style Selector="Border.badge-error">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge-error > TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+
+    <Style Selector="Border.badge-warning">
+        <Setter Property="Background" Value="{DynamicResource BrandWarningSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandWarningBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge-warning > TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandWarningBrush}" />
+    </Style>
+
+    <!-- ==================== ICON BUTTONS ==================== -->
+
+    <!-- Standard Icon-Button: quadratisch 32x32, nur Icon, kein Text -->
+    <Style Selector="Button.icon-btn">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="MinWidth" Value="32" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.icon-btn /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Button.icon-btn:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.icon-btn:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberPressBrush}" />
+    </Style>
+
+    <!-- Icon-Button danger Variante: Hover/Press wird rot (für Löschen, Kick, Ban) -->
+    <Style Selector="Button.icon-btn.danger:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+
+    <!-- Icon-Button naked: ohne Border, rein transparent (für Karten-interne Toolbar-Buttons) -->
+    <Style Selector="Button.icon-btn.naked">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.icon-btn.naked /template/ ContentPresenter">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- ==================== ROW ACTION BUTTON ==================== -->
+
+    <!-- Kompakter Outlined-Button für Listen-Actions (Kick/Ban, Row-Actions). -->
+    <Style Selector="Button.btn-row">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinWidth" Value="0" />
+    </Style>
+    <Style Selector="Button.btn-row /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Button.btn-row:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
+    </Style>
+
+    <!-- Row-Action danger Variante: Border leicht rot, Text rot; Hover füllt mit Error-Farbe -->
+    <Style Selector="Button.btn-row.danger">
+        <Setter Property="Foreground" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+    <Style Selector="Button.btn-row.danger /template/ ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+    <Style Selector="Button.btn-row.danger:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <!-- ==================== LIST ROW (hover-tint) ==================== -->
+
+    <!-- Listen-Zeilen mit subtilem Hover-Tint (Players, Events). Verwendung: <Border Classes="list-row"> -->
+    <Style Selector="Border.list-row">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Border.list-row:pointerover">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+    </Style>
+
+    <!-- ==================== FEATURE TILE ==================== -->
+
+    <!-- Kleine Info-Kachel (Feature-Übersicht in Wizards, Onboarding). Verwendung: <Border Classes="feature-tile"> -->
+    <Style Selector="Border.feature-tile">
+        <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+
+    <!-- ==================== ALERT BANNERS ==================== -->
+
+    <!-- Base-Alert: 3px Akzent-Streifen links + subtiler Füll-Hintergrund + Text-Icon davor.
+         Verwendung: Border mit Class + Grid innen (ColumnDefinitions="Auto,*,Auto") für Icon/Text/Action -->
+    <Style Selector="Border.alert">
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1,1,1,1" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+    <Style Selector="Border.alert-info">
+        <Setter Property="Background" Value="{DynamicResource BrandInfoSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandInfoBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+    <Style Selector="Border.alert-success">
+        <Setter Property="Background" Value="{DynamicResource BrandSuccessSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandSuccessBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+    <Style Selector="Border.alert-warning">
+        <Setter Property="Background" Value="{DynamicResource BrandWarningSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandWarningBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+    <Style Selector="Border.alert-error">
+        <Setter Property="Background" Value="{DynamicResource BrandErrorSubtleBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BrandErrorBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+
+    <!-- ==================== EMPTY STATE ==================== -->
+
+    <!-- Container für Empty-States: zentriert, großzügig. Innen: Icon (TextBlock.empty-state-icon) +
+         Titel (TextBlock.empty-state-title) + Body (TextBlock.empty-state-body) + optionaler Action-Button -->
+    <Style Selector="StackPanel.empty-state">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Spacing" Value="12" />
+        <Setter Property="Margin" Value="0,48,0,48" />
+    </Style>
+    <Style Selector="TextBlock.empty-state-icon">
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="48" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.empty-state-title">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextPrimaryBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.empty-state-body">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="MaxWidth" Value="420" />
+    </Style>
+
+    <!-- ==================== DIVIDER ==================== -->
+
+    <!-- Horizontaler 1px-Trenner: Verwendung <Border Classes="divider" /> statt Rectangle -->
+    <Style Selector="Border.divider">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource BrandNavyBorderBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- ==================== STATUS DOT ==================== -->
+
+    <!-- Kleiner farbiger Kreis (Firewall-Status, Online-Indicator). Verwendung: <Ellipse Classes="status-dot status-success" /> -->
+    <Style Selector="Ellipse.status-dot">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Height" Value="10" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Ellipse.status-dot.status-success">
+        <Setter Property="Fill" Value="{DynamicResource BrandSuccessBrush}" />
+    </Style>
+    <Style Selector="Ellipse.status-dot.status-warning">
+        <Setter Property="Fill" Value="{DynamicResource BrandWarningBrush}" />
+    </Style>
+    <Style Selector="Ellipse.status-dot.status-error">
+        <Setter Property="Fill" Value="{DynamicResource BrandErrorBrush}" />
+    </Style>
+    <Style Selector="Ellipse.status-dot.status-muted">
+        <Setter Property="Fill" Value="{DynamicResource BrandTextMutedBrush}" />
     </Style>
 
 </Styles>

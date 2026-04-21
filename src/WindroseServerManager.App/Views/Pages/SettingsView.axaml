@@ -11,7 +11,7 @@
 
             <!-- ═══ HEADER ═══ -->
             <TextBlock Classes="page-title" Text="{DynamicResource Settings.Title}" />
-            <TextBlock Classes="caption" Text="{DynamicResource Settings.Subtitle}" Margin="0,4,0,0" />
+            <TextBlock Classes="caption muted" Text="{DynamicResource Settings.Subtitle}" Margin="0,4,0,0" />
 
             <!-- ═══════════════════════════════════════
                  GRUPPE: DARSTELLUNG
@@ -104,19 +104,17 @@
                                    Text="{DynamicResource Settings.Network.Hint}" />
                     </StackPanel>
 
-                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+                    <Border Classes="divider" Margin="0,2" />
 
                     <!-- Firewall -->
                     <StackPanel Spacing="10">
-                        <TextBlock Classes="section-header" FontSize="14"
+                        <TextBlock Classes="body-emphasis"
                                    Text="{DynamicResource Settings.Firewall.Title}" />
                         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                             <Panel Width="10" Height="10">
-                                <Ellipse Width="10" Height="10"
-                                         Fill="{DynamicResource BrandSuccessBrush}"
+                                <Ellipse Classes="status-dot status-success"
                                          IsVisible="{Binding IsFirewallRuleInstalled}" />
-                                <Ellipse Width="10" Height="10"
-                                         Fill="{DynamicResource BrandTextMutedBrush}"
+                                <Ellipse Classes="status-dot status-muted"
                                          IsVisible="{Binding !IsFirewallRuleInstalled}" />
                             </Panel>
                             <TextBlock Classes="body" Text="{DynamicResource Settings.Firewall.Installed}"
@@ -144,11 +142,11 @@
                                    Text="{DynamicResource Settings.Firewall.Hint}" />
                     </StackPanel>
 
-                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+                    <Border Classes="divider" Margin="0,2" />
 
                     <!-- Autostart -->
                     <StackPanel Spacing="6">
-                        <TextBlock Classes="section-header" FontSize="14"
+                        <TextBlock Classes="body-emphasis"
                                    Text="{DynamicResource Settings.AutoStart.Title}" />
                         <CheckBox Content="{DynamicResource Settings.AutoStart.Label}"
                                   IsChecked="{Binding AutoStartEnabled}" />
@@ -185,31 +183,27 @@
                                 IsEnabled="{Binding HasServerConfigured}" />
                     </StackPanel>
 
-                    <Rectangle Height="1" Fill="{DynamicResource BrandNavyBorderBrush}" Margin="0,2" />
+                    <Border Classes="divider" Margin="0,2" />
 
                     <!-- RCON Passwort -->
                     <StackPanel Spacing="10">
-                        <TextBlock Classes="section-header" FontSize="14"
+                        <TextBlock Classes="body-emphasis"
                                    Text="{DynamicResource Settings.WindrosePlus.RconPassword}" />
                         <TextBlock Classes="caption" TextWrapping="Wrap"
                                    Text="{DynamicResource Settings.WindrosePlus.RconPasswordHint}" />
 
                         <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8"
                               IsVisible="{Binding RconPassword, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                            <TextBox Grid.Column="0"
+                            <TextBox Grid.Column="0" Classes="mono"
                                      Text="{Binding RconPassword}"
                                      IsReadOnly="True"
-                                     PasswordChar="{Binding ShowRconPassword, Converter={x:Static vm:BoolToPasswordCharConverter.Instance}}"
-                                     FontFamily="Consolas,Courier New" />
-                            <Button Grid.Column="1"
+                                     PasswordChar="{Binding ShowRconPassword, Converter={x:Static vm:BoolToPasswordCharConverter.Instance}}" />
+                            <Button Grid.Column="1" Classes="icon-btn"
+                                    Content="{Binding ShowRconPassword, Converter={x:Static vm:EnabledToEyeIconConverter.Instance}}"
                                     Command="{Binding ToggleShowRconPasswordCommand}"
-                                    ToolTip.Tip="{DynamicResource Settings.WindrosePlus.RconPassword}">
-                                <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                           Text="{Binding ShowRconPassword, Converter={x:Static vm:EnabledToEyeIconConverter.Instance}}" />
-                            </Button>
-                            <Button Grid.Column="2"
+                                    ToolTip.Tip="{DynamicResource Settings.WindrosePlus.RconPassword}" />
+                            <Button Grid.Column="2" Classes="icon-btn"
                                     Content="&#xE8C8;"
-                                    FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
                                     Command="{Binding CopyRconPasswordCommand}"
                                     ToolTip.Tip="{DynamicResource Action.Copy}" />
                         </Grid>
@@ -226,15 +220,13 @@
             <!-- ═══════════════════════════════════════
                  SPEICHERN
             ═══════════════════════════════════════ -->
-            <Border Margin="0,20,0,0" Padding="16"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}"
-                    BorderBrush="{DynamicResource BrandNavyBorderBrush}"
-                    BorderThickness="1" CornerRadius="8">
+            <Border Classes="card" Margin="0,20,0,0"
+                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
-                        <TextBlock Classes="body" FontWeight="SemiBold"
+                        <TextBlock Classes="body-emphasis"
                                    Text="{DynamicResource Settings.Save.Title}" />
-                        <TextBlock Classes="caption"
+                        <TextBlock Classes="caption muted"
                                    Text="{DynamicResource Settings.Save.Hint}" />
                     </StackPanel>
                     <Button Grid.Column="1" Classes="primary"

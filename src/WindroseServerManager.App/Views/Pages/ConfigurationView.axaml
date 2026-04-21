@@ -10,16 +10,20 @@
     <ScrollViewer>
         <StackPanel Margin="0,0,0,24">
             <TextBlock Classes="page-title" Text="{DynamicResource Configuration.Title}" />
-            <TextBlock Classes="caption" Text="{DynamicResource Configuration.Subtitle}" Margin="0,4,0,20" />
+            <TextBlock Classes="caption muted" Text="{DynamicResource Configuration.Subtitle}"
+                       Margin="0,4,0,20" />
 
-            <Border Classes="card" Margin="0,0,0,16"
-                    BorderBrush="{DynamicResource BrandWarningBrush}" BorderThickness="1">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="!" FontSize="18" FontWeight="Bold"
-                               Foreground="{DynamicResource BrandWarningBrush}" VerticalAlignment="Center" />
-                    <TextBlock Classes="body" TextWrapping="Wrap"
+            <Border Classes="alert-warning" Margin="0,0,0,16">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0"
+                               Text="&#xE7BA;"
+                               FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                               FontSize="16" VerticalAlignment="Center"
+                               Foreground="{DynamicResource BrandWarningBrush}" />
+                    <TextBlock Grid.Column="1" Classes="body" TextWrapping="Wrap"
+                               VerticalAlignment="Center"
                                Text="{DynamicResource Configuration.StopHint}" />
-                </StackPanel>
+                </Grid>
             </Border>
 
             <Border Classes="card" Margin="0,0,0,16">
@@ -59,7 +63,7 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="4" Margin="8,0,0,0">
                             <TextBlock Classes="caption" Text="{DynamicResource Configuration.P2pProxy}" />
-                            <TextBox Text="{Binding P2pProxyAddress}" Watermark="127.0.0.1"
+                            <TextBox Text="{Binding P2pProxyAddress}" PlaceholderText="127.0.0.1"
                                      ToolTip.Tip="{DynamicResource Configuration.P2pProxy.Tip}" />
                         </StackPanel>
                     </Grid>
@@ -74,14 +78,11 @@
                                 IsVisible="{Binding PersistentServerId, Converter={x:Static ObjectConverters.IsNotNull}}"
                                 ToolTip.Tip="{DynamicResource Configuration.PersistentServerId.Tip}">
                         <TextBlock Classes="caption" Text="{DynamicResource Configuration.PersistentServerId}" />
-                        <SelectableTextBlock
-                                   FontFamily="Consolas, Courier New, monospace"
-                                   FontSize="12"
+                        <SelectableTextBlock Classes="mono-sm"
                                    Foreground="{DynamicResource BrandTextPrimaryBrush}"
                                    Text="{Binding PersistentServerId}"
                                    TextWrapping="Wrap" />
-                        <TextBlock Classes="caption"
-                                   Foreground="{DynamicResource BrandTextMutedBrush}"
+                        <TextBlock Classes="caption muted"
                                    Text="{DynamicResource Configuration.PersistentServerId.Hint}" />
                     </StackPanel>
 
@@ -140,9 +141,7 @@
                             <StackPanel Grid.Column="1" Spacing="4">
                                 <TextBlock Classes="caption" Text="{DynamicResource Configuration.IslandId}" />
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                    <SelectableTextBlock Grid.Column="0"
-                                               FontFamily="Consolas, Courier New, monospace"
-                                               FontSize="12"
+                                    <SelectableTextBlock Grid.Column="0" Classes="mono-sm"
                                                Foreground="{DynamicResource BrandTextPrimaryBrush}"
                                                TextWrapping="Wrap"
                                                VerticalAlignment="Center"
@@ -185,10 +184,12 @@
 
                         <TextBlock Classes="section-header" Text="{DynamicResource Configuration.Parameters}" Margin="0,12,0,0" />
                         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                              ColumnSpacing="24" RowSpacing="12">
+                              ColumnSpacing="24" RowSpacing="16">
 
                             <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.MobHealth}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.MobHealth}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.MobHealth.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
                                             Value="{Binding MobHealth}" />
@@ -198,7 +199,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.MobDamage}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.MobDamage}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.MobDamage.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
                                             Value="{Binding MobDamage}" />
@@ -208,7 +211,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.ShipsHealth}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.ShipsHealth}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.ShipsHealth.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.4" Maximum="5.0" TickFrequency="0.1"
                                             Value="{Binding ShipsHealth}" />
@@ -218,7 +223,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="1" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.ShipsDamage}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.ShipsDamage}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.ShipsDamage.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="2.5" TickFrequency="0.1"
                                             Value="{Binding ShipsDamage}" />
@@ -228,7 +235,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="2" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.BoardingDifficulty}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.BoardingDifficulty}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.BoardingDifficulty.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.2" Maximum="5.0" TickFrequency="0.1"
                                             Value="{Binding BoardingDifficulty}" />
@@ -238,7 +247,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Grid.Row="2" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.CoopMobScaling}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.CoopMobScaling}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.CoopMobScaling.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.0" Maximum="2.0" TickFrequency="0.1"
                                             Value="{Binding CoopStatsCorrection}" />
@@ -248,7 +259,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="0" Grid.Row="3" Spacing="4">
-                                <TextBlock Classes="caption" Text="{DynamicResource Configuration.CoopShipScaling}" />
+                                <TextBlock Classes="body-sm" FontWeight="SemiBold" Text="{DynamicResource Configuration.CoopShipScaling}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                                           Text="{DynamicResource Configuration.CoopShipScaling.Desc}" />
                                 <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
                                     <Slider Grid.Column="0" Minimum="0.0" Maximum="2.0" TickFrequency="0.1"
                                             Value="{Binding CoopShipStatsCorrection}" />
@@ -259,9 +272,17 @@
                         </Grid>
 
                         <TextBlock Classes="section-header" Text="{DynamicResource Configuration.CoopExploration}" Margin="0,12,0,0" />
-                        <StackPanel Spacing="8">
-                            <CheckBox Content="{DynamicResource Configuration.CoopSharedQuests}" IsChecked="{Binding CoopSharedQuests}" />
-                            <CheckBox Content="{DynamicResource Configuration.EasyExplore}" IsChecked="{Binding EasyExplore}" />
+                        <StackPanel Spacing="12">
+                            <StackPanel Spacing="2">
+                                <CheckBox Content="{DynamicResource Configuration.CoopSharedQuests}" IsChecked="{Binding CoopSharedQuests}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap" Margin="22,0,0,0"
+                                           Text="{DynamicResource Configuration.CoopSharedQuests.Desc}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <CheckBox Content="{DynamicResource Configuration.EasyExplore}" IsChecked="{Binding EasyExplore}" />
+                                <TextBlock Classes="caption muted" TextWrapping="Wrap" Margin="22,0,0,0"
+                                           Text="{DynamicResource Configuration.EasyExplore.Desc}" />
+                            </StackPanel>
                         </StackPanel>
 
                         <Grid Margin="0,12,0,0" ColumnDefinitions="Auto,*,Auto">

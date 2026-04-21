@@ -133,6 +133,14 @@ public partial class EditorViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void ResetAll()
+    {
+        foreach (var group in Categories)
+            foreach (var entry in group.Entries)
+                entry.ResetCommand.Execute(null);
+    }
+
     private bool CanExecuteSave() => CanSave;
 
     [RelayCommand(CanExecute = nameof(CanExecuteSave))]

@@ -13,11 +13,9 @@
 
             <!-- Tile: Players -->
             <Border Grid.Row="0" Grid.Column="0"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F465;" />
@@ -29,11 +27,9 @@
 
             <!-- Tile: Kick & Ban -->
             <Border Grid.Row="0" Grid.Column="1"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F6AB;" />
@@ -45,11 +41,9 @@
 
             <!-- Tile: Broadcast -->
             <Border Grid.Row="0" Grid.Column="2"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F4E2;" />
@@ -61,11 +55,9 @@
 
             <!-- Tile: Events -->
             <Border Grid.Row="1" Grid.Column="0"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F4DC;" />
@@ -77,11 +69,9 @@
 
             <!-- Tile: Sea Chart -->
             <Border Grid.Row="1" Grid.Column="1"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x1F5FA;" />
@@ -93,11 +83,9 @@
 
             <!-- Tile: INI-Editor -->
             <Border Grid.Row="1" Grid.Column="2"
-                    CornerRadius="6"
-                    Padding="10 8"
-                    Background="{DynamicResource BrandNavySurfaceAltBrush}">
+                    Classes="feature-tile">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock FontSize="18"
+                    <TextBlock FontSize="16"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource BrandAmberBrush}"
                                Text="&#x2699;" />
@@ -136,39 +124,20 @@
                            ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconTooltip}" />
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto"
                       ColumnSpacing="4">
-                    <TextBox Grid.Column="0"
+                    <TextBox Grid.Column="0" Classes="mono"
                              x:Name="RconPasswordBox"
                              PasswordChar="•"
-                             FontFamily="Consolas,Courier New"
                              Text="{Binding RconPassword, Mode=TwoWay}" />
-                    <Button Grid.Column="1"
-                            Classes="subtle"
-                            Width="32" Height="32"
-                            Padding="0"
+                    <Button Grid.Column="1" Classes="icon-btn"
+                            Content="&#xE7B3;"
                             Click="OnTogglePasswordVisibility"
-                            ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconLabel}">
-                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                   FontSize="14"
-                                   Text="&#xE7B3;" />
-                    </Button>
-                    <Button Grid.Column="2"
-                            Classes="subtle"
-                            Width="32" Height="32"
-                            Padding="0"
-                            Click="OnCopyPassword">
-                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                   FontSize="14"
-                                   Text="&#xE8C8;" />
-                    </Button>
-                    <Button Grid.Column="3"
-                            Classes="subtle"
-                            Width="32" Height="32"
-                            Padding="0"
-                            Click="OnRegeneratePassword">
-                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                   FontSize="14"
-                                   Text="&#xE72C;" />
-                    </Button>
+                            ToolTip.Tip="{DynamicResource Wizard.WindrosePlus.RconLabel}" />
+                    <Button Grid.Column="2" Classes="icon-btn"
+                            Content="&#xE8C8;"
+                            Click="OnCopyPassword" />
+                    <Button Grid.Column="3" Classes="icon-btn"
+                            Content="&#xE72C;"
+                            Click="OnRegeneratePassword" />
                 </Grid>
             </StackPanel>
 
@@ -196,7 +165,7 @@
                            Text="{DynamicResource Wizard.WindrosePlus.SteamIdLabel}" />
                 <TextBox x:Name="SteamIdBox"
                          Text="{Binding AdminSteamId, Mode=TwoWay}"
-                         Watermark="{DynamicResource Wizard.WindrosePlus.SteamIdPlaceholder}"
+                         PlaceholderText="{DynamicResource Wizard.WindrosePlus.SteamIdPlaceholder}"
                          LostFocus="OnSteamIdLostFocus" />
                 <TextBlock Classes="caption"
                            TextWrapping="Wrap"

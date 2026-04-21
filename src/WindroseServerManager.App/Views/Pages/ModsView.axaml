@@ -20,20 +20,14 @@
 
                 <!-- Readiness badge -->
                 <Border Grid.Row="0" Grid.Column="2"
-                        CornerRadius="12" Padding="10,4"
-                        IsVisible="{Binding !IsReady}"
-                        Background="{DynamicResource BrandWarningBrush}">
-                    <TextBlock Text="{DynamicResource Mods.SafetyCard.NotReady}"
-                               FontSize="12" FontWeight="SemiBold"
-                               Foreground="#FFFFFF" />
+                        Classes="badge-warning"
+                        IsVisible="{Binding !IsReady}">
+                    <TextBlock Text="{DynamicResource Mods.SafetyCard.NotReady}" />
                 </Border>
                 <Border Grid.Row="0" Grid.Column="2"
-                        CornerRadius="12" Padding="10,4"
-                        IsVisible="{Binding IsReady}"
-                        Background="{DynamicResource BrandSuccessBrush}">
-                    <TextBlock Text="{DynamicResource Mods.SafetyCard.Ready}"
-                               FontSize="12" FontWeight="SemiBold"
-                               Foreground="#FFFFFF" />
+                        Classes="badge-success"
+                        IsVisible="{Binding IsReady}">
+                    <TextBlock Text="{DynamicResource Mods.SafetyCard.Ready}" />
                 </Border>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
@@ -45,7 +39,7 @@
                 <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,10,0,0"
                       ColumnDefinitions="*,Auto">
                     <TextBox Grid.Column="0" Text="{Binding ModsDirectory}" IsReadOnly="True"
-                             Watermark="{DynamicResource Mods.DirWatermark}" />
+                             PlaceholderText="{DynamicResource Mods.DirWatermark}" />
                     <Button Grid.Column="1" Classes="subtle" Margin="8,0,0,0"
                             Content="{DynamicResource Mods.OpenModsDir}"
                             Command="{Binding OpenModsDirCommand}" />
@@ -107,16 +101,11 @@
         <!-- Mod-Liste / Drop-Zone -->
         <Grid Grid.Row="4" Background="Transparent" DragDrop.AllowDrop="True">
             <!-- Empty-State -->
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
-                        IsVisible="{Binding HasNoMods}" Spacing="8">
-                <TextBlock Text="&#xE7BA;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                           FontSize="48" HorizontalAlignment="Center"
-                           Foreground="{DynamicResource BrandTextMutedBrush}" />
-                <TextBlock Classes="section-header" HorizontalAlignment="Center"
+            <StackPanel Classes="empty-state" IsVisible="{Binding HasNoMods}">
+                <TextBlock Classes="empty-state-icon" Text="&#xE7BA;" />
+                <TextBlock Classes="empty-state-title"
                            Text="{DynamicResource Mods.Empty.Title}" />
-                <TextBlock HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="400"
-                           TextWrapping="Wrap"
-                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                <TextBlock Classes="empty-state-body"
                            Text="{DynamicResource Mods.Empty.Body}" />
             </StackPanel>
 
@@ -125,71 +114,23 @@
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Groups}">
-                    <ItemsControl.Styles>
-                        <!-- Hover-State (#6) für Mod-Cards -->
-                        <Style Selector="Border.mod-card">
-                            <Setter Property="Transitions">
-                                <Transitions>
-                                    <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
-                                </Transitions>
-                            </Setter>
-                        </Style>
-                        <Style Selector="Border.mod-card:pointerover">
-                            <Setter Property="BorderBrush" Value="{DynamicResource BrandAmberBrush}" />
-                        </Style>
-                        <!-- Naked Icon-Button für Chevron (#3) -->
-                        <Style Selector="Button.naked-icon">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Padding" Value="4" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </Style>
-                        <Style Selector="Button.naked-icon:pointerover /template/ ContentPresenter">
-                            <Setter Property="Background" Value="Transparent" />
-                        </Style>
-                        <!-- Icon-only danger-Button für Remove (#7) -->
-                        <Style Selector="Button.icon-danger">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Padding" Value="8,6" />
-                            <Setter Property="Foreground" Value="{DynamicResource BrandTextMutedBrush}" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </Style>
-                        <Style Selector="Button.icon-danger:pointerover /template/ ContentPresenter">
-                            <Setter Property="Background" Value="{DynamicResource BrandErrorBrush}" />
-                            <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
-                        </Style>
-                        <!-- Toggle-Icon-Button (Eye / EyeOff) für Sub-Paks (#2) -->
-                        <Style Selector="Button.icon-toggle">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Padding" Value="8,6" />
-                            <Setter Property="Foreground" Value="{DynamicResource BrandTextSecondaryBrush}" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </Style>
-                        <Style Selector="Button.icon-toggle:pointerover /template/ ContentPresenter">
-                            <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
-                        </Style>
-                    </ItemsControl.Styles>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:ModGroupViewModel">
-                            <Border Classes="card mod-card" Margin="0,0,0,8" Padding="16,12"
-                                    BorderBrush="Transparent" BorderThickness="1">
+                            <Border Classes="card-hover" Margin="0,0,0,8" Padding="16,12">
                                 <StackPanel Spacing="10">
                                     <!-- Mod-Header-Row -->
                                     <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
-                                        <!-- Chevron (#3: naked icon, nur bei Bundle) -->
-                                        <Button Grid.Column="0" Classes="naked-icon" Margin="0,0,8,0"
+                                        <!-- Chevron (nur bei Bundle) -->
+                                        <Button Grid.Column="0" Classes="icon-btn naked" Margin="0,0,8,0"
+                                                Width="24" Height="24" FontSize="11"
                                                 IsVisible="{Binding ShowChevron}"
                                                 VerticalAlignment="Center"
+                                                Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                                                Content="{Binding IsExpanded, Converter={x:Static vm:BoolToChevronConverter.Instance}}"
                                                 Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).ToggleGroupExpandedCommand}"
-                                                CommandParameter="{Binding}">
-                                            <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="11"
-                                                       Foreground="{DynamicResource BrandTextSecondaryBrush}"
-                                                       Text="{Binding IsExpanded, Converter={x:Static vm:BoolToChevronConverter.Instance}}" />
-                                        </Button>
+                                                CommandParameter="{Binding}" />
                                         <!-- Spacer wenn kein Chevron → identische Einrückung wie Bundle (damit Singles & Bundles in einer Linie stehen) -->
-                                        <Border Grid.Column="0" Width="19" IsVisible="{Binding !ShowChevron}" />
+                                        <Border Grid.Column="0" Width="24" IsVisible="{Binding !ShowChevron}" />
 
                                         <!-- Checkbox für Bulk-Select (immer sichtbar — wählt bei Bundles alle Paks gemeinsam) -->
                                         <CheckBox Grid.Column="1"
@@ -198,34 +139,26 @@
                                                   Margin="0,0,12,0" />
 
                                         <!-- Status-Dot -->
-                                        <Border Grid.Column="2" Width="10" Height="10"
-                                                CornerRadius="5" Margin="0,0,12,0"
-                                                VerticalAlignment="Center"
-                                                Background="{Binding AllEnabled, Converter={x:Static vm:BoolToEnabledBrushConverter.Instance}}" />
+                                        <Ellipse Grid.Column="2" Classes="status-dot" Margin="0,0,12,0"
+                                                 Fill="{Binding AllEnabled, Converter={x:Static vm:BoolToEnabledBrushConverter.Instance}}" />
 
                                         <!-- Name + Meta -->
                                         <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="2">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock Text="{Binding Header}"
-                                                           FontWeight="SemiBold" FontSize="14"
-                                                           Foreground="{DynamicResource BrandTextPrimaryBrush}" />
-                                                <!-- Nexus-Badge (#8: mit Globe-Icon) -->
-                                                <Border IsVisible="{Binding HasNexusLink}"
-                                                        Background="{DynamicResource BrandNavySurfaceAltBrush}"
-                                                        CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                                                <TextBlock Classes="body-emphasis" Text="{Binding Header}" />
+                                                <!-- Nexus-Badge: mit Globe-Icon -->
+                                                <Border Classes="badge" IsVisible="{Binding HasNexusLink}">
                                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                                         <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                                   FontSize="10"
+                                                                   FontSize="11"
                                                                    Foreground="{DynamicResource BrandTextSecondaryBrush}"
                                                                    VerticalAlignment="Center" />
-                                                        <TextBlock Text="{DynamicResource Mods.Nexus.Linked}"
-                                                                   FontSize="11" Foreground="{DynamicResource BrandTextSecondaryBrush}" />
+                                                        <TextBlock Text="{DynamicResource Mods.Nexus.Linked}" />
                                                     </StackPanel>
                                                 </Border>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock FontSize="12" IsVisible="{Binding IsBundle}"
-                                                           Foreground="{DynamicResource BrandTextMutedBrush}">
+                                                <TextBlock Classes="caption muted" IsVisible="{Binding IsBundle}">
                                                     <Run Text="{Binding PakCount, Mode=OneWay}" />
                                                     <Run Text=" " />
                                                     <Run Text="{DynamicResource Mods.Group.PakSuffix}" />
@@ -236,47 +169,39 @@
                                                     <Run Text=" " />
                                                     <Run Text="{DynamicResource Mods.Group.ActiveSuffix}" />
                                                 </TextBlock>
-                                                <TextBlock FontSize="12" IsVisible="{Binding !IsBundle}"
-                                                           Foreground="{DynamicResource BrandTextMutedBrush}"
+                                                <TextBlock Classes="caption muted" IsVisible="{Binding !IsBundle}"
                                                            Text="{Binding Items[0].FileName}" />
-                                                <TextBlock Text="·" Foreground="{DynamicResource BrandTextMutedBrush}" />
-                                                <TextBlock FontSize="12"
-                                                           Foreground="{DynamicResource BrandTextMutedBrush}">
+                                                <TextBlock Classes="caption muted" Text="·" />
+                                                <TextBlock Classes="caption muted">
                                                     <Run Text="{Binding TotalBytes, Converter={x:Static vm:SizeToMbConverter.Instance}, Mode=OneWay}" />
                                                     <Run Text=" MB" />
                                                 </TextBlock>
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <!-- Nexus-Actions (#4: Globe + Unlink gruppiert) -->
-                                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" Margin="0,0,12,0">
-                                            <Button Classes="naked-icon"
+                                        <!-- Nexus-Actions: Globe + Unlink gruppiert -->
+                                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" Margin="0,0,12,0">
+                                            <Button Classes="icon-btn naked"
+                                                    Content="&#xE71B;"
                                                     IsVisible="{Binding !HasNexusLink}"
                                                     ToolTip.Tip="{DynamicResource Mods.Nexus.Link.Tooltip}"
                                                     Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).LinkNexusCommand}"
-                                                    CommandParameter="{Binding Items[0]}">
-                                                <TextBlock Text="&#xE71B;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                           Foreground="{DynamicResource BrandTextSecondaryBrush}" />
-                                            </Button>
-                                            <Button Classes="naked-icon"
+                                                    CommandParameter="{Binding Items[0]}" />
+                                            <Button Classes="icon-btn naked"
+                                                    Content="&#xE774;"
                                                     IsVisible="{Binding HasNexusLink}"
                                                     ToolTip.Tip="{DynamicResource Mods.Nexus.OpenOnNexus}"
                                                     Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).OpenGroupOnNexusCommand}"
-                                                    CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                           Foreground="{DynamicResource BrandTextSecondaryBrush}" />
-                                            </Button>
-                                            <Button Classes="naked-icon"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Classes="icon-btn naked"
+                                                    Content="&#xE711;"
                                                     IsVisible="{Binding HasNexusLink}"
                                                     ToolTip.Tip="{DynamicResource Mods.Nexus.Unlink.Tooltip}"
                                                     Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).UnlinkGroupCommand}"
-                                                    CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                           Foreground="{DynamicResource BrandTextMutedBrush}" />
-                                            </Button>
+                                                    CommandParameter="{Binding}" />
                                         </StackPanel>
 
-                                        <!-- Toggle (#7: subtle statt primary) -->
+                                        <!-- Toggle Enable/Disable -->
                                         <Button Grid.Column="5" Classes="subtle" Margin="0,0,6,0"
                                                 IsVisible="{Binding !AllEnabled}"
                                                 Content="{DynamicResource Mods.Action.Enable}"
@@ -288,13 +213,12 @@
                                                 Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).DisableGroupCommand}"
                                                 CommandParameter="{Binding}" />
 
-                                        <!-- Remove (#7: icon-only danger) -->
-                                        <Button Grid.Column="6" Classes="icon-danger"
+                                        <!-- Remove -->
+                                        <Button Grid.Column="6" Classes="icon-btn naked danger"
+                                                Content="&#xE74D;"
                                                 ToolTip.Tip="{DynamicResource Mods.Uninstall}"
                                                 Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).UninstallGroupCommand}"
-                                                CommandParameter="{Binding}">
-                                            <TextBlock Text="&#xE74D;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="14" />
-                                        </Button>
+                                                CommandParameter="{Binding}" />
                                     </Grid>
 
                                     <!-- Aufgeklappte Child-Paks (#1: nur bei Bundle) -->
@@ -304,38 +228,34 @@
                                         <ItemsControl ItemsSource="{Binding Items}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:ModItemViewModel">
-                                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,3">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,4">
                                                         <!-- Per-Child-Checkbox für Teilauswahl im Bundle -->
                                                         <CheckBox Grid.Column="0"
                                                                   IsChecked="{Binding IsSelected}"
                                                                   VerticalAlignment="Center"
                                                                   Margin="0,0,10,0" />
-                                                        <!-- #5: kein Dot mehr; Opacity signalisiert disabled -->
-                                                        <TextBlock Grid.Column="1" VerticalAlignment="Center"
-                                                                   FontSize="12"
-                                                                   Opacity="{Binding IsEnabled, Converter={x:Static vm:BoolToOpacityConverter.Instance}}"
-                                                                   Foreground="{DynamicResource BrandTextSecondaryBrush}">
+                                                        <!-- Opacity signalisiert disabled -->
+                                                        <TextBlock Grid.Column="1" Classes="caption"
+                                                                   VerticalAlignment="Center"
+                                                                   Opacity="{Binding IsEnabled, Converter={x:Static vm:BoolToOpacityConverter.Instance}}">
                                                             <Run Text="{Binding FileName}" />
                                                             <Run Text="  ·  " Foreground="{DynamicResource BrandTextMutedBrush}" />
                                                             <Run Text="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}, Mode=OneWay}" />
                                                             <Run Text=" MB" />
                                                         </TextBlock>
-                                                        <!-- #2: Eye/EyeOff icon-only toggle -->
-                                                        <Button Grid.Column="2" Classes="icon-toggle" Margin="0,0,2,0"
+                                                        <!-- Eye/EyeOff toggle -->
+                                                        <Button Grid.Column="2" Classes="icon-btn naked"
+                                                                Margin="0,0,4,0"
+                                                                Content="{Binding IsEnabled, Converter={x:Static vm:EnabledToEyeIconConverter.Instance}}"
                                                                 ToolTip.Tip="{Binding IsEnabled, Converter={x:Static vm:EnabledToToggleLabelConverter.Instance}}"
                                                                 Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).ToggleEnabledCommand}"
-                                                                CommandParameter="{Binding}">
-                                                            <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="13"
-                                                                       Text="{Binding IsEnabled, Converter={x:Static vm:EnabledToEyeIconConverter.Instance}}" />
-                                                        </Button>
-                                                        <!-- #7: icon-only danger -->
-                                                        <Button Grid.Column="3" Classes="icon-danger"
-                                                                Padding="6,4"
+                                                                CommandParameter="{Binding}" />
+                                                        <!-- Uninstall -->
+                                                        <Button Grid.Column="3" Classes="icon-btn naked danger"
+                                                                Content="&#xE74D;"
                                                                 ToolTip.Tip="{DynamicResource Mods.Uninstall}"
                                                                 Command="{Binding $parent[UserControl].((vm:ModsViewModel)DataContext).UninstallCommand}"
-                                                                CommandParameter="{Binding}">
-                                                            <TextBlock Text="&#xE74D;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="12" />
-                                                        </Button>
+                                                                CommandParameter="{Binding}" />
                                                     </Grid>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

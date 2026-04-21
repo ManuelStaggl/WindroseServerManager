@@ -9,4 +9,5 @@ public interface IServerEventLog
 
     Task AppendAsync(ServerEvent evt, CancellationToken ct = default);
     Task<IReadOnlyList<ServerEvent>> ReadRecentAsync(int maxCount = 100, CancellationToken ct = default);
+    Task ClearAsync(CancellationToken ct = default);
 }

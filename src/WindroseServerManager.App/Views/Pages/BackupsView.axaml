@@ -4,50 +4,65 @@
              xmlns:m="using:WindroseServerManager.Core.Models"
              x:Class="WindroseServerManager.App.Views.Pages.BackupsView"
              x:DataType="vm:BackupsViewModel">
-    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" RowSpacing="0">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="0">
 
-        <TextBlock Grid.Row="0" Classes="page-title" Text="{DynamicResource Backups.Title}" />
-        <TextBlock Grid.Row="1" Classes="caption" TextWrapping="Wrap"
-                   Text="{DynamicResource Backups.Subtitle}"
-                   Margin="0,4,0,20" />
+        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="page-title" Text="{DynamicResource Backups.Title}" />
+            <TextBlock Classes="caption muted" TextWrapping="Wrap"
+                       Text="{DynamicResource Backups.Subtitle}" />
+        </StackPanel>
 
         <!-- Settings Card -->
-        <Border Grid.Row="2" Classes="card" Margin="0,0,0,12">
+        <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
             <StackPanel Spacing="12">
                 <TextBlock Classes="section-header" Text="{DynamicResource Backups.BackupDir}" />
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBox Grid.Column="0" Text="{Binding BackupDir}" IsReadOnly="True"
                              PlaceholderText="{DynamicResource Backups.BackupDir.Placeholder}" />
-                    <Button Grid.Column="1" Content="{DynamicResource Action.Change}" Command="{Binding PickBackupDirCommand}" Margin="8,0,0,0" />
+                    <Button Grid.Column="1" Content="{DynamicResource Action.Change}"
+                            Command="{Binding PickBackupDirCommand}" Margin="8,0,0,0" />
                 </Grid>
                 <StackPanel Orientation="Horizontal" Spacing="16">
-                    <CheckBox Content="{DynamicResource ServerControl.Enabled}" IsChecked="{Binding AutoBackupEnabled}" />
+                    <CheckBox Content="{DynamicResource ServerControl.Enabled}"
+                              IsChecked="{Binding AutoBackupEnabled}"
+                              VerticalAlignment="Center" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Classes="body" Text="{DynamicResource Backups.IntervalMin}" VerticalAlignment="Center" />
-                        <NumericUpDown Value="{Binding AutoBackupIntervalMinutes}" Minimum="5" Maximum="1440" Width="120" />
+                        <TextBlock Classes="body" Text="{DynamicResource Backups.IntervalMin}"
+                                   VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding AutoBackupIntervalMinutes}"
+                                       Minimum="5" Maximum="1440" Width="120" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Classes="body" Text="{DynamicResource Backups.MaxKeep}" VerticalAlignment="Center" />
-                        <NumericUpDown Value="{Binding MaxBackupsToKeep}" Minimum="1" Maximum="500" Width="120" />
+                        <TextBlock Classes="body" Text="{DynamicResource Backups.MaxKeep}"
+                                   VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding MaxBackupsToKeep}"
+                                       Minimum="1" Maximum="500" Width="120" />
                     </StackPanel>
-                    <Button Classes="primary" Content="{DynamicResource Action.Save}" Command="{Binding SaveSettingsCommand}" />
+                    <Button Classes="primary" Content="{DynamicResource Action.Save}"
+                            Command="{Binding SaveSettingsCommand}" />
                 </StackPanel>
             </StackPanel>
         </Border>
 
         <!-- Action Bar -->
-        <Border Grid.Row="3" Classes="card" Margin="0,0,0,12">
+        <Border Grid.Row="2" Classes="card" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Classes="primary" Content="{DynamicResource Backups.CreateNow}" Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" />
-                <Button Content="{DynamicResource Backups.Restore}" Command="{Binding RestoreCommand}" IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                <Button Classes="danger" Content="{DynamicResource Action.Delete}" Command="{Binding DeleteCommand}" IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Button Classes="primary" Content="{DynamicResource Backups.CreateNow}"
+                        Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" />
+                <Button Content="{DynamicResource Backups.Restore}"
+                        Command="{Binding RestoreCommand}"
+                        IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Button Classes="danger" Content="{DynamicResource Action.Delete}"
+                        Command="{Binding DeleteCommand}"
+                        IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}" />
                 <Button Content="{DynamicResource Action.Refresh}" Command="{Binding RefreshCommand}" />
-                <Button Classes="subtle" Content="{DynamicResource Backups.OpenBackupDir}" Command="{Binding OpenBackupDirCommand}" />
+                <Button Classes="subtle" Content="{DynamicResource Backups.OpenBackupDir}"
+                        Command="{Binding OpenBackupDirCommand}" />
             </StackPanel>
         </Border>
 
         <!-- Backup List -->
-        <Border Grid.Row="5" Classes="card" Padding="0">
+        <Border Grid.Row="4" Classes="card" Padding="0">
             <Grid>
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto"
@@ -69,7 +84,7 @@
                                 <Setter Property="Background" Value="{DynamicResource BrandNavySurfaceAltBrush}" />
                             </Style>
                             <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-                                <Setter Property="Background" Value="#20D97706" />
+                                <Setter Property="Background" Value="{DynamicResource BrandAmberSubtleBrush}" />
                             </Style>
                         </ListBox.Styles>
                         <ListBox.ItemTemplate>
@@ -77,7 +92,7 @@
                                 <Border BorderBrush="{DynamicResource BrandNavyBorderBrush}"
                                         BorderThickness="0,0,0,1"
                                         Padding="16,12">
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
 
                                         <!-- Archive Icon -->
                                         <TextBlock Grid.Column="0"
@@ -90,38 +105,28 @@
 
                                         <!-- File Name + Date -->
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="{Binding FileName}"
-                                                       FontSize="13" FontWeight="Medium"
-                                                       Foreground="{DynamicResource BrandTextPrimaryBrush}"
+                                            <TextBlock Classes="body-sm"
+                                                       FontWeight="Medium"
+                                                       Text="{Binding FileName}"
                                                        TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding CreatedUtc, Converter={x:Static vm:TimestampToDateTimeLocalConverter.Instance}}"
-                                                       FontSize="11"
-                                                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+                                            <TextBlock Classes="caption-sm muted"
+                                                       Text="{Binding CreatedUtc, Converter={x:Static vm:TimestampToDateTimeLocalConverter.Instance}}" />
                                         </StackPanel>
 
                                         <!-- Auto Badge -->
-                                        <Border Grid.Column="2"
-                                                CornerRadius="10" Padding="8,3"
+                                        <Border Grid.Column="2" Classes="badge"
                                                 Margin="12,0"
-                                                VerticalAlignment="Center"
-                                                IsVisible="{Binding IsAutomatic}"
-                                                Background="{DynamicResource BrandNavySurfaceAltBrush}">
-                                            <TextBlock Text="{DynamicResource Backups.Col.Automatic}"
-                                                       FontSize="10" FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource BrandTextSecondaryBrush}" />
+                                                IsVisible="{Binding IsAutomatic}">
+                                            <TextBlock Text="{DynamicResource Backups.Col.Automatic}" />
                                         </Border>
 
                                         <!-- Size -->
                                         <StackPanel Grid.Column="3"
                                                     Orientation="Horizontal" Spacing="4"
-                                                    VerticalAlignment="Center"
-                                                    Margin="0,0,0,0">
-                                            <TextBlock Text="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}}"
-                                                       FontSize="12" FontFamily="Consolas,Courier New"
-                                                       Foreground="{DynamicResource BrandTextSecondaryBrush}" />
-                                            <TextBlock Text="MB"
-                                                       FontSize="12"
-                                                       Foreground="{DynamicResource BrandTextMutedBrush}" />
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Classes="mono-sm"
+                                                       Text="{Binding SizeBytes, Converter={x:Static vm:SizeToMbConverter.Instance}}" />
+                                            <TextBlock Classes="caption muted" Text="MB" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -131,16 +136,13 @@
                 </ScrollViewer>
 
                 <!-- Empty State -->
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
+                <StackPanel Classes="empty-state"
                             IsVisible="{Binding Backups.Count, Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
-                    <TextBlock Text="&#xE7B8;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                               FontSize="48" HorizontalAlignment="Center"
-                               Foreground="{DynamicResource BrandTextMutedBrush}" />
-                    <TextBlock Text="{DynamicResource Backups.None.Title}"
-                               Classes="section-header" HorizontalAlignment="Center" />
-                    <TextBlock Text="{DynamicResource Backups.None}"
-                               Classes="caption" HorizontalAlignment="Center"
-                               Foreground="{DynamicResource BrandTextMutedBrush}" />
+                    <TextBlock Classes="empty-state-icon" Text="&#xE7B8;" />
+                    <TextBlock Classes="empty-state-title"
+                               Text="{DynamicResource Backups.None.Title}" />
+                    <TextBlock Classes="empty-state-body"
+                               Text="{DynamicResource Backups.None}" />
                 </StackPanel>
             </Grid>
         </Border>

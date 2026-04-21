@@ -21,15 +21,13 @@
 
             <StackPanel Spacing="4">
                 <TextBlock Classes="caption" Text="{DynamicResource Dialog.LinkNexus.UrlLabel}" />
-                <TextBox x:Name="UrlInput" Watermark="https://www.nexusmods.com/windrose/mods/…"
+                <TextBox x:Name="UrlInput" PlaceholderText="https://www.nexusmods.com/windrose/mods/…"
                          KeyDown="OnUrlKeyDown" />
             </StackPanel>
 
-            <Border x:Name="ErrorPanel" IsVisible="False"
-                    Padding="12,10" CornerRadius="6"
-                    Background="{DynamicResource BrandErrorBrush}">
+            <Border x:Name="ErrorPanel" Classes="alert-error" IsVisible="False">
                 <TextBlock x:Name="ErrorText" TextWrapping="Wrap"
-                           Foreground="#FFFFFF" />
+                           Foreground="{DynamicResource BrandErrorBrush}" />
             </Border>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">

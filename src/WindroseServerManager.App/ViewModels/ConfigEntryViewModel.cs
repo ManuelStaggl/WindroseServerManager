@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.Core.Services;
 
@@ -12,6 +13,7 @@ public partial class ConfigEntryViewModel : ObservableObject
 
     [ObservableProperty] private string _rawValue = string.Empty;
     [ObservableProperty] private string? _errorMessage;
+    [ObservableProperty] private bool _isPasswordVisible;
 
     public string Category => Schema.Category;
     public string Key => Schema.Key;
@@ -25,7 +27,7 @@ public partial class ConfigEntryViewModel : ObservableObject
     public bool IsFloat    => Schema.Type == "float";
     public bool IsBool     => Schema.Type == "bool";
     public bool IsInt      => Schema.Type == "int";
-    public bool IsPassword => Schema.Key  == "rcon_password";
+    public bool IsPassword => Schema.Key == "password" && Schema.JsonSection == "rcon";
     public bool IsText     => !IsFloat && !IsBool;
 
     // Slider range capped at 10 for practical UX (text box allows up to schema max)
@@ -35,11 +37,12 @@ public partial class ConfigEntryViewModel : ObservableObject
     // Two-way double property for Slider (floats only)
     public double SliderValue
     {
-        get => double.TryParse(RawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var d)
+        get => IsFloat && double.TryParse(RawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var d)
                ? Math.Clamp(d, SliderMin, SliderMax)
-               : (double)(Schema.Default ?? 1.0);
+               : 1.0;
         set
         {
+            if (!IsFloat) return;
             var formatted = value.ToString("0.##", CultureInfo.InvariantCulture);
             if (formatted != RawValue)
                 RawValue = formatted;
@@ -66,6 +69,12 @@ public partial class ConfigEntryViewModel : ObservableObject
         OnPropertyChanged(nameof(SliderValue));
         OnPropertyChanged(nameof(BoolValue));
     }
+
+    [RelayCommand]
+    public void Reset() => RawValue = FormatValue(null, Schema);
+
+    [RelayCommand]
+    private void TogglePassword() => IsPasswordVisible = !IsPasswordVisible;
 
     private void Validate()
     {
