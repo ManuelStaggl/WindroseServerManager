@@ -65,65 +65,103 @@
                 <ItemsControl ItemsSource="{Binding ServerCards}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:ServerCardViewModel">
-                            <Border Classes="card"
-                                    Margin="0,0,0,10">
-                                <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Border Classes="card" Margin="0,0,0,12" Padding="16">
+                                <StackPanel Spacing="14">
 
-                                    <!-- Server icon -->
-                                    <Border Grid.Column="0"
-                                            Width="40" Height="40"
-                                            CornerRadius="8"
-                                            Background="{DynamicResource BrandNavySurfaceAltBrush}"
-                                            Margin="0,0,14,0"
-                                            VerticalAlignment="Center">
-                                        <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
-                                                   FontSize="20"
-                                                   Text="&#xE8C8;"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="{DynamicResource BrandAmberBrush}" />
-                                    </Border>
-
-                                    <!-- Name + path + active badge -->
-                                    <StackPanel Grid.Column="1"
-                                                Spacing="4"
+                                    <!-- ── Header row: icon + name + badges + primary actions ── -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <!-- Server icon -->
+                                        <Border Grid.Column="0"
+                                                Width="40" Height="40"
+                                                CornerRadius="8"
+                                                Background="{DynamicResource BrandNavySurfaceAltBrush}"
+                                                Margin="0,0,14,0"
                                                 VerticalAlignment="Center">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Classes="body-emphasis"
+                                            <TextBlock FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                                       FontSize="20"
+                                                       Text="&#xE8C8;"
+                                                       HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"
-                                                       Text="{Binding Name}" />
-                                            <Border Classes="badge-accent"
-                                                    IsVisible="{Binding IsActive}">
-                                                <TextBlock Text="{DynamicResource Server.Active}" />
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock Classes="caption muted"
-                                                   Text="{Binding InstallDir}"
-                                                   TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
+                                                       Foreground="{DynamicResource BrandAmberBrush}" />
+                                        </Border>
 
-                                    <!-- Action buttons -->
-                                    <StackPanel Grid.Column="2"
-                                                Orientation="Horizontal"
-                                                Spacing="8"
-                                                VerticalAlignment="Center">
-                                        <Button Classes="subtle"
-                                                Content="{DynamicResource Server.SetActive}"
-                                                IsVisible="{Binding !IsActive}"
-                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).SelectServerCommand}"
-                                                CommandParameter="{Binding Id}" />
-                                        <Button Classes="subtle"
-                                                Content="{DynamicResource Server.InstallWindrosePlus}"
-                                                IsVisible="{Binding !WindrosePlusActive}"
-                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).InstallWindrosePlusCommand}"
-                                                CommandParameter="{Binding Id}" />
-                                        <Button Classes="danger"
-                                                Content="{DynamicResource Server.Delete}"
-                                                Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).DeleteServerCommand}"
-                                                CommandParameter="{Binding Id}" />
-                                    </StackPanel>
-                                </Grid>
+                                        <!-- Name + path + badges -->
+                                        <StackPanel Grid.Column="1"
+                                                    Spacing="4"
+                                                    VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Classes="body-emphasis"
+                                                           VerticalAlignment="Center"
+                                                           Text="{Binding Name}" />
+                                                <Border Classes="badge-accent"
+                                                        IsVisible="{Binding IsActive}">
+                                                    <TextBlock Text="{DynamicResource Server.Active}" />
+                                                </Border>
+                                                <Border Classes="badge-success"
+                                                        IsVisible="{Binding IsRunning}">
+                                                    <TextBlock Text="{DynamicResource Server.Status.Running}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Classes="caption muted"
+                                                       Text="{Binding InstallDir}"
+                                                       TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+
+                                        <!-- Primary action buttons (top-right) -->
+                                        <StackPanel Grid.Column="2"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    VerticalAlignment="Center">
+                                            <Button Classes="subtle"
+                                                    Content="{DynamicResource Server.SetActive}"
+                                                    IsVisible="{Binding !IsActive}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).SelectServerCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            <Button Classes="danger"
+                                                    Content="{DynamicResource Server.Delete}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).DeleteServerCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- ── Divider ── -->
+                                    <Border Classes="divider" />
+
+                                    <!-- ── Per-server settings + secondary actions ── -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <!-- LEFT: settings -->
+                                        <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
+                                            <CheckBox IsChecked="{Binding AutoStartOnAppLaunch, Mode=TwoWay}"
+                                                      Content="{DynamicResource Server.AutoStart.Label}" />
+                                            <TextBlock Classes="caption muted"
+                                                       TextWrapping="Wrap"
+                                                       Text="{DynamicResource Server.AutoStart.Hint}" />
+                                        </StackPanel>
+
+                                        <!-- RIGHT: secondary actions -->
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    VerticalAlignment="Top">
+                                            <Button Classes="subtle"
+                                                    Content="{DynamicResource Server.OpenFolder}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).OpenFolderCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            <Button Classes="subtle"
+                                                    Content="{DynamicResource Server.OpenLiveMap}"
+                                                    IsVisible="{Binding HasLiveMap}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).OpenLiveMapCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            <Button Classes="subtle"
+                                                    Content="{DynamicResource Server.InstallWindrosePlus}"
+                                                    IsVisible="{Binding !WindrosePlusActive}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).InstallWindrosePlusCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

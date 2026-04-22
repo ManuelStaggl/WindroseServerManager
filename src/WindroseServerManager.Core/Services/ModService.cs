@@ -48,10 +48,10 @@ public sealed class ModService : IModService
     public string? ValidateReady()
     {
         if (string.IsNullOrWhiteSpace(_settings.ActiveServerDir))
-            return "Server-Installationspfad ist nicht gesetzt. Zuerst Installation einrichten.";
+            return "Server install path is not set. Set up the installation first.";
 
         if (_process.Status is ServerStatus.Running or ServerStatus.Starting)
-            return "Server läuft. Mod-Änderungen erfordern einen gestoppten Server.";
+            return "Server is running. Mod changes require a stopped server.";
 
         return null;
     }
@@ -108,7 +108,7 @@ public sealed class ModService : IModService
 
         var primary = Path.Combine(dir, fileName);
         if (!File.Exists(primary))
-            throw new FileNotFoundException("Primär-Mod-Datei existiert nicht.", primary);
+            throw new FileNotFoundException("Primary mod file does not exist.", primary);
 
         var metaPath = primary + MetaSuffix;
         File.WriteAllText(metaPath, JsonSerializer.Serialize(meta, MetaJsonOpts));
@@ -176,7 +176,7 @@ public sealed class ModService : IModService
         }
         else
         {
-            throw new InvalidOperationException($"Nicht unterstütztes Format: {ext}. Nur .pak, .zip, .7z.");
+            throw new InvalidOperationException($"Unsupported format: {ext}. Only .pak, .zip, .7z supported.");
         }
 
         if (extractedPaks.Count == 0)
@@ -344,8 +344,8 @@ public sealed class ModService : IModService
     public sealed class ScriptModOnlyException : InvalidOperationException
     {
         public ScriptModOnlyException() : base(
-            "Dieses Archiv enthält nur Script-Dateien (Lua/SML) und keine .pak. " +
-            "Script-Mods laufen nur im Singleplayer — auf dem Server haben sie keine Wirkung und werden nicht installiert.") { }
+            "This archive contains only script files (Lua/SML) and no .pak. " +
+            "Script mods only run in singleplayer — they have no effect on the server and were not installed.") { }
     }
 
     private List<string> ExtractZip(string zipPath, string destDir, CancellationToken ct)

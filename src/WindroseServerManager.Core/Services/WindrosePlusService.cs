@@ -174,7 +174,9 @@ public sealed class WindrosePlusService : IWindrosePlusService
             Directory.CreateDirectory(serverInstallDir);
 
             // -------- Fetch + download WindrosePlus release --------
-            Report(progress, InstallPhase.FetchingRelease, "Lade WindrosePlus-Release-Info...");
+            // Pass empty messages so the UI renders localized phase labels via Loc.Get("InstallPhase.*")
+            // instead of the hardcoded strings we used to ship.
+            Report(progress, InstallPhase.FetchingRelease, string.Empty);
             WindrosePlusRelease wplusRelease;
             try
             {
@@ -191,10 +193,10 @@ public sealed class WindrosePlusService : IWindrosePlusService
                     DigestSha256: null);
             }
 
-            Report(progress, InstallPhase.DownloadingArchive, "Lade WindrosePlus-Archiv...");
+            Report(progress, InstallPhase.DownloadingArchive, string.Empty);
             var wplusZip = await EnsureArchiveCachedAsync(wplusRelease, _archiveCachePath, "WindrosePlus", ct).ConfigureAwait(false);
 
-            Report(progress, InstallPhase.VerifyingDigest, "Verifiziere SHA-256...");
+            Report(progress, InstallPhase.VerifyingDigest, string.Empty);
             var wplusSha = await VerifyDigestAsync(wplusZip, wplusRelease.DigestSha256, ct).ConfigureAwait(false);
 
             // -------- Extract ZIP to temp, then run official install.ps1 --------
@@ -206,13 +208,13 @@ public sealed class WindrosePlusService : IWindrosePlusService
             Directory.CreateDirectory(tempRoot);
             try
             {
-                Report(progress, InstallPhase.Extracting, "Entpacke WindrosePlus...");
+                Report(progress, InstallPhase.Extracting, string.Empty);
                 ZipFile.ExtractToDirectory(wplusZip, tempRoot, overwriteFiles: true);
 
-                Report(progress, InstallPhase.Installing, "Führe install.ps1 aus...");
+                Report(progress, InstallPhase.Installing, string.Empty);
                 await RunInstallScriptAsync(tempRoot, serverDirFull, progress, ct).ConfigureAwait(false);
 
-                Report(progress, InstallPhase.WritingMarker, "Schreibe Versionsmarker...");
+                Report(progress, InstallPhase.WritingMarker, string.Empty);
                 var installedUtc = DateTime.UtcNow;
                 var marker = new WindrosePlusVersionMarker(
                     Tag: wplusRelease.Tag,
@@ -222,7 +224,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
                 var markerJson = JsonSerializer.Serialize(marker, new JsonSerializerOptions { WriteIndented = true });
                 await File.WriteAllTextAsync(Path.Combine(serverDirFull, VersionMarkerFileName), markerJson, ct).ConfigureAwait(false);
 
-                Report(progress, InstallPhase.Complete, "WindrosePlus installiert.");
+                Report(progress, InstallPhase.Complete, string.Empty);
                 _logger.LogInformation("WindrosePlus {Tag} installed into {Dir}", wplusRelease.Tag, serverDirFull);
 
                 return new WindrosePlusInstallResult(
@@ -234,7 +236,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
             }
             finally
             {
-                Report(progress, InstallPhase.CleaningUp, "Räume temporäres Verzeichnis auf...");
+                Report(progress, InstallPhase.CleaningUp, string.Empty);
                 try { if (Directory.Exists(tempRoot)) Directory.Delete(tempRoot, recursive: true); }
                 catch (Exception ex) { _logger.LogDebug(ex, "Temp dir cleanup failed at {Path}", tempRoot); }
             }
@@ -385,9 +387,16 @@ public sealed class WindrosePlusService : IWindrosePlusService
 
         _logger.LogInformation("install.ps1 completed successfully for {Dir}", serverDirFull);
 
+        // The WindrosePlus Lua mod (main.lua:337-340) looks for generateTiles.ps1 at
+        // {gameDir}/tools/ — but install.ps1 only places it under {gameDir}/windrose_plus/tools/.
+        // Mirror the tools folder at the root so tile generation (and the /api/mapinfo dashboard
+        // endpoint) works without manual user intervention.
+        EnsureRootToolsMirror(serverDirFull);
+
         // Clean up files that were staged into the server dir for the script (they've been
         // processed into windrose_plus/ by install.ps1 and are no longer needed at the root).
-        foreach (var name in new[] { "install.ps1", "WindrosePlus", "server", "tools", "README.md", "LICENSE", "UE4SS-settings.ini" })
+        // Keep "tools" — the Lua mod reads from it directly (see EnsureRootToolsMirror above).
+        foreach (var name in new[] { "install.ps1", "WindrosePlus", "server", "README.md", "LICENSE", "UE4SS-settings.ini", "release_notes.md", "config", "cpp-mods", "docs" })
         {
             var path = Path.Combine(serverDirFull, name);
             try
@@ -396,6 +405,36 @@ public sealed class WindrosePlusService : IWindrosePlusService
                 else if (Directory.Exists(path)) Directory.Delete(path, recursive: true);
             }
             catch (Exception ex) { _logger.LogWarning(ex, "Cleanup of staged file {Name} failed (non-fatal)", name); }
+        }
+    }
+
+    /// <summary>
+    /// Mirrors {serverDir}/windrose_plus/tools/ to {serverDir}/tools/ so the WindrosePlus
+    /// Lua mod can locate generateTiles.ps1 at the path it expects. Overwrites existing files
+    /// so a re-install always produces a fresh copy.
+    /// </summary>
+    public void EnsureRootToolsMirror(string serverInstallDir)
+    {
+        if (string.IsNullOrWhiteSpace(serverInstallDir)) return;
+
+        var serverDirFull = Path.GetFullPath(serverInstallDir).TrimEnd('\\', '/');
+        var src = Path.Combine(serverDirFull, "windrose_plus", "tools");
+        if (!Directory.Exists(src))
+        {
+            _logger.LogDebug("windrose_plus/tools/ not present in {Dir} — nothing to mirror", serverDirFull);
+            return;
+        }
+
+        var dst = Path.Combine(serverDirFull, "tools");
+        try
+        {
+            if (Directory.Exists(dst)) Directory.Delete(dst, recursive: true);
+            CopyDirectoryContents(src, dst);
+            _logger.LogInformation("Mirrored windrose_plus/tools/ to root tools/ for {Dir}", serverDirFull);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to mirror tools/ for {Dir} — livemap tile generation may not work", serverDirFull);
         }
     }
 
@@ -431,6 +470,9 @@ public sealed class WindrosePlusService : IWindrosePlusService
                   || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverDirFull + "\\", false)
                   || _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(serverInstallDir, false);
         if (!active) return;
+
+        // Retrofit servers installed before the tools-mirror fix existed.
+        EnsureRootToolsMirror(serverDirFull);
 
         // Try both install layouts (our C# installer puts tools\ at root; install.ps1 puts it under windrose_plus\tools\)
         var buildPak = new[]
@@ -540,7 +582,11 @@ public sealed class WindrosePlusService : IWindrosePlusService
         // Stop any existing dashboard for this dir
         StopDashboard(serverInstallDir);
 
-        var ps = File.Exists(@"C:\Program Files\PowerShell\7\pwsh.exe") ? "pwsh" : "powershell";
+        // Force Windows PowerShell 5.1 for the dashboard. The bundled generateTiles.ps1 uses
+        // Add-Type with inline C# that references System.Drawing.Bitmap — available in WinPS5
+        // but not in pwsh 7 (System.Drawing.Common is a separate nuget there, not auto-loaded).
+        // Running under pwsh 7 makes the live map silently stall at "Map not ready yet".
+        var ps = "powershell";
         var psi = new System.Diagnostics.ProcessStartInfo
         {
             FileName = ps,

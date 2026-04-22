@@ -72,7 +72,10 @@ public partial class MainWindowViewModel : ViewModelBase
             // Phase 11 — WindrosePlus Feature Views
             new() { TitleKey = "Nav.Players",  Icon = "\uE716", VmType = typeof(PlayersViewModel) },
             new() { TitleKey = "Nav.Events",   Icon = "\uE81C", VmType = typeof(EventsViewModel) },
-            new() { TitleKey = "Nav.SeaChart", Icon = "\uE909", VmType = typeof(SeaChartViewModel) },
+            // Sea Chart view removed — live map is now launched per-server via the Server
+            // cards ("Open live map" action), which opens in the default browser where all
+            // Leaflet interactions (zoom/pan/wheel) work reliably. The embedded NativeWebView
+            // in Avalonia.Controls.WebView 12.0.0 does not route mouse input properly.
             new() { TitleKey = "Nav.Editor",   Icon = "\uE70F", VmType = typeof(EditorViewModel) },
             new() { TitleKey = "Nav.Mods", Icon = "\uEA86", VmType = typeof(ModsViewModel) },
             new() { TitleKey = "Nav.Backups", Icon = "\uE8C8", VmType = typeof(BackupsViewModel) },

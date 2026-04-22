@@ -35,22 +35,22 @@ public sealed partial class ServerInstallService : IServerInstallService
     public string? ValidateInstallDir(string installDir)
     {
         if (string.IsNullOrWhiteSpace(installDir))
-            return "Installationspfad darf nicht leer sein.";
+            return "Install path cannot be empty.";
 
         // Trailing Whitespace/Punkt bricht Windows-Pfad-Normalisierung (Path.GetFullPath strippt das,
         // aber der User hätte keine Chance zu sehen dass sein Eingabepfad tatsächlich ein anderer ist).
         if (installDir.EndsWith(' ') || installDir.EndsWith('.'))
-            return "Pfad darf nicht mit Leerzeichen oder Punkt enden.";
+            return "Path cannot end with a space or period.";
 
         // UNC-Pfade (\\Server\Share) sind für SteamCMD/Unreal nicht verlässlich.
         if (installDir.StartsWith(@"\\", StringComparison.Ordinal))
-            return "Netzwerkpfade (UNC) werden nicht unterstützt. Bitte lokalen Pfad wählen.";
+            return "Network paths (UNC) are not supported. Please pick a local path.";
 
         // Non-ASCII-Zeichen (Umlaute, etc.) sind ein historischer Bruchpunkt bei SteamCMD.
         foreach (var ch in installDir)
         {
             if (ch > 127)
-                return "Pfad enthält Sonderzeichen (z.B. Umlaute). SteamCMD/Unreal-Server brauchen reine ASCII-Pfade.";
+                return "Path contains non-ASCII characters (e.g. umlauts). SteamCMD and the Unreal server require pure ASCII paths.";
         }
 
         try
@@ -59,26 +59,26 @@ public sealed partial class ServerInstallService : IServerInstallService
 
             // Pfadlänge > 260 kann mit älteren APIs Probleme machen.
             if (full.Length > 240)
-                return "Pfad ist zu lang (max. 240 Zeichen). Bitte kürzeren Pfad wählen.";
+                return "Path is too long (max 240 characters). Please pick a shorter path.";
 
             var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if (!string.IsNullOrEmpty(programFiles) &&
                 full.StartsWith(programFiles, StringComparison.OrdinalIgnoreCase))
-                return "Pfad darf nicht unter 'Program Files' liegen (Rechte-Probleme).";
+                return "Path cannot be under 'Program Files' (permission issues).";
             if (!string.IsNullOrEmpty(programFilesX86) &&
                 full.StartsWith(programFilesX86, StringComparison.OrdinalIgnoreCase))
-                return "Pfad darf nicht unter 'Program Files (x86)' liegen.";
+                return "Path cannot be under 'Program Files (x86)'.";
 
             // System-/Windows-Ordner ebenfalls blockieren.
             var windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
             if (!string.IsNullOrEmpty(windows) &&
                 full.StartsWith(windows, StringComparison.OrdinalIgnoreCase))
-                return "Pfad darf nicht im Windows-Systemordner liegen.";
+                return "Path cannot be inside the Windows system folder.";
         }
         catch (Exception ex)
         {
-            return $"Pfad ungültig: {ex.Message}";
+            return $"Invalid path: {ex.Message}";
         }
 
         return null;

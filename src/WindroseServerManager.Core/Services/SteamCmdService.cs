@@ -63,10 +63,10 @@ public sealed class SteamCmdService : ISteamCmdService
             if (!File.Exists(_steamCmdExe))
             {
                 throw new InvalidOperationException(
-                    $"SteamCMD extrahiert, aber steamcmd.exe nicht gefunden in {_steamCmdDir}");
+                    $"SteamCMD extracted but steamcmd.exe was not found in {_steamCmdDir}");
             }
 
-            log?.Report("Führe SteamCMD Self-Update aus (kann 1-2 Minuten dauern)...");
+            log?.Report("Running SteamCMD self-update (may take 1-2 minutes)...");
             _logger.LogInformation("Running initial SteamCMD self-update");
             await foreach (var line in RunAsync("+quit", ct).ConfigureAwait(false))
             {

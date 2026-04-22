@@ -152,6 +152,11 @@
                                   IsChecked="{Binding AutoStartEnabled}" />
                         <TextBlock Classes="caption" TextWrapping="Wrap"
                                    Text="{DynamicResource Settings.AutoStart.Hint}" />
+                        <CheckBox Content="{DynamicResource Settings.AutoStartServer.Label}"
+                                  IsChecked="{Binding AutoStartServerOnAppLaunch}"
+                                  Margin="0,4,0,0" />
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="{DynamicResource Settings.AutoStartServer.Hint}" />
                     </StackPanel>
 
                 </StackPanel>

@@ -277,7 +277,7 @@
                             MinWidth="320" MaxWidth="400"
                             Cursor="Hand"
                             Tapped="OnToastTapped"
-                            ToolTip.Tip="Zum Schließen klicken"
+                            ToolTip.Tip="{DynamicResource Toast.ClickToDismiss}"
                             BoxShadow="0 4 16 0 #40000000">
                         <Grid ColumnDefinitions="4,Auto,*">
                             <Border Grid.Column="0"

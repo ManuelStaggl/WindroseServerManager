@@ -119,16 +119,16 @@ public static class WorldParameterCatalog
 
     private static readonly Dictionary<string, string> Labels = new()
     {
-        [CoopSharedQuests]  = "Quest-Fortschritt zwischen Coop-Spielern teilen",
-        [EasyExplore]       = "Karte ohne Marker (erhöht Entdeckungs-Spaß)",
-        [MobHealth]         = "Gegner-Lebenspunkte (1,0 = Standard)",
-        [MobDamage]         = "Gegner-Schaden (1,0 = Standard)",
-        [ShipsHealth]       = "Schiffs-HP (Feinde)",
-        [ShipsDamage]       = "Schiffs-Schaden (Feinde)",
-        [BoardingDiff]      = "Enter-Schwierigkeit",
-        [CoopStatsCorr]     = "Coop: Gegner-Skalierung pro Spieler",
-        [CoopShipStatsCorr] = "Coop: Schiff-Skalierung pro Spieler",
-        [CombatDifficulty]  = "Kampf-Schwierigkeit",
+        [CoopSharedQuests]  = "Share quest progress between coop players",
+        [EasyExplore]       = "Map without markers (more discovery fun)",
+        [MobHealth]         = "Enemy HP (1.0 = default)",
+        [MobDamage]         = "Enemy damage (1.0 = default)",
+        [ShipsHealth]       = "Ship HP (enemies)",
+        [ShipsDamage]       = "Ship damage (enemies)",
+        [BoardingDiff]      = "Boarding difficulty",
+        [CoopStatsCorr]     = "Coop: enemy scaling per player",
+        [CoopShipStatsCorr] = "Coop: ship scaling per player",
+        [CombatDifficulty]  = "Combat difficulty",
     };
 
     public static string GetLabel(string key) => Labels.TryGetValue(key, out var l) ? l : key;

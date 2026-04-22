@@ -24,6 +24,13 @@ public interface IWindrosePlusService : IDisposable
 
     /// <summary>Stop the dashboard server process for this server dir.</summary>
     void StopDashboard(string serverInstallDir);
+
+    /// <summary>
+    /// Mirrors {serverDir}/windrose_plus/tools/ to {serverDir}/tools/ so the WindrosePlus
+    /// Lua mod can locate generateTiles.ps1 at the path it expects. Idempotent — safe to call
+    /// on every launch to retrofit servers that were installed before this workaround existed.
+    /// </summary>
+    void EnsureRootToolsMirror(string serverInstallDir);
 }
 
 /// <summary>Thrown when a fresh install is attempted while offline and no cached archive exists.</summary>

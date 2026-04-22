@@ -57,14 +57,14 @@ public static partial class NexusUrlParser
         var match = UrlRegex.Match(trimmed);
         if (!match.Success)
         {
-            reason = "Kein gültiger Nexus-Link. Erwartet: https://www.nexusmods.com/{domain}/mods/{id}";
+            reason = "Not a valid Nexus link. Expected: https://www.nexusmods.com/{domain}/mods/{id}";
             return false;
         }
 
         var domain = match.Groups["domain"].Value;
         if (!string.Equals(domain, expectedDomain, StringComparison.OrdinalIgnoreCase))
         {
-            reason = $"Link zeigt auf {domain}, erwartet {expectedDomain}. Die Mod gehört nicht zu diesem Spiel.";
+            reason = $"Link points to {domain}, expected {expectedDomain}. This mod is not for this game.";
             return false;
         }
 

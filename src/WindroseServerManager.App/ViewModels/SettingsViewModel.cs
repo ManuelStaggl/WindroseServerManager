@@ -47,6 +47,7 @@ public partial class SettingsViewModel : ViewModelBase
 
     // Autostart
     [ObservableProperty] private bool _autoStartEnabled;
+    [ObservableProperty] private bool _autoStartServerOnAppLaunch;
 
     // App-Update-Check
     [ObservableProperty] private bool _isUpdateCheckBusy;
@@ -93,6 +94,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         _suppressAutoStartWrite = true;
         _autoStartEnabled = _autoStart.IsEnabled();
+        _autoStartServerOnAppLaunch = c.AutoStartServerOnAppLaunch;
         _suppressAutoStartWrite = false;
 
         RebuildLanguageOptions();
@@ -219,6 +221,12 @@ public partial class SettingsViewModel : ViewModelBase
 
     private string? ResolveServerBinary()
         => ServerInstallService.FindServerBinary(_settings.ActiveServerDir);
+
+    partial void OnAutoStartServerOnAppLaunchChanged(bool value)
+    {
+        if (_suppressAutoStartWrite) return;
+        _ = _settings.UpdateAsync(s => s.AutoStartServerOnAppLaunch = value);
+    }
 
     partial void OnAutoStartEnabledChanged(bool value)
     {

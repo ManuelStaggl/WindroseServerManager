@@ -16,6 +16,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     private readonly IWindrosePlusService _wplus;
     private readonly IWindrosePlusApiService _wplusApi;
     private readonly INavigationService _nav;
+    private readonly IServerProcessService _process;
     private System.Threading.CancellationTokenSource? _cts;
 
     // ── Server list ───────────────────────────────────────────────────────────
@@ -54,6 +55,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         IWindrosePlusService wplus,
         IWindrosePlusApiService wplusApi,
         INavigationService nav,
+        IServerProcessService process,
         ILocalizationService localization)
     {
         _install = install;
@@ -62,22 +64,57 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         _wplus = wplus;
         _wplusApi = wplusApi;
         _nav = nav;
+        _process = process;
 
         RefreshServerCards();
         _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
         localization.LanguageChanged += RefreshServerCards;
+        _process.StatusChanged += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
     }
 
     private void RefreshServerCards()
     {
+        // Unsubscribe from the previous cards to avoid duplicate handlers across refreshes.
+        foreach (var existing in ServerCards)
+            existing.AutoStartChanged -= OnCardAutoStartChanged;
+
         ServerCards.Clear();
+        var activeId = _settings.Current.ActiveServerId;
         foreach (var s in _settings.Current.Servers)
         {
-            // Use physical marker to determine if WP is actually installed — settings flag alone
-            // can be true even when the files are missing (e.g. after a broken install).
+            // Physical marker beats the settings flag — the flag can lie after a broken install.
             var wpInstalled = File.Exists(Path.Combine(s.InstallDir, ".wplus-version"));
-            ServerCards.Add(new ServerCardViewModel(s.Id, s.Name, s.InstallDir, s.Id == _settings.Current.ActiveServerId, wpInstalled));
+            var isActive    = s.Id == activeId;
+            var isRunning   = isActive && _process.Status is ServerStatus.Running or ServerStatus.Starting;
+
+            // Live-map URL only meaningful when WindrosePlus is opted-in AND we have a dashboard port.
+            string? liveMapUrl = null;
+            var optedIn = _settings.Current.WindrosePlusActiveByServer.GetValueOrDefault(s.InstallDir, false);
+            if (optedIn)
+            {
+                var port = _settings.Current.WindrosePlusDashboardPortByServer.GetValueOrDefault(s.InstallDir, 0);
+                if (port > 0) liveMapUrl = $"http://localhost:{port}/livemap";
+            }
+
+            var card = new ServerCardViewModel(
+                s.Id, s.Name, s.InstallDir,
+                isActive, wpInstalled,
+                s.AutoStartOnAppLaunch,
+                isRunning,
+                liveMapUrl);
+            card.AutoStartChanged += OnCardAutoStartChanged;
+            ServerCards.Add(card);
         }
+    }
+
+    private void OnCardAutoStartChanged(string serverId, bool value)
+    {
+        // Persist per-server autostart flag when the toggle is flipped in the UI.
+        _ = _settings.UpdateAsync(s =>
+        {
+            var entry = s.Servers.FirstOrDefault(e => e.Id == serverId);
+            if (entry is not null) entry.AutoStartOnAppLaunch = value;
+        });
     }
 
     // ── IWindrosePlusOptInContext ─────────────────────────────────────────────
@@ -305,6 +342,50 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     {
         await _settings.SelectServerAsync(id);
         RefreshServerCards();
+    }
+
+    [RelayCommand]
+    private void OpenFolder(string id)
+    {
+        var entry = _settings.Current.Servers.FirstOrDefault(s => s.Id == id);
+        if (entry is null || string.IsNullOrWhiteSpace(entry.InstallDir)) return;
+        if (!Directory.Exists(entry.InstallDir))
+        {
+            _toasts.Warning(Loc.Get("Error.ServerNotInstalled"));
+            return;
+        }
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = entry.InstallDir,
+                UseShellExecute = true,
+                Verb = "open",
+            });
+        }
+        catch (Exception ex) { _toasts.Error(ex.Message); }
+    }
+
+    [RelayCommand]
+    private void OpenLiveMap(string id)
+    {
+        var entry = _settings.Current.Servers.FirstOrDefault(s => s.Id == id);
+        if (entry is null) return;
+        var port = _settings.Current.WindrosePlusDashboardPortByServer.GetValueOrDefault(entry.InstallDir, 0);
+        if (port <= 0)
+        {
+            _toasts.Warning(Loc.Get("Server.LiveMap.Unavailable"));
+            return;
+        }
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = $"http://localhost:{port}/livemap",
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex) { _toasts.Error(ex.Message); }
     }
 
     [RelayCommand]

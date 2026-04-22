@@ -221,6 +221,7 @@
     <sys:String x:Key="ServerControl.Clear">Leeren</sys:String>
     <sys:String x:Key="ServerControl.ClearHistory.Tip">Sitzungsverlauf löschen</sys:String>
     <sys:String x:Key="Toast.SessionHistoryCleared">Sitzungsverlauf geleert.</sys:String>
+    <sys:String x:Key="Toast.ClickToDismiss">Zum Schließen klicken</sys:String>
     <sys:String x:Key="ServerControl.SearchLog">Log durchsuchen...</sys:String>
     <sys:String x:Key="ServerControl.LinesFormat">{0} Zeilen</sys:String>
     <sys:String x:Key="ServerControl.Filter.All">Alle</sys:String>
@@ -287,6 +288,16 @@
     <sys:String x:Key="Settings.AutoStart.Title">Autostart</sys:String>
     <sys:String x:Key="Settings.AutoStart.Label">Windrose Server Manager beim Windows-Start ausführen</sys:String>
     <sys:String x:Key="Settings.AutoStart.Hint">Trägt einen Eintrag in HKCU\Software\Microsoft\Windows\CurrentVersion\Run ein.</sys:String>
+    <sys:String x:Key="Settings.AutoStartServer.Label">ALLE konfigurierten Server automatisch starten wenn die App startet</sys:String>
+    <sys:String x:Key="Settings.AutoStartServer.Hint">Globaler Schalter — startet jeden Server sobald die App startet. Für einzelne Server nutze stattdessen den Auto-Start-Toggle auf der jeweiligen Server-Karte (Server-Seite). Bereits laufende Server werden übersprungen.</sys:String>
+
+    <!-- Server-Karte: Auto-Start pro Server -->
+    <sys:String x:Key="Server.AutoStart.Label">Diesen Server automatisch starten wenn die App startet</sys:String>
+    <sys:String x:Key="Server.AutoStart.Hint">Der aktive Server wird voll getrackt (Status, Logs, Events). Andere auto-gestartete Server laufen im Hintergrund — über „Als aktiv setzen" übernimmst du die Kontrolle.</sys:String>
+    <sys:String x:Key="Server.Status.Running">Läuft</sys:String>
+    <sys:String x:Key="Server.OpenFolder">Ordner öffnen</sys:String>
+    <sys:String x:Key="Server.OpenLiveMap">Live-Karte öffnen</sys:String>
+    <sys:String x:Key="Server.LiveMap.Unavailable">Live-Karte nicht verfügbar — WindrosePlus-Dashboard läuft für diesen Server nicht.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Title">WindrosePlus</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Hint">WindrosePlus erweitert deinen Server um Spielerliste, Kick &amp; Ban, Broadcast und mehr.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusLabel">Status:</sys:String>
@@ -415,6 +426,13 @@
     <sys:String x:Key="InstallPhase.Validating">Validierung</sys:String>
     <sys:String x:Key="InstallPhase.Complete">Abgeschlossen</sys:String>
     <sys:String x:Key="InstallPhase.Failed">Fehlgeschlagen</sys:String>
+    <sys:String x:Key="InstallPhase.FetchingRelease">Release-Info wird geladen</sys:String>
+    <sys:String x:Key="InstallPhase.DownloadingArchive">WindrosePlus-Archiv wird geladen</sys:String>
+    <sys:String x:Key="InstallPhase.VerifyingDigest">SHA-256 wird verifiziert</sys:String>
+    <sys:String x:Key="InstallPhase.Extracting">Archiv wird entpackt</sys:String>
+    <sys:String x:Key="InstallPhase.Installing">Installer läuft</sys:String>
+    <sys:String x:Key="InstallPhase.WritingMarker">Versionsmarker wird geschrieben</sys:String>
+    <sys:String x:Key="InstallPhase.CleaningUp">Räume auf</sys:String>
 
     <!-- Events (Session-Verlauf) -->
     <sys:String x:Key="Event.Started">Gestartet</sys:String>

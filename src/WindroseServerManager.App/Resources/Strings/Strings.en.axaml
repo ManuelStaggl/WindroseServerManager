@@ -221,6 +221,7 @@
     <sys:String x:Key="ServerControl.Clear">Clear</sys:String>
     <sys:String x:Key="ServerControl.ClearHistory.Tip">Clear the session event history</sys:String>
     <sys:String x:Key="Toast.SessionHistoryCleared">Session history cleared.</sys:String>
+    <sys:String x:Key="Toast.ClickToDismiss">Click to dismiss</sys:String>
     <sys:String x:Key="ServerControl.SearchLog">Search log...</sys:String>
     <sys:String x:Key="ServerControl.LinesFormat">{0} lines</sys:String>
     <sys:String x:Key="ServerControl.Filter.All">All</sys:String>
@@ -287,6 +288,16 @@
     <sys:String x:Key="Settings.AutoStart.Title">Autostart</sys:String>
     <sys:String x:Key="Settings.AutoStart.Label">Run Windrose Server Manager at Windows startup</sys:String>
     <sys:String x:Key="Settings.AutoStart.Hint">Adds an entry to HKCU\Software\Microsoft\Windows\CurrentVersion\Run.</sys:String>
+    <sys:String x:Key="Settings.AutoStartServer.Label">Auto-start ALL configured servers when the app launches</sys:String>
+    <sys:String x:Key="Settings.AutoStartServer.Hint">Global shortcut that starts every server on app launch. For fine-grained control, use the per-server auto-start toggle on each server card (Server page) instead. Already-running servers are skipped.</sys:String>
+
+    <!-- Per-server card auto-start -->
+    <sys:String x:Key="Server.AutoStart.Label">Auto-start this server when the app launches</sys:String>
+    <sys:String x:Key="Server.AutoStart.Hint">The active server is fully tracked (status, logs, events). Other auto-started servers run in the background — switch to them via "Set active" to take control.</sys:String>
+    <sys:String x:Key="Server.Status.Running">Running</sys:String>
+    <sys:String x:Key="Server.OpenFolder">Open folder</sys:String>
+    <sys:String x:Key="Server.OpenLiveMap">Open live map</sys:String>
+    <sys:String x:Key="Server.LiveMap.Unavailable">Live map not available — WindrosePlus dashboard is not running for this server.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Title">WindrosePlus</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Hint">WindrosePlus extends your server with player list, kick &amp; ban, broadcast, and more.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusLabel">Status:</sys:String>
@@ -415,6 +426,13 @@
     <sys:String x:Key="InstallPhase.Validating">Validating</sys:String>
     <sys:String x:Key="InstallPhase.Complete">Complete</sys:String>
     <sys:String x:Key="InstallPhase.Failed">Failed</sys:String>
+    <sys:String x:Key="InstallPhase.FetchingRelease">Fetching release metadata</sys:String>
+    <sys:String x:Key="InstallPhase.DownloadingArchive">Downloading WindrosePlus archive</sys:String>
+    <sys:String x:Key="InstallPhase.VerifyingDigest">Verifying SHA-256</sys:String>
+    <sys:String x:Key="InstallPhase.Extracting">Extracting archive</sys:String>
+    <sys:String x:Key="InstallPhase.Installing">Running installer</sys:String>
+    <sys:String x:Key="InstallPhase.WritingMarker">Writing version marker</sys:String>
+    <sys:String x:Key="InstallPhase.CleaningUp">Cleaning up</sys:String>
 
     <!-- Events (session history) -->
     <sys:String x:Key="Event.Started">Started</sys:String>

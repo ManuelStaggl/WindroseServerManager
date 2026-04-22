@@ -78,4 +78,13 @@ public sealed class AppSettings
     public Dictionary<string, string> WindrosePlusAdminSteamIdByServer  { get; set; } = new();
     /// <summary>Per-server opt-in state for WindrosePlus. Key = server InstallDir. Default: NeverAsked (seeded by migration).</summary>
     public Dictionary<string, OptInState> WindrosePlusOptInStateByServer { get; set; } = new();
+
+    /// <summary>
+    /// When true, ALL configured servers are auto-started when the app launches
+    /// (including Windows autostart → app → server chain). Acts as a shortcut;
+    /// alternatively, per-server opt-in is available via <see cref="ServerEntry.AutoStartOnAppLaunch"/>.
+    /// The effective per-server start condition is <c>(this flag) OR entry.AutoStartOnAppLaunch</c>.
+    /// Idempotent: any server already running is skipped.
+    /// </summary>
+    public bool AutoStartServerOnAppLaunch { get; set; } = false;
 }
