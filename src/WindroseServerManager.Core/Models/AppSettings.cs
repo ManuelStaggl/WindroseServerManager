@@ -74,6 +74,8 @@ public sealed class AppSettings
     public Dictionary<string, int>    WindrosePlusDashboardPortByServer { get; set; } = new();
     /// <summary>Seconds between automatic player list refreshes when WindrosePlus is active. Minimum enforced at 3s.</summary>
     public int WindrosePlusPlayerRefreshSeconds { get; set; } = 10;
+    /// <summary>Hours between automatic WindrosePlus update checks. 0 = disabled. Default 6h.</summary>
+    public int WindrosePlusUpdateCheckIntervalHours { get; set; } = 6;
     /// <summary>Per-server admin SteamID64 entered in wizard/retrofit. Key = server InstallDir.</summary>
     public Dictionary<string, string> WindrosePlusAdminSteamIdByServer  { get; set; } = new();
     /// <summary>Per-server opt-in state for WindrosePlus. Key = server InstallDir. Default: NeverAsked (seeded by migration).</summary>

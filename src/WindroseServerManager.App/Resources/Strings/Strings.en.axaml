@@ -258,6 +258,8 @@
     <sys:String x:Key="Settings.Group.System">NETWORK &amp; SYSTEM</sys:String>
     <sys:String x:Key="Settings.Group.WindrosePlus">WINDROSE PLUS</sys:String>
     <sys:String x:Key="Settings.Group.App">APP</sys:String>
+    <sys:String x:Key="Settings.Group.General">GENERAL</sys:String>
+    <sys:String x:Key="Settings.Group.About">ABOUT</sys:String>
     <sys:String x:Key="Settings.Save.Title">Save settings</sys:String>
     <sys:String x:Key="Settings.Save.Hint">Server start and Steam settings take effect on the next launch.</sys:String>
     <sys:String x:Key="Settings.Language.Title">Language</sys:String>
@@ -706,4 +708,25 @@
 
     <!-- Phase 12 — Shared opt-out CTA -->
     <sys:String x:Key="WindrosePlus.OptOut.Cta">Install WindrosePlus</sys:String>
+
+    <!-- WindrosePlus update check -->
+    <sys:String x:Key="Server.WindrosePlus.UpdateBadge">Update</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.UpdateNow">Update</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.All">Update all</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BannerTitleFormat">WindrosePlus {0} available</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BannerBodyFormat">{0} server(s) have an older version installed.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Starting">{0}: updating WindrosePlus…</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Done">{0}: WindrosePlus updated.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Failed">{0}: update failed — {1}</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.StopFirst">Please stop the server before updating WindrosePlus.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.SkippedRunning">{0}: skipped (still running).</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BatchSummary">Update finished: {0} ok, {1} failed, {2} skipped.</sys:String>
+
+    <sys:String x:Key="Settings.WindrosePlus.Update.Title">WindrosePlus updates</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.Hint">Compares the installed WindrosePlus version of every server with the latest GitHub release. Nothing is installed automatically.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalLabel">Check interval</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalOff">Never (manual)</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalHours">Every {0} hours</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.CheckNow">Check now</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.OpenReleasePage">Open release page</sys:String>
 </ResourceDictionary>

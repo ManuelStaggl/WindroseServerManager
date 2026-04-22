@@ -17,10 +17,19 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     private readonly IWindrosePlusApiService _wplusApi;
     private readonly INavigationService _nav;
     private readonly IServerProcessService _process;
+    private readonly IWindrosePlusUpdateService _wplusUpdate;
     private System.Threading.CancellationTokenSource? _cts;
 
     // ── Server list ───────────────────────────────────────────────────────────
     public ObservableCollection<ServerCardViewModel> ServerCards { get; } = new();
+
+    // Aggregate WindrosePlus-update state for the header banner.
+    [ObservableProperty] private bool _windrosePlusUpdateBannerVisible;
+    [ObservableProperty] private int _windrosePlusUpdatePendingCount;
+    [ObservableProperty] private string? _windrosePlusLatestTag;
+    [ObservableProperty] private bool _isUpdatingAllWindrosePlus;
+    [ObservableProperty] private string _windrosePlusUpdateBannerTitle = string.Empty;
+    [ObservableProperty] private string _windrosePlusUpdateBannerBody = string.Empty;
 
     // ── Wizard state ──────────────────────────────────────────────────────────
     [ObservableProperty] private bool _isAddingServer;
@@ -56,7 +65,8 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         IWindrosePlusApiService wplusApi,
         INavigationService nav,
         IServerProcessService process,
-        ILocalizationService localization)
+        ILocalizationService localization,
+        IWindrosePlusUpdateService wplusUpdate)
     {
         _install = install;
         _settings = settings;
@@ -65,11 +75,48 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         _wplusApi = wplusApi;
         _nav = nav;
         _process = process;
+        _wplusUpdate = wplusUpdate;
 
         RefreshServerCards();
         _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
         localization.LanguageChanged += RefreshServerCards;
         _process.StatusChanged += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
+        _wplusUpdate.UpdateChecked += _ => Avalonia.Threading.Dispatcher.UIThread.Post(ApplyUpdateStatusToCards);
+    }
+
+    private void ApplyUpdateStatusToCards()
+    {
+        var result = _wplusUpdate.LastResult;
+        if (result is null)
+        {
+            WindrosePlusUpdateBannerVisible = false;
+            WindrosePlusUpdatePendingCount = 0;
+            WindrosePlusLatestTag = null;
+            return;
+        }
+        foreach (var card in ServerCards)
+        {
+            var status = result.Servers.FirstOrDefault(x => x.ServerId == card.Id);
+            if (status is null)
+            {
+                card.HasWindrosePlusUpdate = false;
+                card.InstalledWindrosePlusTag = null;
+                card.LatestWindrosePlusTag = null;
+            }
+            else
+            {
+                card.InstalledWindrosePlusTag = status.InstalledTag;
+                card.LatestWindrosePlusTag = result.LatestTag;
+                card.HasWindrosePlusUpdate = status.HasUpdate;
+            }
+        }
+        WindrosePlusUpdatePendingCount = result.Servers.Count(x => x.HasUpdate);
+        WindrosePlusLatestTag = result.LatestTag;
+        WindrosePlusUpdateBannerVisible = result.AnyUpdate;
+        WindrosePlusUpdateBannerTitle = result.LatestTag is null
+            ? string.Empty
+            : Loc.Format("Server.WindrosePlus.Update.BannerTitleFormat", result.LatestTag);
+        WindrosePlusUpdateBannerBody = Loc.Format("Server.WindrosePlus.Update.BannerBodyFormat", WindrosePlusUpdatePendingCount);
     }
 
     private void RefreshServerCards()
@@ -105,6 +152,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             card.AutoStartChanged += OnCardAutoStartChanged;
             ServerCards.Add(card);
         }
+        ApplyUpdateStatusToCards();
     }
 
     private void OnCardAutoStartChanged(string serverId, bool value)
@@ -334,6 +382,89 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         retrofitVm.StateChanged += RefreshServerCards;
         await retrofitVm.OpenRetrofitDialogCommand.ExecuteAsync(null);
         retrofitVm.StateChanged -= RefreshServerCards;
+        RefreshServerCards();
+    }
+
+    [RelayCommand]
+    private async Task UpdateWindrosePlus(string id)
+    {
+        var entry = _settings.Current.Servers.FirstOrDefault(s => s.Id == id);
+        if (entry is null) return;
+        var card = ServerCards.FirstOrDefault(c => c.Id == id);
+
+        // Safety: server must be stopped — we're overwriting DLLs.
+        if (entry.Id == _settings.Current.ActiveServerId &&
+            _process.Status is ServerStatus.Running or ServerStatus.Starting)
+        {
+            _toasts.Warning(Loc.Get("Server.WindrosePlus.Update.StopFirst"));
+            return;
+        }
+
+        if (card is not null) card.IsUpdatingWindrosePlus = true;
+        try
+        {
+            _toasts.Info(Loc.Format("Server.WindrosePlus.Update.Starting", entry.Name));
+            await _wplus.InstallAsync(entry.InstallDir, null, CancellationToken.None);
+            _toasts.Success(Loc.Format("Server.WindrosePlus.Update.Done", entry.Name));
+            await _wplusUpdate.CheckAsync();
+        }
+        catch (WindrosePlusOfflineException)
+        {
+            _toasts.Error(Loc.Get("Error.WindrosePlus.NoInternet"));
+        }
+        catch (Exception ex)
+        {
+            _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex));
+        }
+        finally
+        {
+            if (card is not null) card.IsUpdatingWindrosePlus = false;
+            RefreshServerCards();
+        }
+    }
+
+    [RelayCommand]
+    private async Task UpdateAllWindrosePlus()
+    {
+        var result = _wplusUpdate.LastResult;
+        if (result is null || !result.AnyUpdate) return;
+
+        var targets = result.Servers.Where(x => x.HasUpdate).ToList();
+        if (targets.Count == 0) return;
+
+        // Skip the active server if it's currently running (user must stop it first).
+        var activeId = _settings.Current.ActiveServerId;
+        var activeRunning = _process.Status is ServerStatus.Running or ServerStatus.Starting;
+
+        int ok = 0, skipped = 0, failed = 0;
+        foreach (var t in targets)
+        {
+            if (t.ServerId == activeId && activeRunning)
+            {
+                _toasts.Warning(Loc.Format("Server.WindrosePlus.Update.SkippedRunning", t.ServerName));
+                skipped++;
+                continue;
+            }
+            var card = ServerCards.FirstOrDefault(c => c.Id == t.ServerId);
+            if (card is not null) card.IsUpdatingWindrosePlus = true;
+            try
+            {
+                await _wplus.InstallAsync(t.InstallDir, null, CancellationToken.None);
+                ok++;
+            }
+            catch (Exception ex)
+            {
+                failed++;
+                _toasts.Error(Loc.Format("Server.WindrosePlus.Update.Failed", t.ServerName, ErrorMessageHelper.FriendlyMessage(ex)));
+            }
+            finally
+            {
+                if (card is not null) card.IsUpdatingWindrosePlus = false;
+            }
+        }
+
+        await _wplusUpdate.CheckAsync();
+        _toasts.Info(Loc.Format("Server.WindrosePlus.Update.BatchSummary", ok, failed, skipped));
         RefreshServerCards();
     }
 

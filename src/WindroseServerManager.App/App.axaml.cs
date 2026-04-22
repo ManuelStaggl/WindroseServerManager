@@ -224,6 +224,8 @@ public partial class App : Application
         s.AddSingleton<IAutoStartService, AutoStartService>();
         s.AddSingleton<IAppUpdateService, AppUpdateService>();
         s.AddHostedService<AppUpdateScheduler>();
+        s.AddSingleton<IWindrosePlusUpdateService, WindrosePlusUpdateService>();
+        s.AddHostedService<WindrosePlusUpdateScheduler>();
 
         s.AddSingleton<MainWindowViewModel>();
 

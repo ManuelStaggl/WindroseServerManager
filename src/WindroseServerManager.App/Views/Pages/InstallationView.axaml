@@ -14,7 +14,7 @@
         <!-- ================================================================ -->
         <!-- SERVER LIST (IsAddingServer = false)                             -->
         <!-- ================================================================ -->
-        <Grid RowDefinitions="Auto,*"
+        <Grid RowDefinitions="Auto,Auto,*"
               IsVisible="{Binding !IsAddingServer}">
 
             <!-- Page header row: title+subtitle left, add button right -->
@@ -37,8 +37,28 @@
                                    Converter={x:Static vm:IntToBoolConverter.Instance}}" />
             </Grid>
 
-            <!-- Empty state -->
+            <!-- WindrosePlus-Update-Banner -->
             <Border Grid.Row="1"
+                    Classes="alert alert-warning"
+                    Margin="0,0,0,16"
+                    IsVisible="{Binding WindrosePlusUpdateBannerVisible}">
+                <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Classes="body-emphasis"
+                                   Text="{Binding WindrosePlusUpdateBannerTitle}" />
+                        <TextBlock Classes="caption"
+                                   Text="{Binding WindrosePlusUpdateBannerBody}" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Classes="primary"
+                            Content="{DynamicResource Server.WindrosePlus.Update.All}"
+                            Command="{Binding UpdateAllWindrosePlusCommand}"
+                            IsEnabled="{Binding !IsUpdatingAllWindrosePlus}" />
+                </Grid>
+            </Border>
+
+            <!-- Empty state -->
+            <Border Grid.Row="2"
                     Classes="card"
                     IsVisible="{Binding ServerCards.Count,
                                Converter={x:Static vm:CountToInverseBoolConverter.Instance}}">
@@ -57,7 +77,7 @@
             </Border>
 
             <!-- Server cards list -->
-            <ScrollViewer Grid.Row="1"
+            <ScrollViewer Grid.Row="2"
                           IsVisible="{Binding ServerCards.Count,
                                      Converter={x:Static vm:IntToBoolConverter.Instance}}"
                           HorizontalScrollBarVisibility="Disabled"
@@ -100,6 +120,11 @@
                                                 <Border Classes="badge-success"
                                                         IsVisible="{Binding IsRunning}">
                                                     <TextBlock Text="{DynamicResource Server.Status.Running}" />
+                                                </Border>
+                                                <Border Classes="badge-warning"
+                                                        IsVisible="{Binding HasWindrosePlusUpdate}"
+                                                        ToolTip.Tip="{Binding LatestWindrosePlusTag}">
+                                                    <TextBlock Text="{DynamicResource Server.WindrosePlus.UpdateBadge}" />
                                                 </Border>
                                             </StackPanel>
                                             <TextBlock Classes="caption muted"
@@ -157,6 +182,12 @@
                                                     Content="{DynamicResource Server.InstallWindrosePlus}"
                                                     IsVisible="{Binding !WindrosePlusActive}"
                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).InstallWindrosePlusCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            <Button Classes="primary"
+                                                    Content="{DynamicResource Server.WindrosePlus.UpdateNow}"
+                                                    IsVisible="{Binding HasWindrosePlusUpdate}"
+                                                    IsEnabled="{Binding !IsUpdatingWindrosePlus}"
+                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).UpdateWindrosePlusCommand}"
                                                     CommandParameter="{Binding Id}" />
                                         </StackPanel>
                                     </Grid>

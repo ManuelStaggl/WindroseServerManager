@@ -17,6 +17,12 @@ public sealed class LanguageOption
     public required string DisplayName { get; init; }
 }
 
+public sealed class UpdateIntervalOption
+{
+    public required int Hours { get; init; }         // 0 = off
+    public required string DisplayName { get; init; }
+}
+
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly IAppSettingsService _settings;
@@ -27,6 +33,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly ILocalizationService _localization;
     private readonly IWindrosePlusService _wplus;
     private readonly IWindrosePlusApiService _wplusApi;
+    private readonly IWindrosePlusUpdateService _wplusUpdate;
 
     [ObservableProperty] private bool _autoRestartOnCrash;
     [ObservableProperty] private int _gracefulShutdownSeconds;
@@ -39,7 +46,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string _steamAppId = "4129620";
     [ObservableProperty] private string _steamLogin = string.Empty;
 
-    [ObservableProperty] private string? _statusMessage;
+    // Wird true während der Konstruktor die Properties aus Settings füllt —
+    // verhindert dass jedes Initial-Assign eine Persist-Runde auslöst.
+    private bool _suppressPersist;
 
     // Firewall
     [ObservableProperty] private bool _isFirewallRuleInstalled;
@@ -56,6 +65,18 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string? _pendingReleaseUrl;
     [ObservableProperty] private string? _pendingDownloadUrl;
 
+    // WindrosePlus-Update-Check
+    [ObservableProperty] private bool _isWindrosePlusUpdateCheckBusy;
+    [ObservableProperty] private string? _windrosePlusUpdateStatus;
+    [ObservableProperty] private bool _hasWindrosePlusUpdateAvailable;
+    [ObservableProperty] private string? _windrosePlusLatestTag;
+    [ObservableProperty] private string? _windrosePlusReleaseUrl;
+    [ObservableProperty] private int _windrosePlusPendingCount;
+
+    public ObservableCollection<UpdateIntervalOption> WindrosePlusIntervalOptions { get; } = new();
+    [ObservableProperty] private UpdateIntervalOption? _selectedWindrosePlusInterval;
+    private bool _suppressIntervalWrite;
+
     // Language
     public ObservableCollection<LanguageOption> LanguageOptions { get; } = new();
     [ObservableProperty] private LanguageOption? _selectedLanguageOption;
@@ -71,7 +92,8 @@ public partial class SettingsViewModel : ViewModelBase
         IAppUpdateService appUpdate,
         ILocalizationService localization,
         IWindrosePlusService wplus,
-        IWindrosePlusApiService wplusApi)
+        IWindrosePlusApiService wplusApi,
+        IWindrosePlusUpdateService wplusUpdate)
     {
         _settings = settings;
         _toasts = toasts;
@@ -81,7 +103,9 @@ public partial class SettingsViewModel : ViewModelBase
         _localization = localization;
         _wplus = wplus;
         _wplusApi = wplusApi;
+        _wplusUpdate = wplusUpdate;
 
+        _suppressPersist = true;
         var c = settings.Current;
         _autoRestartOnCrash = c.AutoRestartOnCrash;
         _gracefulShutdownSeconds = c.GracefulShutdownSeconds;
@@ -91,6 +115,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         _steamAppId = c.SteamAppId;
         _steamLogin = c.SteamLogin;
+        _suppressPersist = false;
 
         _suppressAutoStartWrite = true;
         _autoStartEnabled = _autoStart.IsEnabled();
@@ -100,8 +125,85 @@ public partial class SettingsViewModel : ViewModelBase
         RebuildLanguageOptions();
         _localization.LanguageChanged += OnLanguageChanged;
 
+        RebuildIntervalOptions();
+        _wplusUpdate.UpdateChecked += OnWindrosePlusUpdateChecked;
+        ApplyLastWindrosePlusResult();
+
         _settings.Changed += OnSettingsChanged;
         _ = CheckFirewallCoreAsync(showToast: false);
+    }
+
+    private void RebuildIntervalOptions()
+    {
+        _suppressIntervalWrite = true;
+        try
+        {
+            WindrosePlusIntervalOptions.Clear();
+            WindrosePlusIntervalOptions.Add(new UpdateIntervalOption { Hours = 0,  DisplayName = Loc.Get("Settings.WindrosePlus.Update.IntervalOff") });
+            WindrosePlusIntervalOptions.Add(new UpdateIntervalOption { Hours = 4,  DisplayName = Loc.Format("Settings.WindrosePlus.Update.IntervalHours", 4) });
+            WindrosePlusIntervalOptions.Add(new UpdateIntervalOption { Hours = 6,  DisplayName = Loc.Format("Settings.WindrosePlus.Update.IntervalHours", 6) });
+            WindrosePlusIntervalOptions.Add(new UpdateIntervalOption { Hours = 12, DisplayName = Loc.Format("Settings.WindrosePlus.Update.IntervalHours", 12) });
+            WindrosePlusIntervalOptions.Add(new UpdateIntervalOption { Hours = 24, DisplayName = Loc.Format("Settings.WindrosePlus.Update.IntervalHours", 24) });
+
+            var current = _settings.Current.WindrosePlusUpdateCheckIntervalHours;
+            SelectedWindrosePlusInterval =
+                WindrosePlusIntervalOptions.FirstOrDefault(o => o.Hours == current)
+                ?? WindrosePlusIntervalOptions.First(o => o.Hours == 6);
+        }
+        finally { _suppressIntervalWrite = false; }
+    }
+
+    partial void OnSelectedWindrosePlusIntervalChanged(UpdateIntervalOption? value)
+    {
+        if (_suppressIntervalWrite || value is null) return;
+        if (_settings.Current.WindrosePlusUpdateCheckIntervalHours == value.Hours) return;
+        _ = _settings.UpdateAsync(s => s.WindrosePlusUpdateCheckIntervalHours = value.Hours);
+    }
+
+    private void OnWindrosePlusUpdateChecked(WindrosePlusUpdateResult r)
+        => Avalonia.Threading.Dispatcher.UIThread.Post(() => ApplyWindrosePlusResult(r));
+
+    private void ApplyLastWindrosePlusResult()
+    {
+        if (_wplusUpdate.LastResult is { } r) ApplyWindrosePlusResult(r);
+    }
+
+    private void ApplyWindrosePlusResult(WindrosePlusUpdateResult r)
+    {
+        WindrosePlusUpdateStatus = r.Message;
+        HasWindrosePlusUpdateAvailable = r.AnyUpdate;
+        WindrosePlusLatestTag = r.LatestTag;
+        WindrosePlusReleaseUrl = r.ReleaseUrl;
+        WindrosePlusPendingCount = r.Servers.Count(s => s.HasUpdate);
+    }
+
+    [RelayCommand]
+    private async Task CheckWindrosePlusUpdateAsync()
+    {
+        if (IsWindrosePlusUpdateCheckBusy) return;
+        try
+        {
+            IsWindrosePlusUpdateCheckBusy = true;
+            WindrosePlusUpdateStatus = Loc.Get("Toast.UpdateChecking");
+            var result = await _wplusUpdate.CheckAsync();
+            ApplyWindrosePlusResult(result);
+            if (!result.Succeeded) _toasts.Warning(result.Message);
+            else if (result.AnyUpdate) _toasts.Info(result.Message);
+            else _toasts.Success(result.Message);
+        }
+        catch (Exception ex)
+        {
+            WindrosePlusUpdateStatus = ErrorMessageHelper.FriendlyMessage(ex);
+            _toasts.Error(WindrosePlusUpdateStatus);
+        }
+        finally { IsWindrosePlusUpdateCheckBusy = false; }
+    }
+
+    [RelayCommand]
+    private void OpenWindrosePlusReleasePage()
+    {
+        if (!string.IsNullOrWhiteSpace(WindrosePlusReleaseUrl))
+            TryOpenUrl(WindrosePlusReleaseUrl!);
     }
 
     public string AppVersionDisplay =>
@@ -258,22 +360,42 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private async Task SaveAsync()
+    partial void OnAutoRestartOnCrashChanged(bool value)
     {
-        await _settings.UpdateAsync(s =>
-        {
-            s.AutoRestartOnCrash = AutoRestartOnCrash;
-            s.GracefulShutdownSeconds = Math.Max(5, GracefulShutdownSeconds);
+        if (_suppressPersist) return;
+        _ = _settings.UpdateAsync(s => s.AutoRestartOnCrash = value);
+    }
 
-            s.LogEnabled = LogEnabled;
-            s.ExtraLaunchArgs = ExtraLaunchArgs?.Trim() ?? string.Empty;
+    partial void OnGracefulShutdownSecondsChanged(int value)
+    {
+        if (_suppressPersist) return;
+        _ = _settings.UpdateAsync(s => s.GracefulShutdownSeconds = Math.Max(5, value));
+    }
 
-            s.SteamAppId = string.IsNullOrWhiteSpace(SteamAppId) ? "4129620" : SteamAppId.Trim();
-            s.SteamLogin = SteamLogin?.Trim() ?? string.Empty;
-        });
-        StatusMessage = Loc.Get("Toast.SettingsSaved");
-        _toasts.Success(Loc.Get("Toast.SettingsSaved"));
+    partial void OnLogEnabledChanged(bool value)
+    {
+        if (_suppressPersist) return;
+        _ = _settings.UpdateAsync(s => s.LogEnabled = value);
+    }
+
+    partial void OnExtraLaunchArgsChanged(string value)
+    {
+        if (_suppressPersist) return;
+        _ = _settings.UpdateAsync(s => s.ExtraLaunchArgs = value?.Trim() ?? string.Empty);
+    }
+
+    partial void OnSteamAppIdChanged(string value)
+    {
+        if (_suppressPersist) return;
+        // Leer bleibt leer während Tippens — Fallback auf 4129620 nur wenn der User das Feld leer lässt.
+        var v = value?.Trim();
+        _ = _settings.UpdateAsync(s => s.SteamAppId = string.IsNullOrEmpty(v) ? "4129620" : v);
+    }
+
+    partial void OnSteamLoginChanged(string value)
+    {
+        if (_suppressPersist) return;
+        _ = _settings.UpdateAsync(s => s.SteamLogin = value?.Trim() ?? string.Empty);
     }
 
     public string AppVersion =>

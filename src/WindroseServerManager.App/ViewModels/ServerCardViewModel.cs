@@ -16,6 +16,10 @@ public sealed partial class ServerCardViewModel : ObservableObject
     [ObservableProperty] private bool _isRunning;
     [ObservableProperty] private bool _hasLiveMap;
     [ObservableProperty] private string? _liveMapUrl;
+    [ObservableProperty] private bool _hasWindrosePlusUpdate;
+    [ObservableProperty] private string? _installedWindrosePlusTag;
+    [ObservableProperty] private string? _latestWindrosePlusTag;
+    [ObservableProperty] private bool _isUpdatingWindrosePlus;
 
     public string Id { get; }
     public string Name { get; }

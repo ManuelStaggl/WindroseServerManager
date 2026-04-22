@@ -258,6 +258,8 @@
     <sys:String x:Key="Settings.Group.System">NETZWERK &amp; SYSTEM</sys:String>
     <sys:String x:Key="Settings.Group.WindrosePlus">WINDROSE PLUS</sys:String>
     <sys:String x:Key="Settings.Group.App">APP</sys:String>
+    <sys:String x:Key="Settings.Group.General">ALLGEMEIN</sys:String>
+    <sys:String x:Key="Settings.Group.About">ÜBER</sys:String>
     <sys:String x:Key="Settings.Save.Title">Einstellungen speichern</sys:String>
     <sys:String x:Key="Settings.Save.Hint">Server-Start und Steam-Einstellungen werden beim nächsten Start übernommen.</sys:String>
     <sys:String x:Key="Settings.Language.Title">Sprache</sys:String>
@@ -706,4 +708,25 @@
 
     <!-- Phase 12 — Shared opt-out CTA -->
     <sys:String x:Key="WindrosePlus.OptOut.Cta">WindrosePlus installieren</sys:String>
+
+    <!-- WindrosePlus-Update-Check -->
+    <sys:String x:Key="Server.WindrosePlus.UpdateBadge">Update</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.UpdateNow">Aktualisieren</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.All">Alle aktualisieren</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BannerTitleFormat">WindrosePlus {0} verfügbar</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BannerBodyFormat">{0} Server haben eine ältere Version installiert.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Starting">{0}: WindrosePlus wird aktualisiert…</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Done">{0}: WindrosePlus aktualisiert.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Failed">{0}: Update fehlgeschlagen — {1}</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.StopFirst">Bitte zuerst den Server stoppen, bevor WindrosePlus aktualisiert wird.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.SkippedRunning">{0}: übersprungen (läuft noch).</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BatchSummary">Update abgeschlossen: {0} erfolgreich, {1} fehlgeschlagen, {2} übersprungen.</sys:String>
+
+    <sys:String x:Key="Settings.WindrosePlus.Update.Title">WindrosePlus-Updates</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.Hint">Vergleicht die installierte WindrosePlus-Version jedes Servers mit dem neuesten Release auf GitHub. Es wird nichts automatisch installiert.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalLabel">Prüf-Intervall</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalOff">Nie (manuell)</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.IntervalHours">Alle {0} Stunden</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.CheckNow">Jetzt prüfen</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.OpenReleasePage">Release-Seite öffnen</sys:String>
 </ResourceDictionary>
