@@ -19,6 +19,18 @@ public interface IServerConfigService
     Task<ServerDescription?> LoadServerDescriptionAsync(CancellationToken ct = default);
     Task SaveServerDescriptionAsync(ServerDescription desc, CancellationToken ct = default);
 
+    /// <summary>
+    /// Liest ServerDescription.json aus einem explizit angegebenen Server-Installationsordner.
+    /// Wird vom Install-Wizard benötigt, bevor der Server als "aktiv" registriert ist.
+    /// </summary>
+    Task<ServerDescription?> LoadServerDescriptionFromAsync(string installDir, CancellationToken ct = default);
+
+    /// <summary>
+    /// Schreibt ServerDescription.json in einen explizit angegebenen Server-Installationsordner.
+    /// Wird vom Install-Wizard benötigt, bevor der Server als "aktiv" registriert ist.
+    /// </summary>
+    Task SaveServerDescriptionToAsync(string installDir, ServerDescription desc, CancellationToken ct = default);
+
     /// <summary>Lists world subdirectories found under the resolved Worlds root.</summary>
     IEnumerable<string> ListWorldIds();
 

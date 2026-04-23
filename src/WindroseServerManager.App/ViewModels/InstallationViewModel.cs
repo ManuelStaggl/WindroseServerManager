@@ -18,6 +18,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     private readonly INavigationService _nav;
     private readonly IServerProcessService _process;
     private readonly IWindrosePlusUpdateService _wplusUpdate;
+    private readonly IServerConfigService _config;
     private System.Threading.CancellationTokenSource? _cts;
 
     // ── Server list ───────────────────────────────────────────────────────────
@@ -80,7 +81,8 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         INavigationService nav,
         IServerProcessService process,
         ILocalizationService localization,
-        IWindrosePlusUpdateService wplusUpdate)
+        IWindrosePlusUpdateService wplusUpdate,
+        IServerConfigService config)
     {
         _install = install;
         _settings = settings;
@@ -90,6 +92,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         _nav = nav;
         _process = process;
         _wplusUpdate = wplusUpdate;
+        _config = config;
 
         RefreshServerCards();
         _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
@@ -365,7 +368,27 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 await _wplusApi.WriteConfigAsync(NewInstallDir, cfg, _cts.Token);
             }
 
-            // 3) Persist server entry + per-server state
+            // 3) ServerDescription.json mit gewähltem Namen + Invite-Code anlegen,
+            //    damit Dashboard/Configuration den richtigen Namen anzeigen und
+            //    frisch installierte Server von Anfang an einen Invite-Code haben.
+            //    Wenn bereits eine Datei existiert (adoptierter Server), füllen wir
+            //    nur leere Felder auf — ein bestehender Invite-Code bleibt unangetastet.
+            try
+            {
+                var existing = await _config.LoadServerDescriptionFromAsync(NewInstallDir, _cts.Token)
+                               ?? new ServerDescription();
+                if (string.IsNullOrWhiteSpace(existing.ServerName))
+                    existing.ServerName = NewServerName;
+                if (string.IsNullOrWhiteSpace(existing.InviteCode))
+                    existing.InviteCode = InviteCodeGenerator.Generate();
+                await _config.SaveServerDescriptionToAsync(NewInstallDir, existing, _cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Konnte ServerDescription.json nicht vor-initialisieren — Server wird Defaults schreiben");
+            }
+
+            // 4) Persist server entry + per-server state
             var installDir = NewInstallDir.TrimEnd('\\', '/');
             var name = NewServerName;
             var optedIn = IsOptingIn;

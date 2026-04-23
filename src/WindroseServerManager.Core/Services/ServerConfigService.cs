@@ -147,10 +147,22 @@ public sealed class ServerConfigService : IServerConfigService
         return string.Join('.', parts.Take(3));
     }
 
-    public async Task<ServerDescription?> LoadServerDescriptionAsync(CancellationToken ct = default)
+    public Task<ServerDescription?> LoadServerDescriptionAsync(CancellationToken ct = default)
     {
-        var path = GetServerDescriptionPath();
-        if (path is null) return null;
+        var root = GetConfigRoot();
+        if (root is null) return Task.FromResult<ServerDescription?>(null);
+        return LoadServerDescriptionCoreAsync(root, updateCache: true, ct);
+    }
+
+    public Task<ServerDescription?> LoadServerDescriptionFromAsync(string installDir, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(installDir);
+        return LoadServerDescriptionCoreAsync(installDir, updateCache: false, ct);
+    }
+
+    private async Task<ServerDescription?> LoadServerDescriptionCoreAsync(string installDir, bool updateCache, CancellationToken ct)
+    {
+        var path = Path.Combine(installDir, ServerDescriptionRelativeDir, ServerDescriptionFileName);
         if (!File.Exists(path))
         {
             _logger.LogInformation("ServerDescription not found at {Path}", path);
@@ -162,7 +174,7 @@ public sealed class ServerConfigService : IServerConfigService
             var envelope = await JsonSerializer.DeserializeAsync<ServerDescriptionFile>(stream, JsonOptions, ct)
                                .ConfigureAwait(false)
                            ?? new ServerDescriptionFile();
-            _lastServerEnvelope = envelope;
+            if (updateCache) _lastServerEnvelope = envelope;
             return envelope.Persistent ?? new ServerDescription();
         }
         catch (Exception ex)
@@ -172,21 +184,53 @@ public sealed class ServerConfigService : IServerConfigService
         }
     }
 
-    public async Task SaveServerDescriptionAsync(ServerDescription desc, CancellationToken ct = default)
+    public Task SaveServerDescriptionAsync(ServerDescription desc, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(desc);
         var root = GetConfigRoot();
         if (root is null) throw new InvalidOperationException("Server-Installationspfad ist nicht gesetzt.");
+        return SaveServerDescriptionCoreAsync(root, desc, useCachedEnvelope: true, ct);
+    }
 
-        var dir = Path.Combine(root, ServerDescriptionRelativeDir);
+    public Task SaveServerDescriptionToAsync(string installDir, ServerDescription desc, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(installDir);
+        ArgumentNullException.ThrowIfNull(desc);
+        return SaveServerDescriptionCoreAsync(installDir, desc, useCachedEnvelope: false, ct);
+    }
+
+    private async Task SaveServerDescriptionCoreAsync(string installDir, ServerDescription desc, bool useCachedEnvelope, CancellationToken ct)
+    {
+        var dir = Path.Combine(installDir, ServerDescriptionRelativeDir);
         Directory.CreateDirectory(dir);
+
+        // Wenn eine Datei für diesen Ordner existiert, vorhandenes Envelope einlesen um
+        // Version/DeploymentId/unknown-keys zu bewahren — auch im Wizard-Kontext.
+        ServerDescriptionFile? existingEnvelope = useCachedEnvelope ? _lastServerEnvelope : null;
+        if (existingEnvelope is null)
+        {
+            var existingPath = Path.Combine(dir, ServerDescriptionFileName);
+            if (File.Exists(existingPath))
+            {
+                try
+                {
+                    await using var stream = File.OpenRead(existingPath);
+                    existingEnvelope = await JsonSerializer
+                        .DeserializeAsync<ServerDescriptionFile>(stream, JsonOptions, ct)
+                        .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "Konnte bestehendes Envelope unter {Path} nicht lesen, schreibe neu", existingPath);
+                }
+            }
+        }
 
         var envelope = new ServerDescriptionFile
         {
-            Version = _lastServerEnvelope?.Version ?? 1,
-            // Nie leeren — vorhandene DeploymentId durchreichen.
-            DeploymentId = _lastServerEnvelope?.DeploymentId ?? string.Empty,
-            ExtensionData = _lastServerEnvelope?.ExtensionData,
+            Version = existingEnvelope?.Version ?? 1,
+            DeploymentId = existingEnvelope?.DeploymentId ?? string.Empty,
+            ExtensionData = existingEnvelope?.ExtensionData,
             Persistent = desc,
         };
 
@@ -196,11 +240,9 @@ public sealed class ServerConfigService : IServerConfigService
         {
             await JsonSerializer.SerializeAsync(stream, envelope, JsonOptions, ct).ConfigureAwait(false);
         }
-        // Atomic replace
         File.Move(tmp, path, overwrite: true);
 
-        // Refresh cache so subsequent saves remain consistent
-        _lastServerEnvelope = envelope;
+        if (useCachedEnvelope) _lastServerEnvelope = envelope;
 
         _logger.LogInformation("Saved {Path}", path);
     }

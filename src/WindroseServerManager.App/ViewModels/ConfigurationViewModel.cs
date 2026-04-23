@@ -69,12 +69,28 @@ public partial class ConfigurationViewModel : ViewModelBase
 
     public string? PersistentServerId => Server?.PersistentServerId is { Length: > 0 } s ? s : null;
 
+    private string? _lastLoadedServerDir;
+
     public ConfigurationViewModel(IServerConfigService config, IAppSettingsService settings, IToastService toasts)
     {
         _config = config;
         _settings = settings;
         _toasts = toasts;
+        _lastLoadedServerDir = _settings.ActiveServerDir;
+        _settings.Changed += OnSettingsChanged;
         _ = ReloadAsync();
+    }
+
+    private void OnSettingsChanged(AppSettings settings)
+    {
+        // Active server kann sich nach dem App-Start ändern (z. B. erster Install via Wizard).
+        // Dann müssen wir die stale Default-Werte durch die realen ServerDescription-Daten ersetzen.
+        var currentDir = _settings.ActiveServerDir;
+        if (!string.Equals(currentDir, _lastLoadedServerDir, StringComparison.OrdinalIgnoreCase))
+        {
+            _lastLoadedServerDir = currentDir;
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => { _ = ReloadAsync(); });
+        }
     }
 
     public bool CanOpenInstallDir
@@ -391,6 +407,23 @@ public partial class ConfigurationViewModel : ViewModelBase
         try
         {
             await _config.SaveServerDescriptionAsync(Server);
+
+            // Name in der Server-Liste (ServerEntry) mit dem in-game Namen synchron halten,
+            // damit Dashboard / Server-Page / Configuration immer denselben Namen anzeigen.
+            var activeDir = _settings.ActiveServerDir;
+            var newName = Server.ServerName;
+            if (!string.IsNullOrWhiteSpace(activeDir) && !string.IsNullOrWhiteSpace(newName))
+            {
+                await _settings.UpdateAsync(s =>
+                {
+                    var entry = s.Servers.FirstOrDefault(e =>
+                        string.Equals(e.InstallDir?.TrimEnd('\\', '/'), activeDir.TrimEnd('\\', '/'),
+                            StringComparison.OrdinalIgnoreCase));
+                    if (entry is not null && !string.Equals(entry.Name, newName, StringComparison.Ordinal))
+                        entry.Name = newName;
+                });
+            }
+
             StatusMessage = Loc.Get("Toast.ServerDescriptionSaved");
             _toasts.Success(Loc.Get("Toast.ServerDescriptionSaved"));
         }
