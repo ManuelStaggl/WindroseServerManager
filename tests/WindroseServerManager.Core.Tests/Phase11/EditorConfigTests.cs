@@ -79,14 +79,15 @@ public class EditorConfigTests
     [Fact]
     public void Validate_RconEnabled_ValidBool_ReturnsNull()
     {
-        Assert.Null(WindrosePlusConfigSchema.Validate("rcon_enabled", "true"));
-        Assert.Null(WindrosePlusConfigSchema.Validate("rcon_enabled", "false"));
+        // Schema key is just "enabled" — Section "Server" + JsonSection "rcon" disambiguate it.
+        Assert.Null(WindrosePlusConfigSchema.Validate("enabled", "true"));
+        Assert.Null(WindrosePlusConfigSchema.Validate("enabled", "false"));
     }
 
     [Fact]
     public void Validate_RconEnabled_NotBool_ReturnsError()
     {
-        Assert.NotNull(WindrosePlusConfigSchema.Validate("rcon_enabled", "yes"));
+        Assert.NotNull(WindrosePlusConfigSchema.Validate("enabled", "yes"));
     }
 
     [Fact]

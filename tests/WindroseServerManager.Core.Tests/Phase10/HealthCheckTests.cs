@@ -80,6 +80,6 @@ public class HealthCheckTests
         var result = await HealthCheckHelper.IsHealthyAsync(port, client, CancellationToken.None);
 
         Assert.True(result);
-        Assert.Equal($"http://localhost:{port}/api/status", handler.LastRequestUri!.ToString());
+        Assert.Equal($"http://localhost:{port}/api/health", handler.LastRequestUri!.ToString());
     }
 }

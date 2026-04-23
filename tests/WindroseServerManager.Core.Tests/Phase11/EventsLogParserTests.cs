@@ -17,7 +17,8 @@ public class EventsLogParserTests
 
         Assert.NotNull(evt);
         Assert.Equal("join", evt!.Type);
-        Assert.Equal("76561198012345678", evt.SteamId);
+        // WindrosePlus events.log emits no steamId field — parser sets it to null by design.
+        Assert.Null(evt.SteamId);
         Assert.Equal("Bob", evt.Name);
         Assert.Equal(new DateTime(2026, 4, 20, 12, 0, 0, DateTimeKind.Utc), evt.Timestamp);
     }
@@ -121,12 +122,14 @@ public class EventsLogParserTests
     }
 
     [Fact]
-    public void MatchesFilter_MatchesSteamId()
+    public void MatchesFilter_SteamIdInput_NeverMatches_BecauseEventsLogHasNoSteamId()
     {
+        // WindrosePlus events.log has no steamId field, so a SteamId filter can never match
+        // unless the literal digits appear in the name. This pins down the documented behavior.
         const string line = """{"type":"join","steamId":"76561198012345678","name":"Bob","timestamp":"2026-04-20T12:00:00Z"}""";
         var evt = EventsLogParser.TryParseLine(line)!;
 
-        Assert.True(EventsLogParser.MatchesFilter(evt, "76561"));
+        Assert.False(EventsLogParser.MatchesFilter(evt, "76561"));
     }
 
     [Fact]

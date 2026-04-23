@@ -140,18 +140,24 @@ public class WindrosePlusServiceTests
         Assert.Equal("v1.0.6", marker!.Tag);
     }
 
-    // ---------- WPLUS-03: License bundling ----------
+    // ---------- WPLUS-03: License handling ----------
 
     [Fact]
-    public async Task Install_CopiesLicenseToServerDir()
+    public async Task Install_DoesNotKeepUpstreamLicense_InServerDir()
     {
+        // Historical context: earlier versions copied the WindrosePlus LICENSE into the
+        // server dir as WindrosePlus-LICENSE.txt. Phase 08-03 moved MIT attribution into
+        // the About-dialog and the install now cleans up LICENSE/README/etc. from the
+        // server root after install.ps1 has processed them. Pin the cleanup policy so
+        // nobody accidentally reintroduces upstream files at the server root.
         using var fixture = new TempServerFixture();
         var github = new FakeGithubReleaseServer();
         var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
-        var licensePath = Path.Combine(fixture.ServerDir, "WindrosePlus-LICENSE.txt");
-        Assert.True(File.Exists(licensePath));
-        Assert.Contains("MIT License", File.ReadAllText(licensePath));
+
+        Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "LICENSE")));
+        Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "WindrosePlus-LICENSE.txt")));
+        Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "README.md")));
     }
 
     // ---------- WPLUS-04: Launcher resolution ----------
@@ -175,10 +181,14 @@ public class WindrosePlusServiceTests
     }
 
     [Fact]
-    public void ResolveLauncher_Active_ReturnsBat()
+    public void ResolveLauncher_Active_ReturnsExe_BecauseBatArchitectureWasRemoved()
     {
+        // Historical context: the launcher used to wrap WindrosePlus startup in a
+        // generated StartWindrosePlusServer.bat. The PS5-refactor moved that work into
+        // a BuildPak pre-launch PowerShell step + a direct .exe start. This test pins
+        // the new contract — even with a leftover .bat present, the launcher returns the .exe.
         using var fixture = new TempServerFixture();
-        File.WriteAllText(Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat"), "@echo off");
+        File.WriteAllText(Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat"), "irrelevant");
         var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline());
         var info = new ServerInstallInfo(
             IsInstalled: true,
@@ -189,28 +199,8 @@ public class WindrosePlusServiceTests
             WindrosePlusActive: true,
             WindrosePlusVersionTag: "v1.0.6");
         var (exe, args) = svc.ResolveLauncher(fixture.ServerDir, info);
-        Assert.EndsWith("StartWindrosePlusServer.bat", exe, StringComparison.OrdinalIgnoreCase);
-        Assert.Equal(string.Empty, args);
-    }
-
-    [Fact]
-    public void ResolveLauncher_Active_BatMissing_FallsBackWithWarning()
-    {
-        using var fixture = new TempServerFixture();
-        // .bat intentionally NOT created — fallback path.
-        var logger = new TestLogger();
-        var svc = CreateService(fixture, FakeHttpMessageHandler.ThrowsOffline(), logger);
-        var info = new ServerInstallInfo(
-            IsInstalled: true,
-            InstallDir: fixture.ServerDir,
-            BuildId: null,
-            SizeBytes: 0,
-            LastUpdatedUtc: null,
-            WindrosePlusActive: true,
-            WindrosePlusVersionTag: "v1.0.6");
-        var (exe, _) = svc.ResolveLauncher(fixture.ServerDir, info);
         Assert.EndsWith("WindroseServer.exe", exe, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(logger.Warnings, w => w.Contains("StartWindrosePlusServer.bat"));
+        Assert.Equal(string.Empty, args);
     }
 
     // Inline test double — records Warning/Error messages.

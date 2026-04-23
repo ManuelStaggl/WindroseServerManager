@@ -40,20 +40,21 @@ public class ServerProcessServiceLauncherTests
     }
 
     [Fact]
-    public void Start_UsesBat_WhenWindrosePlusActive_AndBatExists()
+    public void Start_UsesExe_WhenActive_BecauseBatArchitectureWasRemoved()
     {
+        // Historical context: earlier versions generated a StartWindrosePlusServer.bat
+        // and launched that when WindrosePlus was active. The PS5-refactor replaced the
+        // .bat launcher with a BuildPak pre-launch step + direct .exe start.
+        // This test pins the new contract so nobody accidentally reintroduces the .bat.
         using var fixture = new TempServerFixture();
-        // Seed a WindrosePlus launcher at the server root.
-        var batPath = Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat");
-        File.WriteAllText(batPath, "@echo off\r\necho WindrosePlus launch\r\n");
+        File.WriteAllText(Path.Combine(fixture.ServerDir, "StartWindrosePlusServer.bat"), "irrelevant");
 
         var svc = CreateService(fixture);
         var info = BuildInfo(fixture.ServerDir, active: true);
 
-        var (exe, extraArgs) = svc.ResolveLauncher(fixture.ServerDir, info);
+        var (exe, _) = svc.ResolveLauncher(fixture.ServerDir, info);
 
-        Assert.EndsWith("StartWindrosePlusServer.bat", exe);
-        Assert.Equal(string.Empty, extraArgs);
+        Assert.EndsWith("WindroseServer.exe", exe);
     }
 
     [Fact]
@@ -69,21 +70,6 @@ public class ServerProcessServiceLauncherTests
         var (exe, _) = svc.ResolveLauncher(fixture.ServerDir, info);
 
         Assert.EndsWith("WindroseServer.exe", exe);
-    }
-
-    [Fact]
-    public void Start_FallsBackToExe_WhenActiveButBatMissing()
-    {
-        using var fixture = new TempServerFixture();
-        // NO StartWindrosePlusServer.bat exists — fixture only seeds WindroseServer.exe.
-        var logger = new TestLogger();
-        var svc = CreateService(fixture, logger);
-        var info = BuildInfo(fixture.ServerDir, active: true);
-
-        var (exe, _) = svc.ResolveLauncher(fixture.ServerDir, info);
-
-        Assert.EndsWith("WindroseServer.exe", exe);
-        Assert.Contains(logger.Warnings, w => w.Contains("StartWindrosePlusServer.bat", StringComparison.OrdinalIgnoreCase));
     }
 
     // ---- Test doubles mirrored from WindrosePlusServiceTests (private there) ----

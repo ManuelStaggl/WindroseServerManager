@@ -10,7 +10,7 @@ public static class HealthCheckHelper
     private static readonly TimeSpan InternalTimeout = TimeSpan.FromSeconds(3);
 
     /// <summary>
-    /// Sends a GET request to http://localhost:{port}/api/status.
+    /// Sends a GET request to http://localhost:{port}/api/health.
     /// Returns true only on a 2xx response.
     /// Returns false when: port &lt;= 0, HttpRequestException, TaskCanceledException,
     /// OperationCanceledException, or a non-success status code.
