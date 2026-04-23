@@ -94,7 +94,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "RunPreLaunchAsync failed — continuing with server start");
-            AppendSystem($"[WARNUNG] WindrosePlus Pre-Launch fehlgeschlagen: {ex.Message}");
+            AppendSystem($"[WARNUNG] Windrose+ Pre-Launch fehlgeschlagen: {ex.Message}");
         }
 
         // Phase 3: start process under lock

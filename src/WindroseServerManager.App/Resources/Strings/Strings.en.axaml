@@ -256,7 +256,7 @@
     <sys:String x:Key="Settings.Group.Display">DISPLAY</sys:String>
     <sys:String x:Key="Settings.Group.Server">SERVER</sys:String>
     <sys:String x:Key="Settings.Group.System">NETWORK &amp; SYSTEM</sys:String>
-    <sys:String x:Key="Settings.Group.WindrosePlus">WINDROSE PLUS</sys:String>
+    <sys:String x:Key="Settings.Group.WindrosePlus">WINDROSE+</sys:String>
     <sys:String x:Key="Settings.Group.App">APP</sys:String>
     <sys:String x:Key="Settings.Group.General">GENERAL</sys:String>
     <sys:String x:Key="Settings.Group.About">ABOUT</sys:String>
@@ -299,17 +299,17 @@
     <sys:String x:Key="Server.Status.Running">Running</sys:String>
     <sys:String x:Key="Server.OpenFolder">Open folder</sys:String>
     <sys:String x:Key="Server.OpenLiveMap">Open live map</sys:String>
-    <sys:String x:Key="Server.LiveMap.Unavailable">Live map not available — WindrosePlus dashboard is not running for this server.</sys:String>
-    <sys:String x:Key="Settings.WindrosePlus.Title">WindrosePlus</sys:String>
-    <sys:String x:Key="Settings.WindrosePlus.Hint">WindrosePlus extends your server with player list, kick &amp; ban, broadcast, and more.</sys:String>
+    <sys:String x:Key="Server.LiveMap.Unavailable">Live map not available — Windrose+ dashboard is not running for this server.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Title">Windrose+</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Hint">Windrose+ extends your server with player list, kick &amp; ban, broadcast, and more.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusLabel">Status:</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusActive">Active</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusOptedOut">Not installed (declined)</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusNotInstalled">Not installed</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.StatusNoServer">No server configured</sys:String>
-    <sys:String x:Key="Settings.WindrosePlus.ManageButton">Install / manage WindrosePlus</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.ManageButton">Install / manage Windrose+</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.RconPassword">RCON Password</sys:String>
-    <sys:String x:Key="Settings.WindrosePlus.RconPasswordHint">The password for RCON commands and the WindrosePlus dashboard.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.RconPasswordHint">The password for RCON commands and the Windrose+ dashboard.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.RconPasswordCopied">Password copied.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.RconPasswordNone">No password configured.</sys:String>
     <sys:String x:Key="Settings.AppUpdate.Title">App updates</sys:String>
@@ -429,7 +429,7 @@
     <sys:String x:Key="InstallPhase.Complete">Complete</sys:String>
     <sys:String x:Key="InstallPhase.Failed">Failed</sys:String>
     <sys:String x:Key="InstallPhase.FetchingRelease">Fetching release metadata</sys:String>
-    <sys:String x:Key="InstallPhase.DownloadingArchive">Downloading WindrosePlus archive</sys:String>
+    <sys:String x:Key="InstallPhase.DownloadingArchive">Downloading Windrose+ archive</sys:String>
     <sys:String x:Key="InstallPhase.VerifyingDigest">Verifying SHA-256</sys:String>
     <sys:String x:Key="InstallPhase.Extracting">Extracting archive</sys:String>
     <sys:String x:Key="InstallPhase.Installing">Running installer</sys:String>
@@ -514,47 +514,47 @@
 
     <!-- WindrosePlus (Phase 8) -->
     <sys:String x:Key="About.ThirdPartyLicenses.Heading">Third-Party Licenses</sys:String>
-    <sys:String x:Key="About.ThirdPartyLicenses.WindrosePlus.Intro">WindrosePlus (MIT License) — © HumanGenome. Bundles UE4SS and the WindrosePlus server mod.</sys:String>
-    <sys:String x:Key="About.WindrosePlus.RepoLink">WindrosePlus on GitHub</sys:String>
+    <sys:String x:Key="About.ThirdPartyLicenses.WindrosePlus.Intro">Windrose+ (MIT License) — © HumanGenome. Bundles UE4SS and the Windrose+ server mod.</sys:String>
+    <sys:String x:Key="About.WindrosePlus.RepoLink">Windrose+ on GitHub</sys:String>
     <sys:String x:Key="About.WindrosePlus.ShowLicense">Show license text</sys:String>
-    <sys:String x:Key="Warning.WindrosePlusBatMissing">WindrosePlus is active but StartWindrosePlusServer.bat is missing. Launching WindroseServer.exe instead.</sys:String>
-    <sys:String x:Key="Error.WindrosePlusOfflineFirstInstall">WindrosePlus cannot be installed: GitHub is unreachable and no cache is available. Please check your internet connection and try again.</sys:String>
+    <sys:String x:Key="Warning.WindrosePlusBatMissing">Windrose+ is active but StartWindrose+Server.bat is missing. Launching WindroseServer.exe instead.</sys:String>
+    <sys:String x:Key="Error.WindrosePlusOfflineFirstInstall">Windrose+ cannot be installed: GitHub is unreachable and no cache is available. Please check your internet connection and try again.</sys:String>
 
     <!-- Phase 9 — Opt-in UX (Wizard + Retrofit) -->
     <sys:String x:Key="Wizard.Title">Set Up New Server</sys:String>
     <sys:String x:Key="Wizard.Step1.Label">Install Path</sys:String>
-    <sys:String x:Key="Wizard.Step2.Label">WindrosePlus</sys:String>
+    <sys:String x:Key="Wizard.Step2.Label">Windrose+</sys:String>
     <sys:String x:Key="Wizard.Step3.Label">Confirm</sys:String>
     <sys:String x:Key="Wizard.Action.Install">Install</sys:String>
     <sys:String x:Key="Wizard.Action.Adopt">Adopt</sys:String>
     <sys:String x:Key="Wizard.Action.Next">Next</sys:String>
 
     <sys:String x:Key="Wizard.Adoption.DetectedTitle">Existing installation detected</sys:String>
-    <sys:String x:Key="Wizard.Adoption.DetectedHint">A Windrose server binary already lives in this folder (e.g. from a manual SteamCMD install). The wizard will skip the SteamCMD download and adopt the existing installation. WindrosePlus can optionally be added on top.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DetectedHint">A Windrose server binary already lives in this folder (e.g. from a manual SteamCMD install). The wizard will skip the SteamCMD download and adopt the existing installation. Windrose+ can optionally be added on top.</sys:String>
     <sys:String x:Key="Wizard.Adoption.SummaryHint">Existing installation will be adopted — no SteamCMD download will run.</sys:String>
     <sys:String x:Key="Wizard.Adoption.Progress">Adopting existing installation…</sys:String>
     <sys:String x:Key="Wizard.Adoption.DuplicateTitle">Folder is already registered</sys:String>
     <sys:String x:Key="Wizard.Adoption.DuplicateHint">This folder is already managed as server '{0}'. Either pick a different path or use the existing entry.</sys:String>
     <sys:String x:Key="Wizard.Adoption.DuplicateHint.Prefix">Already registered as </sys:String>
     <sys:String x:Key="Wizard.Adoption.DuplicateError">This folder is already registered as server '{0}'.</sys:String>
-    <sys:String x:Key="Wizard.Adoption.ServerRunningError">A Windrose server process is currently running in the target folder. Please stop the server before (re)installing WindrosePlus — otherwise the DLLs are locked.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.ServerRunningError">A Windrose server process is currently running in the target folder. Please stop the server before (re)installing Windrose+ — otherwise the DLLs are locked.</sys:String>
 
-    <sys:String x:Key="Wizard.WindrosePlus.OptIn">Install WindrosePlus</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.OptOut">Continue without WindrosePlus</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.Disclaimer">WindrosePlus is a separate MIT-licensed mod. It installs into your server's game files and can be disabled at any time in Settings.</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.OptIn">Install Windrose+</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.OptOut">Continue without Windrose+</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Disclaimer">Windrose+ is a separate MIT-licensed mod. It installs into your server's game files and can be disabled at any time in Settings.</sys:String>
 
     <sys:String x:Key="Wizard.WindrosePlus.RconLabel">RCON Password</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.RconTooltip">Used for WindrosePlus admin HTTP commands</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.RconTooltip">Used for Windrose+ admin HTTP commands</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.PortLabel">Dashboard Port</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.PortHint">Auto-selected (18080–18099). Can be changed in Settings.</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.SteamIdLabel">Admin Steam ID *</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.SteamIdPlaceholder">SteamID64 or steamcommunity.com/profiles/...</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.SteamIdRequired">Required — will be set as server admin.</sys:String>
 
-    <sys:String x:Key="Wizard.WindrosePlus.Progress.Downloading">Downloading WindrosePlus...</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.Progress.Extracting">Extracting WindrosePlus...</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.Progress.Installing">Installing WindrosePlus...</sys:String>
-    <sys:String x:Key="Wizard.WindrosePlus.InstallSuccess">WindrosePlus installed successfully.</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Downloading">Downloading Windrose+...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Extracting">Extracting Windrose+...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.Progress.Installing">Installing Windrose+...</sys:String>
+    <sys:String x:Key="Wizard.WindrosePlus.InstallSuccess">Windrose+ installed successfully.</sys:String>
 
     <sys:String x:Key="Feature.Players">Player List</sys:String>
     <sys:String x:Key="Feature.KickBan">Kick &amp; Ban</sys:String>
@@ -562,21 +562,21 @@
     <sys:String x:Key="Feature.Events">Events Log</sys:String>
     <sys:String x:Key="Feature.SeaChart">Sea Chart</sys:String>
     <sys:String x:Key="Feature.IniEditor">INI Editor</sys:String>
-    <sys:String x:Key="Feature.GitHubLink">WindrosePlus by HumanGenome · MIT · Learn more ↗</sys:String>
+    <sys:String x:Key="Feature.GitHubLink">Windrose+ by HumanGenome · MIT · Learn more ↗</sys:String>
 
     <sys:String x:Key="Error.WindrosePlus.SteamIdInvalid">Invalid format. Please provide a numeric profile URL (steamcommunity.com/profiles/...) or a SteamID64 (17 digits).</sys:String>
-    <sys:String x:Key="Error.WindrosePlus.InstallFailed">WindrosePlus installation failed. Please try again.</sys:String>
-    <sys:String x:Key="Error.WindrosePlus.NoInternet">No internet access. WindrosePlus cannot be downloaded.</sys:String>
+    <sys:String x:Key="Error.WindrosePlus.InstallFailed">Windrose+ installation failed. Please try again.</sys:String>
+    <sys:String x:Key="Error.WindrosePlus.NoInternet">No internet access. Windrose+ cannot be downloaded.</sys:String>
 
-    <sys:String x:Key="Retrofit.Banner.Title">WindrosePlus Available</sys:String>
+    <sys:String x:Key="Retrofit.Banner.Title">Windrose+ Available</sys:String>
     <sys:String x:Key="Retrofit.Banner.Body">Unlock player management, events, sea chart, and config editor.</sys:String>
     <sys:String x:Key="Retrofit.Banner.Action.Install">Install Now</sys:String>
     <sys:String x:Key="Retrofit.Banner.Action.Later">Not Interested</sys:String>
-    <sys:String x:Key="Retrofit.Dialog.Title">Install WindrosePlus</sys:String>
+    <sys:String x:Key="Retrofit.Dialog.Title">Install Windrose+</sys:String>
 
     <!-- Phase 10 — Health Banner (HEALTH-01, HEALTH-02) -->
-    <sys:String x:Key="Health.Banner.Title">WindrosePlus not responding</sys:String>
-    <sys:String x:Key="Health.Banner.Body">The WindrosePlus HTTP dashboard did not respond after server start. WindrosePlus may be incompatible with the current Windrose version.</sys:String>
+    <sys:String x:Key="Health.Banner.Title">Windrose+ not responding</sys:String>
+    <sys:String x:Key="Health.Banner.Body">The Windrose+ HTTP dashboard did not respond after server start. Windrose+ may be incompatible with the current Windrose version.</sys:String>
     <sys:String x:Key="Health.Banner.Action.Report">Report Issue</sys:String>
     <sys:String x:Key="Health.Banner.Action.Dismiss">Dismiss</sys:String>
 
@@ -588,7 +588,7 @@
     <sys:String x:Key="Server.AddNew">New Server</sys:String>
     <sys:String x:Key="Server.Active">Active</sys:String>
     <sys:String x:Key="Server.SetActive">Set Active</sys:String>
-    <sys:String x:Key="Server.InstallWindrosePlus">Install WindrosePlus</sys:String>
+    <sys:String x:Key="Server.InstallWindrosePlus">Install Windrose+</sys:String>
     <sys:String x:Key="Error.ServerNotInstalled">Windrose Server is not installed yet. Please set up the server via "New Server" first.</sys:String>
     <sys:String x:Key="Server.Delete">Remove Server</sys:String>
     <sys:String x:Key="Server.Delete.Confirm">Remove server from list? Files on disk will be preserved.</sys:String>
@@ -598,7 +598,7 @@
     <sys:String x:Key="Server.Empty">No server configured</sys:String>
     <sys:String x:Key="Server.Empty.Hint">Click "New Server" to set up your first Windrose server.</sys:String>
     <sys:String x:Key="Server.Step1.Title">Set up server</sys:String>
-    <sys:String x:Key="Server.Step2.Title">WindrosePlus</sys:String>
+    <sys:String x:Key="Server.Step2.Title">Windrose+</sys:String>
     <sys:String x:Key="Server.Step3.Title">Installation</sys:String>
     <sys:String x:Key="Server.Name.Label">Server name</sys:String>
     <sys:String x:Key="Server.Name.Hint">e.g. My Windrose Server</sys:String>
@@ -621,8 +621,8 @@
     <sys:String x:Key="Events.Clear.Label">Clear</sys:String>
     <sys:String x:Key="Events.Clear.Tip">Clear the entire event history</sys:String>
     <sys:String x:Key="Toast.EventsCleared">Event history cleared.</sys:String>
-    <sys:String x:Key="Events.OptOut.Title">WindrosePlus Not Active</sys:String>
-    <sys:String x:Key="Events.OptOut.Desc">The event log requires WindrosePlus.</sys:String>
+    <sys:String x:Key="Events.OptOut.Title">Windrose+ Not Active</sys:String>
+    <sys:String x:Key="Events.OptOut.Desc">The event log requires Windrose+.</sys:String>
     <sys:String x:Key="Events.Badge.Join">JOIN</sys:String>
     <sys:String x:Key="Events.Badge.Leave">LEAVE</sys:String>
 
@@ -655,9 +655,9 @@
     <sys:String x:Key="Players.Banned">Player {0} banned permanently.</sys:String>
     <sys:String x:Key="Players.BannedTimed">Player {0} banned for {1} minutes.</sys:String>
     <sys:String x:Key="Players.Empty">No players connected.</sys:String>
-    <sys:String x:Key="Players.Error">Could not reach WindrosePlus dashboard.</sys:String>
-    <sys:String x:Key="Players.OptOut.Title">WindrosePlus Not Active</sys:String>
-    <sys:String x:Key="Players.OptOut.Desc">Player management (kick, ban, broadcast) requires WindrosePlus.</sys:String>
+    <sys:String x:Key="Players.Error">Could not reach Windrose+ dashboard.</sys:String>
+    <sys:String x:Key="Players.OptOut.Title">Windrose+ Not Active</sys:String>
+    <sys:String x:Key="Players.OptOut.Desc">Player management (kick, ban, broadcast) requires Windrose+.</sys:String>
 
     <!-- Phase 11 — Sea Chart View -->
     <sys:String x:Key="SeaChart.Title">Sea Chart</sys:String>
@@ -666,15 +666,15 @@
     <sys:String x:Key="SeaChart.OpenLivemap">Open Live Map in Browser</sys:String>
     <sys:String x:Key="SeaChart.Refresh">Refresh</sys:String>
     <sys:String x:Key="SeaChart.NoMap">Player markers appear once players are online.</sys:String>
-    <sys:String x:Key="SeaChart.Error">WindrosePlus dashboard not reachable.</sys:String>
+    <sys:String x:Key="SeaChart.Error">Windrose+ dashboard not reachable.</sys:String>
     <sys:String x:Key="SeaChart.Detail.Alive">Alive</sys:String>
     <sys:String x:Key="SeaChart.Detail.Close">Close</sys:String>
-    <sys:String x:Key="SeaChart.OptOut.Title">WindrosePlus Not Active</sys:String>
-    <sys:String x:Key="SeaChart.OptOut.Desc">The live sea chart requires WindrosePlus.</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Title">Windrose+ Not Active</sys:String>
+    <sys:String x:Key="SeaChart.OptOut.Desc">The live sea chart requires Windrose+.</sys:String>
 
     <!-- Phase 11 — Config Editor View -->
-    <sys:String x:Key="Editor.Title">WindrosePlus Config</sys:String>
-    <sys:String x:Key="Editor.Subtitle">Settings for the WindrosePlus mod (windrose_plus.json)</sys:String>
+    <sys:String x:Key="Editor.Title">Windrose+ Config</sys:String>
+    <sys:String x:Key="Editor.Subtitle">Settings for the Windrose+ mod (windrose_plus.json)</sys:String>
     <sys:String x:Key="Editor.Save">Save</sys:String>
     <sys:String x:Key="Editor.ResetAll">Reset all</sys:String>
     <sys:String x:Key="Editor.Reset.Tip">Reset to default value</sys:String>
@@ -689,7 +689,7 @@
     <sys:String x:Key="Editor.Multiplier.Suffix">x</sys:String>
     <!-- Schema field names + descriptions -->
     <sys:String x:Key="Editor.Schema.HttpPort.Name">Dashboard Port</sys:String>
-    <sys:String x:Key="Editor.Schema.HttpPort.Desc">HTTP port of the WindrosePlus dashboard. Default: 8780. Must match the port configured in the manager.</sys:String>
+    <sys:String x:Key="Editor.Schema.HttpPort.Desc">HTTP port of the Windrose+ dashboard. Default: 8780. Must match the port configured in the manager.</sys:String>
     <sys:String x:Key="Editor.Schema.RconEnabled.Name">RCON Enabled</sys:String>
     <sys:String x:Key="Editor.Schema.RconEnabled.Desc">Enables the RCON interface for kick, ban and broadcast commands from the manager.</sys:String>
     <sys:String x:Key="Editor.Schema.RconPassword.Name">RCON Password</sys:String>
@@ -714,27 +714,27 @@
     <sys:String x:Key="Editor.Schema.PointsPerLevel.Desc">Number of skill points a player receives per level-up.</sys:String>
     <sys:String x:Key="Editor.Schema.Weight.Name">Carry Weight</sys:String>
     <sys:String x:Key="Editor.Schema.Weight.Desc">Maximum carry weight for players. Affects how much can be carried.</sys:String>
-    <sys:String x:Key="Editor.OptOut.Title">WindrosePlus Not Active</sys:String>
-    <sys:String x:Key="Editor.OptOut.Desc">The config editor requires WindrosePlus.</sys:String>
+    <sys:String x:Key="Editor.OptOut.Title">Windrose+ Not Active</sys:String>
+    <sys:String x:Key="Editor.OptOut.Desc">The config editor requires Windrose+.</sys:String>
 
     <!-- Phase 12 — Shared opt-out CTA -->
-    <sys:String x:Key="WindrosePlus.OptOut.Cta">Install WindrosePlus</sys:String>
+    <sys:String x:Key="WindrosePlus.OptOut.Cta">Install Windrose+</sys:String>
 
     <!-- WindrosePlus update check -->
     <sys:String x:Key="Server.WindrosePlus.UpdateBadge">Update</sys:String>
     <sys:String x:Key="Server.WindrosePlus.UpdateNow">Update</sys:String>
     <sys:String x:Key="Server.WindrosePlus.Update.All">Update all</sys:String>
-    <sys:String x:Key="Server.WindrosePlus.Update.BannerTitleFormat">WindrosePlus {0} available</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.BannerTitleFormat">Windrose+ {0} available</sys:String>
     <sys:String x:Key="Server.WindrosePlus.Update.BannerBodyFormat">{0} server(s) have an older version installed.</sys:String>
-    <sys:String x:Key="Server.WindrosePlus.Update.Starting">{0}: updating WindrosePlus…</sys:String>
-    <sys:String x:Key="Server.WindrosePlus.Update.Done">{0}: WindrosePlus updated.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Starting">{0}: updating Windrose+…</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.Done">{0}: Windrose+ updated.</sys:String>
     <sys:String x:Key="Server.WindrosePlus.Update.Failed">{0}: update failed — {1}</sys:String>
-    <sys:String x:Key="Server.WindrosePlus.Update.StopFirst">Please stop the server before updating WindrosePlus.</sys:String>
+    <sys:String x:Key="Server.WindrosePlus.Update.StopFirst">Please stop the server before updating Windrose+.</sys:String>
     <sys:String x:Key="Server.WindrosePlus.Update.SkippedRunning">{0}: skipped (still running).</sys:String>
     <sys:String x:Key="Server.WindrosePlus.Update.BatchSummary">Update finished: {0} ok, {1} failed, {2} skipped.</sys:String>
 
-    <sys:String x:Key="Settings.WindrosePlus.Update.Title">WindrosePlus updates</sys:String>
-    <sys:String x:Key="Settings.WindrosePlus.Update.Hint">Compares the installed WindrosePlus version of every server with the latest GitHub release. Nothing is installed automatically.</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.Title">Windrose+ updates</sys:String>
+    <sys:String x:Key="Settings.WindrosePlus.Update.Hint">Compares the installed Windrose+ version of every server with the latest GitHub release. Nothing is installed automatically.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Update.IntervalLabel">Check interval</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Update.IntervalOff">Never (manual)</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Update.IntervalHours">Every {0} hours</sys:String>
