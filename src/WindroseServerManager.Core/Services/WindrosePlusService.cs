@@ -393,6 +393,21 @@ public sealed class WindrosePlusService : IWindrosePlusService
         // endpoint) works without manual user intervention.
         EnsureRootToolsMirror(serverDirFull);
 
+        // MIT-Compliance: preserve the upstream LICENSE next to the mod ("as-is") before cleanup
+        // so it stays with the work even if the manager is uninstalled. install.ps1 doesn't drop
+        // it under windrose_plus/ itself — we copy it there from the staged root.
+        var rootLicense = Path.Combine(serverDirFull, "LICENSE");
+        var modLicense  = Path.Combine(serverDirFull, "windrose_plus", "LICENSE");
+        if (File.Exists(rootLicense) && !File.Exists(modLicense))
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(modLicense)!);
+                File.Copy(rootLicense, modLicense, overwrite: false);
+            }
+            catch (Exception ex) { _logger.LogWarning(ex, "Could not preserve Windrose+ LICENSE under windrose_plus/ (non-fatal)"); }
+        }
+
         // Clean up files that were staged into the server dir for the script (they've been
         // processed into windrose_plus/ by install.ps1 and are no longer needed at the root).
         // Keep "tools" — the Lua mod reads from it directly (see EnsureRootToolsMirror above).

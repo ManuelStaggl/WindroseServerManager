@@ -140,23 +140,27 @@ public class WindrosePlusServiceTests
         Assert.Equal("v1.0.6", marker!.Tag);
     }
 
-    // ---------- WPLUS-03: License handling ----------
+    // ---------- WPLUS-03: License handling (MIT compliance) ----------
 
     [Fact]
-    public async Task Install_DoesNotKeepUpstreamLicense_InServerDir()
+    public async Task Install_PreservesLicenseUnderWindrosePlusFolder()
     {
-        // Historical context: earlier versions copied the WindrosePlus LICENSE into the
-        // server dir as WindrosePlus-LICENSE.txt. Phase 08-03 moved MIT attribution into
-        // the About-dialog and the install now cleans up LICENSE/README/etc. from the
-        // server root after install.ps1 has processed them. Pin the cleanup policy so
-        // nobody accidentally reintroduces upstream files at the server root.
+        // MIT-Compliance per the upstream maintainer's request: the LICENSE file must
+        // stay next to the mod ("as-is"). install.ps1 doesn't place it under
+        // windrose_plus/ itself, so we copy it there before the root cleanup runs.
+        // This pins both halves of the contract: LICENSE preserved under the mod,
+        // staged files (LICENSE/README.md) removed from the server root.
         using var fixture = new TempServerFixture();
         var github = new FakeGithubReleaseServer();
         var svc = CreateService(fixture, github.CreateHandler());
         await svc.InstallAsync(fixture.ServerDir, progress: null, CancellationToken.None);
 
+        var preservedLicense = Path.Combine(fixture.ServerDir, "windrose_plus", "LICENSE");
+        Assert.True(File.Exists(preservedLicense), "Upstream LICENSE must be preserved under windrose_plus/.");
+        Assert.Contains("MIT License", File.ReadAllText(preservedLicense));
+
+        // Root cleanup still happens — staged files are gone after install.
         Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "LICENSE")));
-        Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "WindrosePlus-LICENSE.txt")));
         Assert.False(File.Exists(Path.Combine(fixture.ServerDir, "README.md")));
     }
 
