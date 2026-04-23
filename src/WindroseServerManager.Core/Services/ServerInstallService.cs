@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using WindroseServerManager.Core.Models;
@@ -351,6 +353,107 @@ public sealed partial class ServerInstallService : IServerInstallService
         }
         catch { }
         return null;
+    }
+
+    public async Task<bool> InitializeServerDescriptionAsync(string installDir, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(installDir))
+            throw new ArgumentException("Install dir must be provided.", nameof(installDir));
+
+        var exe = FindServerBinary(installDir);
+        if (exe is null)
+        {
+            _logger.LogWarning("Init-Run übersprungen — keine Server-Binary in {Dir}", installDir);
+            return false;
+        }
+
+        var serverDescPath = Path.Combine(installDir, "R5", "ServerDescription.json");
+        if (await IsServerDescriptionValidAsync(serverDescPath, ct).ConfigureAwait(false))
+        {
+            _logger.LogInformation("ServerDescription.json bereits initialisiert, Init-Run übersprungen: {Path}", serverDescPath);
+            return true;
+        }
+
+        if (IsServerProcessRunning(installDir))
+        {
+            _logger.LogWarning("Server läuft bereits in {Dir} — Init-Run nicht möglich", installDir);
+            return false;
+        }
+
+        var psi = new ProcessStartInfo
+        {
+            FileName = exe,
+            Arguments = "-log",
+            WorkingDirectory = Path.GetDirectoryName(exe)!,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        using var proc = new Process { StartInfo = psi, EnableRaisingEvents = true };
+        // Discard stdout/stderr so the pipe buffer can't block the server and hang this method.
+        proc.OutputDataReceived += (_, _) => { };
+        proc.ErrorDataReceived += (_, _) => { };
+
+        _logger.LogInformation("Starte Init-Run für {Exe}", exe);
+        try
+        {
+            if (!proc.Start()) return false;
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+
+            var deadline = DateTime.UtcNow.AddSeconds(45);
+            while (DateTime.UtcNow < deadline)
+            {
+                if (await IsServerDescriptionValidAsync(serverDescPath, ct).ConfigureAwait(false))
+                {
+                    // Kurze Wartezeit, damit der Server den Schreibvorgang abschließen kann.
+                    await Task.Delay(1500, ct).ConfigureAwait(false);
+                    return true;
+                }
+                if (proc.HasExited)
+                {
+                    _logger.LogWarning("Init-Run Prozess beendete vorzeitig (ExitCode {Code}) vor gültiger ServerDescription.json", proc.ExitCode);
+                    break;
+                }
+                await Task.Delay(300, ct).ConfigureAwait(false);
+            }
+
+            return await IsServerDescriptionValidAsync(serverDescPath, ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            try
+            {
+                if (!proc.HasExited)
+                {
+                    proc.Kill(entireProcessTree: true);
+                    proc.WaitForExit(5000);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Konnte Init-Run Prozess nicht sauber beenden");
+            }
+        }
+    }
+
+    private static async Task<bool> IsServerDescriptionValidAsync(string path, CancellationToken ct)
+    {
+        if (!File.Exists(path)) return false;
+        try
+        {
+            await using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var doc = await JsonDocument.ParseAsync(fs, cancellationToken: ct).ConfigureAwait(false);
+            if (!doc.RootElement.TryGetProperty("DeploymentId", out var depId)) return false;
+            return depId.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(depId.GetString());
+        }
+        catch
+        {
+            // Datei wird möglicherweise gerade vom Server geschrieben — im nächsten Poll erneut versuchen.
+            return false;
+        }
     }
 
     [GeneratedRegex(@"progress:\s*([\d.]+)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 5000)]

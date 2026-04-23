@@ -120,6 +120,7 @@
     <sys:String x:Key="Installation.PickFolder.Title">Pick install folder</sys:String>
     <sys:String x:Key="Installation.Complete">Installation complete.</sys:String>
     <sys:String x:Key="Installation.Cancelled">Cancelled.</sys:String>
+    <sys:String x:Key="Installation.InitializingServerConfig">Initializing server configuration…</sys:String>
 
     <!-- Status (shared — Installed/Not installed) -->
     <sys:String x:Key="Status.Installed">Installed</sys:String>

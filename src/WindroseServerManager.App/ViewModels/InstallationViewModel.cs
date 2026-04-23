@@ -368,24 +368,37 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 await _wplusApi.WriteConfigAsync(NewInstallDir, cfg, _cts.Token);
             }
 
-            // 3) ServerDescription.json mit gewähltem Namen + Invite-Code anlegen,
-            //    damit Dashboard/Configuration den richtigen Namen anzeigen und
-            //    frisch installierte Server von Anfang an einen Invite-Code haben.
-            //    Wenn bereits eine Datei existiert (adoptierter Server), füllen wir
-            //    nur leere Felder auf — ein bestehender Invite-Code bleibt unangetastet.
+            // 3) ServerName + Invite-Code anwenden.
+            //
+            //    Windrose schreibt ServerDescription.json selbst beim ersten Start und verwirft
+            //    jede vorab abgelegte Datei mit leerer DeploymentId — deshalb funktionierte das
+            //    reine Vorab-Schreiben seit jeher nicht, obwohl die UI konsistent aussah
+            //    (bekannter Bug aus v1.2.1).
+            //
+            //    Ansatz: Bei frischen Installs booten wir den Server kurz headless, damit er
+            //    DeploymentId + PersistentServerId setzt, beenden ihn dann und patchen unseren
+            //    gewünschten ServerName in die vom Server erzeugte Datei. Bei adoptierten
+            //    Installs existiert die Datei schon korrekt — wir überspringen den Init-Run.
             try
             {
+                if (!IsExistingInstall)
+                {
+                    CurrentPhase = Loc.Get("Installation.InitializingServerConfig");
+                    var initialized = await _install.InitializeServerDescriptionAsync(NewInstallDir, _cts.Token);
+                    if (!initialized)
+                        Serilog.Log.Warning("Server-Init-Run lieferte keine gültige ServerDescription.json — ServerName wird trotzdem versucht zu schreiben");
+                }
+
                 var existing = await _config.LoadServerDescriptionFromAsync(NewInstallDir, _cts.Token)
                                ?? new ServerDescription();
-                if (string.IsNullOrWhiteSpace(existing.ServerName))
-                    existing.ServerName = NewServerName;
+                existing.ServerName = NewServerName;
                 if (string.IsNullOrWhiteSpace(existing.InviteCode))
                     existing.InviteCode = InviteCodeGenerator.Generate();
                 await _config.SaveServerDescriptionToAsync(NewInstallDir, existing, _cts.Token);
             }
             catch (Exception ex)
             {
-                Serilog.Log.Warning(ex, "Konnte ServerDescription.json nicht vor-initialisieren — Server wird Defaults schreiben");
+                Serilog.Log.Warning(ex, "Konnte ServerName/InviteCode nicht auf ServerDescription.json anwenden");
             }
 
             // 4) Persist server entry + per-server state
