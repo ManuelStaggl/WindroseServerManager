@@ -111,6 +111,31 @@
                            Foreground="{DynamicResource BrandTextMutedBrush}"
                            TextWrapping="Wrap"
                            Text="{DynamicResource Installation.PathHint}" />
+
+                <!-- Adoption-Hinweis: bestehende manuelle SteamCMD-Installation erkannt -->
+                <Border IsVisible="{Binding IsExistingInstall}"
+                        Background="{DynamicResource BrandSuccessSubtleBrush}"
+                        BorderBrush="{DynamicResource BrandSuccessBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12,10">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#x2713;"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrandSuccessBrush}"
+                                   VerticalAlignment="Center" />
+                        <StackPanel Spacing="2">
+                            <TextBlock Classes="body"
+                                       FontWeight="SemiBold"
+                                       Text="{DynamicResource Wizard.Adoption.DetectedTitle}" />
+                            <TextBlock Classes="caption"
+                                       Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                                       TextWrapping="Wrap"
+                                       Text="{DynamicResource Wizard.Adoption.DetectedHint}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
             <!-- Step 2: WindrosePlus opt-in -->
@@ -123,6 +148,19 @@
                         IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=3}">
                 <TextBlock Classes="section-header"
                            Text="{DynamicResource Wizard.Step3.Label}" />
+
+                <!-- Adoption-Banner auch in Step 3, damit der Modus klar ist -->
+                <Border IsVisible="{Binding IsExistingInstall}"
+                        Background="{DynamicResource BrandSuccessSubtleBrush}"
+                        BorderBrush="{DynamicResource BrandSuccessBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12,10">
+                    <TextBlock Classes="caption"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource BrandTextSecondaryBrush}"
+                               Text="{DynamicResource Wizard.Adoption.SummaryHint}" />
+                </Border>
 
                 <StackPanel Spacing="6">
                     <TextBlock Classes="caption"
@@ -186,8 +224,26 @@
                         Classes="primary"
                         Content="{DynamicResource Wizard.Action.Install}"
                         Command="{Binding InstallCommand}"
-                        IsEnabled="{Binding !IsInstalling}"
-                        IsVisible="{Binding CurrentStep, Converter={StaticResource IntEquals}, ConverterParameter=3}" />
+                        IsEnabled="{Binding !IsInstalling}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="CurrentStep" Converter="{StaticResource IntEquals}" ConverterParameter="3" />
+                            <Binding Path="!IsExistingInstall" />
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
+                <Button Grid.Column="3"
+                        Classes="primary"
+                        Content="{DynamicResource Wizard.Action.Adopt}"
+                        Command="{Binding InstallCommand}"
+                        IsEnabled="{Binding !IsInstalling}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="CurrentStep" Converter="{StaticResource IntEquals}" ConverterParameter="3" />
+                            <Binding Path="IsExistingInstall" />
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
             </Grid>
         </Grid>
     </Border>

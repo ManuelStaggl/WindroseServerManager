@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -30,6 +31,14 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
     [ObservableProperty] private bool _isInstalling;
     [ObservableProperty] private string _currentPhase = string.Empty;
     [ObservableProperty] private string? _errorMessage;
+
+    /// <summary>
+    /// True, wenn unter dem aktuellen <see cref="InstallDir"/> bereits eine
+    /// Server-Binary liegt (z.B. weil der Nutzer manuell via SteamCMD installiert hat).
+    /// In dem Fall überspringt der Wizard den SteamCMD-Download und adoptiert
+    /// die bestehende Installation nur noch (Persist + optional WindrosePlus).
+    /// </summary>
+    [ObservableProperty] private bool _isExistingInstall;
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
@@ -66,7 +75,15 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
         GoBackCommand.NotifyCanExecuteChanged();
     }
 
-    partial void OnInstallDirChanged(string value) => GoNextCommand.NotifyCanExecuteChanged();
+    partial void OnInstallDirChanged(string value)
+    {
+        var trimmed = value?.Trim();
+        IsExistingInstall =
+            !string.IsNullOrWhiteSpace(trimmed) &&
+            Directory.Exists(trimmed) &&
+            ServerInstallService.FindServerBinary(trimmed!) is not null;
+        GoNextCommand.NotifyCanExecuteChanged();
+    }
     partial void OnIsOptingInChanged(bool value)
     {
         if (!value) HasSteamIdError = false;
@@ -129,18 +146,26 @@ public partial class InstallWizardViewModel : ViewModelBase, IWindrosePlusOptInC
         ErrorMessage = null;
         try
         {
-            // 1) SteamCMD install (Windrose server)
-            await foreach (var p in _install.InstallOrUpdateAsync(InstallDir, _cts.Token))
+            // 1) SteamCMD install (Windrose server) — bei adoptierter Installation überspringen,
+            //    sonst würde +app_update validate eine bestehende manuelle Installation erneut ziehen.
+            if (IsExistingInstall)
             {
-                CurrentPhase = string.IsNullOrWhiteSpace(p.Message)
-                    ? Loc.Get($"InstallPhase.{p.Phase}")
-                    : $"{Loc.Get($"InstallPhase.{p.Phase}")}: {p.Message}";
-
-                if (p.Phase == InstallPhase.Failed)
+                CurrentPhase = Loc.Get("Wizard.Adoption.Progress");
+            }
+            else
+            {
+                await foreach (var p in _install.InstallOrUpdateAsync(InstallDir, _cts.Token))
                 {
-                    ErrorMessage = p.Message;
-                    _toasts.Error(p.Message);
-                    return;
+                    CurrentPhase = string.IsNullOrWhiteSpace(p.Message)
+                        ? Loc.Get($"InstallPhase.{p.Phase}")
+                        : $"{Loc.Get($"InstallPhase.{p.Phase}")}: {p.Message}";
+
+                    if (p.Phase == InstallPhase.Failed)
+                    {
+                        ErrorMessage = p.Message;
+                        _toasts.Error(p.Message);
+                        return;
+                    }
                 }
             }
 

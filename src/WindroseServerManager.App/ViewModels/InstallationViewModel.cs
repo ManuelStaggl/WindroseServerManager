@@ -40,6 +40,20 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     [ObservableProperty] private string _newInstallDir = string.Empty;
     [ObservableProperty] private string? _step1Error;
 
+    /// <summary>
+    /// True, wenn unter <see cref="NewInstallDir"/> bereits eine Windrose-Server-Binary liegt
+    /// (z. B. aus einer manuellen SteamCMD-Installation). Der Wizard überspringt dann den
+    /// SteamCMD-Download und adoptiert die bestehende Installation.
+    /// </summary>
+    [ObservableProperty] private bool _isExistingInstall;
+
+    /// <summary>
+    /// True, wenn unter <see cref="NewInstallDir"/> bereits ein im Manager registrierter Server liegt.
+    /// In dem Fall blockieren wir den Wizard, sonst entstehen doppelte Einträge auf denselben Ordner.
+    /// </summary>
+    [ObservableProperty] private bool _isDuplicateInstall;
+    [ObservableProperty] private string? _duplicateServerName;
+
     // Step 2 – IWindrosePlusOptInContext
     [ObservableProperty] private bool _isOptingIn = true;
     [ObservableProperty] private string _rconPassword = string.Empty;
@@ -177,6 +191,30 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
 
     partial void OnAdminSteamIdChanged(string value) => OnPropertyChanged(nameof(IsSteamIdMissing));
 
+    partial void OnNewInstallDirChanged(string value)
+    {
+        var trimmed = value?.Trim();
+        IsExistingInstall =
+            !string.IsNullOrWhiteSpace(trimmed) &&
+            Directory.Exists(trimmed) &&
+            ServerInstallService.FindServerBinary(trimmed!) is not null;
+
+        // Doppelter Eintrag auf den gleichen Ordner — vergleiche normalisiert,
+        // damit Trailing-Slash / Casing nicht durchrutscht.
+        var normalized = string.IsNullOrWhiteSpace(trimmed)
+            ? string.Empty
+            : trimmed!.TrimEnd('\\', '/');
+        var dup = string.IsNullOrEmpty(normalized)
+            ? null
+            : _settings.Current.Servers.FirstOrDefault(s =>
+                string.Equals(
+                    s.InstallDir?.TrimEnd('\\', '/'),
+                    normalized,
+                    StringComparison.OrdinalIgnoreCase));
+        IsDuplicateInstall = dup is not null;
+        DuplicateServerName = dup?.Name;
+    }
+
     public void RegeneratePassword() => RconPassword = RconPasswordGenerator.Generate(24);
 
     public void ValidateSteamId()
@@ -192,6 +230,9 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         NewServerName = string.Empty;
         NewInstallDir = string.Empty;
         Step1Error = null;
+        IsExistingInstall = false;
+        IsDuplicateInstall = false;
+        DuplicateServerName = null;
         IsOptingIn = true;
         RconPassword = RconPasswordGenerator.Generate(24);
         DashboardPort = FreePortProbe.FindFreePort();
@@ -240,6 +281,11 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             }
             Step1Error = _install.ValidateInstallDir(NewInstallDir);
             if (Step1Error is not null) return;
+            if (IsDuplicateInstall)
+            {
+                Step1Error = Loc.Format("Wizard.Adoption.DuplicateError", DuplicateServerName ?? "?");
+                return;
+            }
         }
         if (WizardStep < 3)
             WizardStep++;
@@ -256,24 +302,44 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     {
         HasWizardError = false;
         WizardError = null;
+
+        // Safety: bei Adoption mit WindrosePlus-Reinstall müssen wir DLLs überschreiben können —
+        // das geht nicht, wenn ein Server-Prozess die Dateien hält.
+        if (IsExistingInstall && IsOptingIn &&
+            ServerInstallService.IsServerProcessRunning(NewInstallDir))
+        {
+            WizardError = Loc.Get("Wizard.Adoption.ServerRunningError");
+            HasWizardError = true;
+            _toasts.Error(WizardError);
+            return;
+        }
+
         IsInstalling = true;
         InstallCompleted = false;
         _cts = new System.Threading.CancellationTokenSource();
         try
         {
-            // 1) SteamCMD install
-            await foreach (var p in _install.InstallOrUpdateAsync(NewInstallDir, _cts.Token))
+            // 1) SteamCMD install — bei adoptierter Installation überspringen, sonst würde
+            //    +app_update validate eine bestehende manuelle Installation erneut ziehen.
+            if (IsExistingInstall)
             {
-                CurrentPhase = string.IsNullOrWhiteSpace(p.Message)
-                    ? Loc.Get($"InstallPhase.{p.Phase}")
-                    : $"{Loc.Get($"InstallPhase.{p.Phase}")}: {p.Message}";
-
-                if (p.Phase == InstallPhase.Failed)
+                CurrentPhase = Loc.Get("Wizard.Adoption.Progress");
+            }
+            else
+            {
+                await foreach (var p in _install.InstallOrUpdateAsync(NewInstallDir, _cts.Token))
                 {
-                    WizardError = p.Message;
-                    HasWizardError = true;
-                    _toasts.Error(p.Message);
-                    return;
+                    CurrentPhase = string.IsNullOrWhiteSpace(p.Message)
+                        ? Loc.Get($"InstallPhase.{p.Phase}")
+                        : $"{Loc.Get($"InstallPhase.{p.Phase}")}: {p.Message}";
+
+                    if (p.Phase == InstallPhase.Failed)
+                    {
+                        WizardError = p.Message;
+                        HasWizardError = true;
+                        _toasts.Error(p.Message);
+                        return;
+                    }
                 }
             }
 

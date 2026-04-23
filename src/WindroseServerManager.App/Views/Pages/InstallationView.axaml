@@ -339,6 +339,61 @@
                                            Text="{DynamicResource Installation.PathHint}" />
                             </StackPanel>
 
+                            <!-- Duplicate-Warnung: dieser Ordner ist bereits ein registrierter Server -->
+                            <Border IsVisible="{Binding IsDuplicateInstall}"
+                                    Background="{DynamicResource BrandErrorSubtleBrush}"
+                                    BorderBrush="{DynamicResource BrandErrorBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12,10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="!"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource BrandErrorBrush}"
+                                               VerticalAlignment="Center" />
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="body"
+                                                   FontWeight="SemiBold"
+                                                   Text="{DynamicResource Wizard.Adoption.DuplicateTitle}" />
+                                        <TextBlock Classes="caption muted"
+                                                   TextWrapping="Wrap">
+                                            <Run Text="{DynamicResource Wizard.Adoption.DuplicateHint.Prefix}" />
+                                            <Run Text="{Binding DuplicateServerName}" FontWeight="SemiBold" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Adoption-Hinweis: bestehende manuelle SteamCMD-Installation erkannt -->
+                            <Border Background="{DynamicResource BrandSuccessSubtleBrush}"
+                                    BorderBrush="{DynamicResource BrandSuccessBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12,10">
+                                <Border.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsExistingInstall" />
+                                        <Binding Path="!IsDuplicateInstall" />
+                                    </MultiBinding>
+                                </Border.IsVisible>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="&#x2713;"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource BrandSuccessBrush}"
+                                               VerticalAlignment="Center" />
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="body"
+                                                   FontWeight="SemiBold"
+                                                   Text="{DynamicResource Wizard.Adoption.DetectedTitle}" />
+                                        <TextBlock Classes="caption muted"
+                                                   TextWrapping="Wrap"
+                                                   Text="{DynamicResource Wizard.Adoption.DetectedHint}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
                             <!-- Validation error -->
                             <TextBlock Classes="caption"
                                        Foreground="{DynamicResource BrandErrorBrush}"
@@ -367,6 +422,18 @@
                         <StackPanel Spacing="16">
                             <TextBlock Classes="section-header"
                                        Text="{DynamicResource Server.Step3.Title}" />
+
+                            <!-- Adoption-Banner auch in Step 3, damit der Modus klar ist -->
+                            <Border IsVisible="{Binding IsExistingInstall}"
+                                    Background="{DynamicResource BrandSuccessSubtleBrush}"
+                                    BorderBrush="{DynamicResource BrandSuccessBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12,10">
+                                <TextBlock Classes="caption muted"
+                                           TextWrapping="Wrap"
+                                           Text="{DynamicResource Wizard.Adoption.SummaryHint}" />
+                            </Border>
 
                             <!-- Summary (before install starts) -->
                             <StackPanel Spacing="4"
@@ -449,13 +516,33 @@
                         IsVisible="{Binding WizardStep,
                                    Converter={StaticResource IntLess}, ConverterParameter=3}" />
 
-                <!-- Install (step 3, not yet completed) -->
+                <!-- Install (step 3, new install) -->
                 <Button Grid.Column="4"
                         Classes="primary"
                         Content="{DynamicResource Server.StartInstall}"
                         Command="{Binding InstallCommand}"
-                        IsVisible="{Binding ShowInstallButton}"
-                        IsEnabled="{Binding !IsInstalling}" />
+                        IsEnabled="{Binding !IsInstalling}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="ShowInstallButton" />
+                            <Binding Path="!IsExistingInstall" />
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
+
+                <!-- Adopt (step 3, existing install detected) -->
+                <Button Grid.Column="4"
+                        Classes="primary"
+                        Content="{DynamicResource Wizard.Action.Adopt}"
+                        Command="{Binding InstallCommand}"
+                        IsEnabled="{Binding !IsInstalling}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="ShowInstallButton" />
+                            <Binding Path="IsExistingInstall" />
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
 
                 <!-- Done (after success) -->
                 <Button Grid.Column="4"

@@ -526,7 +526,18 @@
     <sys:String x:Key="Wizard.Step2.Label">WindrosePlus</sys:String>
     <sys:String x:Key="Wizard.Step3.Label">Bestätigung</sys:String>
     <sys:String x:Key="Wizard.Action.Install">Installieren</sys:String>
+    <sys:String x:Key="Wizard.Action.Adopt">Übernehmen</sys:String>
     <sys:String x:Key="Wizard.Action.Next">Weiter</sys:String>
+
+    <sys:String x:Key="Wizard.Adoption.DetectedTitle">Bestehende Installation gefunden</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DetectedHint">In diesem Ordner liegt bereits eine Windrose-Server-Binary (z. B. aus einer manuellen SteamCMD-Installation). Der Wizard überspringt den SteamCMD-Download und übernimmt die bestehende Installation. WindrosePlus kann optional dazuinstalliert werden.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.SummaryHint">Bestehende Installation wird übernommen — kein erneuter SteamCMD-Download.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.Progress">Bestehende Installation wird übernommen…</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateTitle">Ordner ist bereits registriert</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateHint">Dieser Ordner wird bereits als Server '{0}' verwaltet. Wähle entweder einen anderen Pfad oder verwende den bestehenden Eintrag.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateHint.Prefix">Bereits registriert als </sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateError">Dieser Ordner ist bereits als Server '{0}' registriert.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.ServerRunningError">Im Zielordner läuft gerade ein Windrose-Server-Prozess. Bitte stoppe den Server, bevor WindrosePlus (re)installiert wird — sonst sind die DLLs gesperrt.</sys:String>
 
     <sys:String x:Key="Wizard.WindrosePlus.OptIn">WindrosePlus installieren</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.OptOut">Ohne WindrosePlus fortfahren</sys:String>

@@ -526,7 +526,18 @@
     <sys:String x:Key="Wizard.Step2.Label">WindrosePlus</sys:String>
     <sys:String x:Key="Wizard.Step3.Label">Confirm</sys:String>
     <sys:String x:Key="Wizard.Action.Install">Install</sys:String>
+    <sys:String x:Key="Wizard.Action.Adopt">Adopt</sys:String>
     <sys:String x:Key="Wizard.Action.Next">Next</sys:String>
+
+    <sys:String x:Key="Wizard.Adoption.DetectedTitle">Existing installation detected</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DetectedHint">A Windrose server binary already lives in this folder (e.g. from a manual SteamCMD install). The wizard will skip the SteamCMD download and adopt the existing installation. WindrosePlus can optionally be added on top.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.SummaryHint">Existing installation will be adopted — no SteamCMD download will run.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.Progress">Adopting existing installation…</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateTitle">Folder is already registered</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateHint">This folder is already managed as server '{0}'. Either pick a different path or use the existing entry.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateHint.Prefix">Already registered as </sys:String>
+    <sys:String x:Key="Wizard.Adoption.DuplicateError">This folder is already registered as server '{0}'.</sys:String>
+    <sys:String x:Key="Wizard.Adoption.ServerRunningError">A Windrose server process is currently running in the target folder. Please stop the server before (re)installing WindrosePlus — otherwise the DLLs are locked.</sys:String>
 
     <sys:String x:Key="Wizard.WindrosePlus.OptIn">Install WindrosePlus</sys:String>
     <sys:String x:Key="Wizard.WindrosePlus.OptOut">Continue without WindrosePlus</sys:String>

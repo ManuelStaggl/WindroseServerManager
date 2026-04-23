@@ -291,6 +291,45 @@ public sealed partial class ServerInstallService : IServerInstallService
     }
 
     /// <summary>
+    /// Prüft ob unter <paramref name="installDir"/> aktuell ein Windrose-Server-Prozess läuft.
+    /// Wichtig vor Adoption/Re-Install: laufende Server halten DLLs (UE4SS, WindrosePlus mod.dll)
+    /// offen und blockieren das Überschreiben.
+    /// </summary>
+    public static bool IsServerProcessRunning(string installDir)
+    {
+        if (string.IsNullOrWhiteSpace(installDir)) return false;
+        var normalized = Path.GetFullPath(installDir).TrimEnd('\\', '/');
+        string[] names = { "WindroseServer", "WindroseServer-Win64-Shipping", "WindowsServer" };
+        foreach (var name in names)
+        {
+            System.Diagnostics.Process[] procs;
+            try { procs = System.Diagnostics.Process.GetProcessesByName(name); }
+            catch { continue; }
+            foreach (var p in procs)
+            {
+                try
+                {
+                    var path = p.MainModule?.FileName;
+                    if (string.IsNullOrEmpty(path)) continue;
+                    var full = Path.GetFullPath(path);
+                    if (full.StartsWith(normalized + Path.DirectorySeparatorChar,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    // MainModule kann bei fremden Prozessen oder beim Race
+                    // ("Access denied" / "process exited") werfen — ignorieren.
+                }
+                finally { p.Dispose(); }
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Sucht die Server-Binary: WindroseServer.exe, WindowsServer.exe (legacy) oder
     /// Windrose-Win64-Shipping.exe im Install-Dir — im Root oder in Unterordnern.
     /// </summary>
