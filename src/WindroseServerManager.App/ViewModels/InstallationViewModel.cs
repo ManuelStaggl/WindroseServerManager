@@ -394,6 +394,13 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 existing.ServerName = NewServerName;
                 if (string.IsNullOrWhiteSpace(existing.InviteCode))
                     existing.InviteCode = InviteCodeGenerator.Generate();
+                // Windrose baut ihren internen gRPC-Bind-String als {P2pProxyAddress}:{randomPort}.
+                // Mit leerem P2pProxyAddress kommt ":43512" raus, gRPC lehnt ab und der Server
+                // killt sich mit "Data is inconsistent" (reproduziert in v1.2.2-Tests). Windrose
+                // setzt das Feld beim ersten Start nicht zuverlässig — wir pinnen es auf 127.0.0.1
+                // wenn leer, damit der Loopback-Bind in jedem Fall funktioniert.
+                if (string.IsNullOrWhiteSpace(existing.P2pProxyAddress))
+                    existing.P2pProxyAddress = "127.0.0.1";
                 await _config.SaveServerDescriptionToAsync(NewInstallDir, existing, _cts.Token);
             }
             catch (Exception ex)

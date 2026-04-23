@@ -13,6 +13,7 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
     private readonly IAppSettingsService _settings;
     private readonly IServerEventLog _events;
     private readonly IWindrosePlusService _windrosePlus;
+    private readonly IServerConfigService _config;
     private readonly object _lock = new();
 
     private readonly ConcurrentQueue<ServerLogLine> _logBuffer = new();
@@ -24,12 +25,14 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         ILogger<ServerProcessService> logger,
         IAppSettingsService settings,
         IServerEventLog events,
-        IWindrosePlusService windrosePlus)
+        IWindrosePlusService windrosePlus,
+        IServerConfigService config)
     {
         _logger = logger;
         _settings = settings;
         _events = events;
         _windrosePlus = windrosePlus;
+        _config = config;
     }
 
     public ServerStatus Status { get; private set; } = ServerStatus.Stopped;
@@ -82,7 +85,22 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             _startedServerDir = dir;
         }
 
-        // Phase 2: WindrosePlus pre-launch hook (async, outside lock)
+        // Phase 2a: ServerDescription.json heilen falls P2pProxyAddress leer ist.
+        // Windrose baut den internen gRPC-Bind-String als {P2pProxyAddress}:{randomPort}.
+        // Leeres Feld → ":43512" → gRPC lehnt ab → Server killt sich mit "Data is inconsistent".
+        // Neue Installs setzen das Feld korrekt (ab v1.2.3). Diese Heilung schützt bestehende
+        // Server, bei denen Windrose das Feld beim ersten Start leer gelassen hat.
+        try
+        {
+            await HealServerDescriptionIfNeededAsync(dir, ct).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { return false; }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Konnte ServerDescription.json nicht heilen — Server wird trotzdem gestartet");
+        }
+
+        // Phase 2b: WindrosePlus pre-launch hook (async, outside lock)
         try
         {
             await _windrosePlus.RunPreLaunchAsync(dir, ct).ConfigureAwait(false);
@@ -491,6 +509,18 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
             LastUpdatedUtc: null,
             WindrosePlusActive: active,
             WindrosePlusVersionTag: tag);
+    }
+
+    private async Task HealServerDescriptionIfNeededAsync(string installDir, CancellationToken ct)
+    {
+        var desc = await _config.LoadServerDescriptionFromAsync(installDir, ct).ConfigureAwait(false);
+        if (desc is null) return; // kein erster Start noch — Install-Flow setzt das Feld
+        if (!string.IsNullOrWhiteSpace(desc.P2pProxyAddress)) return;
+
+        desc.P2pProxyAddress = "127.0.0.1";
+        await _config.SaveServerDescriptionToAsync(installDir, desc, ct).ConfigureAwait(false);
+        _logger.LogInformation("Geheilt: leeres P2pProxyAddress in {Dir} auf 127.0.0.1 gesetzt (sonst crasht der gRPC-Init)", installDir);
+        AppendSystem("[Info] ServerDescription.json: P2pProxyAddress war leer — auf 127.0.0.1 gesetzt, damit der gRPC-Server starten kann.");
     }
 
     private static string CombineArgs(string a, string b) =>
