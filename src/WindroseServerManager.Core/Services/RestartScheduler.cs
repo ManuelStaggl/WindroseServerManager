@@ -25,6 +25,7 @@ public sealed class RestartScheduler : BackgroundService
     private readonly IMetricsService _metrics;
     private readonly IServerEventLog _events;
     private readonly IBackupService _backupService;
+    private readonly INotificationService _notification;
 
     private DateTime _lastTriggerDate = DateTime.MinValue;
     private DateTime _lastWarnDate = DateTime.MinValue;
@@ -38,7 +39,8 @@ public sealed class RestartScheduler : BackgroundService
         IServerProcessService server,
         IMetricsService metrics,
         IServerEventLog events,
-        IBackupService backupService)
+        IBackupService backupService,
+        INotificationService notification)
     {
         _logger = logger;
         _settings = settings;
@@ -46,6 +48,7 @@ public sealed class RestartScheduler : BackgroundService
         _metrics = metrics;
         _events = events;
         _backupService = backupService;
+        _notification = notification;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -198,12 +201,15 @@ public sealed class RestartScheduler : BackgroundService
             try
             {
                 _logger.LogInformation("Creating backup before restart");
+                _notification.NotifyInfo("Creating backup...");
                 await _backupService.CreateBackupAsync(isAutomatic: true, ct).ConfigureAwait(false);
                 _logger.LogInformation("Backup completed successfully");
+                _notification.NotifySuccess("Backup completed successfully before restart");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Backup on restart failed, but proceeding with restart");
+                _notification.NotifyError($"Backup failed: {ex.Message}. Restart will proceed anyway.");
             }
         }
 
@@ -212,12 +218,15 @@ public sealed class RestartScheduler : BackgroundService
 
         try
         {
+            _notification.NotifyInfo("Starting server...");
             await _server.StartAsync(ct).ConfigureAwait(false);
             _logger.LogInformation("Scheduled restart complete");
+            _notification.NotifySuccess("Server restarted successfully");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Scheduled restart: start failed");
+            _notification.NotifyError($"Server restart failed: {ex.Message}");
         }
     }
 }

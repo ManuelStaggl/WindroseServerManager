@@ -219,6 +219,8 @@ public partial class App : Application
 
         s.AddSingleton<INavigationService, NavigationService>();
         s.AddSingleton<IToastService, ToastService>();
+        s.AddSingleton<INotificationService>(sp => 
+            new NotificationServiceAdapter(sp.GetRequiredService<IToastService>()));
         s.AddSingleton<IFirewallService, FirewallService>();
         s.AddSingleton<IUpdateCheckService, UpdateCheckService>();
         s.AddSingleton<IAutoStartService, AutoStartService>();

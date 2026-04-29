@@ -6,7 +6,7 @@ A Windows desktop app (Avalonia / .NET 9) that bundles SteamCMD setup, server co
 
 **Status: Stable · v1.2.0**
 
-![Version](https://img.shields.io/badge/version-1.2.0-success)
+![Version](https://img.shields.io/badge/version-1.2.4-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
 ![.NET](https://img.shields.io/badge/.NET-9-512BD4)

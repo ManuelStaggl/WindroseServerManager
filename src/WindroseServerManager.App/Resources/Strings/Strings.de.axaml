@@ -343,6 +343,12 @@
     <sys:String x:Key="Toast.ServerRestarting">Server wird neu gestartet...</sys:String>
     <sys:String x:Key="Toast.RestartInProgress">Neustart läuft...</sys:String>
     <sys:String x:Key="Toast.ServerKilled">Server beendet (Force-Kill).</sys:String>
+    <sys:String x:Key="Toast.BackupOnRestartCreating">Backup wird erstellt...</sys:String>
+    <sys:String x:Key="Toast.BackupOnRestartSuccess">Backup erfolgreich vor dem Neustart erstellt.</sys:String>
+    <sys:String x:Key="Toast.BackupOnRestartFailed">Backup fehlgeschlagen — Neustart wird trotzdem durchgeführt.</sys:String>
+    <sys:String x:Key="Toast.RestartStarting">Server wird gestartet...</sys:String>
+    <sys:String x:Key="Toast.RestartSuccess">Server erfolgreich neu gestartet.</sys:String>
+    <sys:String x:Key="Toast.RestartFailed">Server-Neustart fehlgeschlagen.</sys:String>
     <sys:String x:Key="Toast.StopTooSlow">Server konnte nicht rechtzeitig gestoppt werden.</sys:String>
     <sys:String x:Key="Toast.LogCleared">Log geleert.</sys:String>
     <sys:String x:Key="Toast.LogExportedFormat">Log exportiert: {0}</sys:String>

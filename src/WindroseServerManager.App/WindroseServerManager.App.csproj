@@ -10,10 +10,10 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>WindroseServerManager.App</RootNamespace>
     <AssemblyName>WindroseServerManager</AssemblyName>
-    <Version>1.2.3</Version>
-    <AssemblyVersion>1.2.3</AssemblyVersion>
-    <FileVersion>1.2.3</FileVersion>
-    <InformationalVersion>1.2.3</InformationalVersion>
+    <Version>1.2.4</Version>
+    <AssemblyVersion>1.2.4</AssemblyVersion>
+    <FileVersion>1.2.4</FileVersion>
+    <InformationalVersion>1.2.4</InformationalVersion>
     <Product>Windrose Server Manager</Product>
     <Company>Windrose Community</Company>
     <Copyright>© 2026 Manuel Staggl — MIT License</Copyright>
