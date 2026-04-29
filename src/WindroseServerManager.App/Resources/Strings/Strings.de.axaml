@@ -213,6 +213,7 @@
     <sys:String x:Key="ServerControl.RamOverSuffix">% (bezogen auf Host-RAM)</sys:String>
     <sys:String x:Key="ServerControl.UptimeOver">Bei Uptime über</sys:String>
     <sys:String x:Key="ServerControl.Hours">Stunden</sys:String>
+    <sys:String x:Key="ServerControl.BackupOnRestart">Sicherung beim Neustart erstellen</sys:String>
     <sys:String x:Key="ServerControl.SessionHistory">Session-Verlauf</sys:String>
     <sys:String x:Key="ServerControl.NoEventsYet">Noch keine Events — Server starten um den Verlauf aufzubauen.</sys:String>
     <sys:String x:Key="ServerControl.LiveLog">Live-Log</sys:String>

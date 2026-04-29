@@ -52,6 +52,7 @@ public sealed class AppSettings
     public int AutoBackupIntervalMinutes { get; set; } = 60;
     public bool AutoBackupEnabled { get; set; } = false;
     public int MaxBackupsToKeep { get; set; } = 20;
+    public bool BackupOnRestartEnabled { get; set; } = false;
 
     // App-Update (GitHub Releases)
     /// <summary>Tag-Name (z.B. "v1.0.1"), den der User via "Später" verworfen hat. Bei neueren Versionen wieder anzeigen.</summary>

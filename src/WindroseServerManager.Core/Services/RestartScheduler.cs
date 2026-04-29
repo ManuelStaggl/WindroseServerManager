@@ -24,6 +24,7 @@ public sealed class RestartScheduler : BackgroundService
     private readonly IServerProcessService _server;
     private readonly IMetricsService _metrics;
     private readonly IServerEventLog _events;
+    private readonly IBackupService _backupService;
 
     private DateTime _lastTriggerDate = DateTime.MinValue;
     private DateTime _lastWarnDate = DateTime.MinValue;
@@ -36,13 +37,15 @@ public sealed class RestartScheduler : BackgroundService
         IAppSettingsService settings,
         IServerProcessService server,
         IMetricsService metrics,
-        IServerEventLog events)
+        IServerEventLog events,
+        IBackupService backupService)
     {
         _logger = logger;
         _settings = settings;
         _server = server;
         _metrics = metrics;
         _events = events;
+        _backupService = backupService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -188,6 +191,21 @@ public sealed class RestartScheduler : BackgroundService
 
         try { await _server.StopAsync(ct).ConfigureAwait(false); }
         catch (Exception ex) { _logger.LogError(ex, "Scheduled restart: stop failed"); }
+
+        // Backup on restart if enabled.
+        if (_settings.Current.BackupOnRestartEnabled)
+        {
+            try
+            {
+                _logger.LogInformation("Creating backup before restart");
+                await _backupService.CreateBackupAsync(isAutomatic: true, ct).ConfigureAwait(false);
+                _logger.LogInformation("Backup completed successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Backup on restart failed, but proceeding with restart");
+            }
+        }
 
         try { await Task.Delay(TimeSpan.FromSeconds(10), ct).ConfigureAwait(false); }
         catch (OperationCanceledException) { return; }
