@@ -451,6 +451,8 @@
     <sys:String x:Key="Event.ScheduledRestart">Geplanter Restart</sys:String>
     <sys:String x:Key="Event.AutoRestartRam">Auto-Restart (RAM)</sys:String>
     <sys:String x:Key="Event.AutoRestartUptime">Auto-Restart (Uptime)</sys:String>
+    <sys:String x:Key="Event.BackupOnRestartSuccess">Backup erstellt</sys:String>
+    <sys:String x:Key="Event.BackupOnRestartFailed">Backup fehlgeschlagen</sys:String>
     <sys:String x:Key="Event.SessionDurationHm">Session-Dauer: {0}h {1}m</sys:String>
     <sys:String x:Key="Event.SessionDurationMs">Session-Dauer: {0}m {1}s</sys:String>
 

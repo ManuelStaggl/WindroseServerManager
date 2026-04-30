@@ -205,11 +205,17 @@ public sealed class RestartScheduler : BackgroundService
                 await _backupService.CreateBackupAsync(isAutomatic: true, ct).ConfigureAwait(false);
                 _logger.LogInformation("Backup completed successfully");
                 _notification.NotifySuccess("Backup completed successfully before restart");
+                await _events.AppendAsync(
+                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartSuccess, "Backup created before restart"),
+                    ct).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Backup on restart failed, but proceeding with restart");
                 _notification.NotifyError($"Backup failed: {ex.Message}. Restart will proceed anyway.");
+                await _events.AppendAsync(
+                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartFailed, $"Backup failed: {ex.Message}"),
+                    ct).ConfigureAwait(false);
             }
         }
 

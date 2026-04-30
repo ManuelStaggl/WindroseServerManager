@@ -8,6 +8,8 @@ public enum ServerEventType
     ScheduledRestart,
     AutoRestartHighRam,
     AutoRestartMaxUptime,
+    BackupOnRestartSuccess,
+    BackupOnRestartFailed,
 }
 
 /// <summary>
