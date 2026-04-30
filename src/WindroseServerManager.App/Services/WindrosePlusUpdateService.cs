@@ -10,7 +10,7 @@ namespace WindroseServerManager.App.Services;
 /// </summary>
 public sealed class WindrosePlusUpdateService : IWindrosePlusUpdateService
 {
-    private const string ReleaseUrl = "https://github.com/windrose-plus/windrose-plus/releases/latest";
+    private const string ReleaseUrl = "https://github.com/humangenome/WindrosePlus/releases/latest";
 
     private readonly IWindrosePlusService _wplus;
     private readonly IAppSettingsService _settings;
