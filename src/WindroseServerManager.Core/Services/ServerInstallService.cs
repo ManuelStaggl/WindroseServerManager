@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using WindroseServerManager.Core.Models;
 
@@ -18,15 +19,18 @@ public sealed partial class ServerInstallService : IServerInstallService
     private readonly ILogger<ServerInstallService> _logger;
     private readonly ISteamCmdService _steamCmd;
     private readonly IAppSettingsService _settings;
+    private readonly IHttpClientFactory _httpFactory;
 
     public ServerInstallService(
         ILogger<ServerInstallService> logger,
         ISteamCmdService steamCmd,
-        IAppSettingsService settings)
+        IAppSettingsService settings,
+        IHttpClientFactory httpFactory)
     {
         _logger = logger;
         _steamCmd = steamCmd;
         _settings = settings;
+        _httpFactory = httpFactory;
     }
 
     private string AppId =>
@@ -190,6 +194,29 @@ public sealed partial class ServerInstallService : IServerInstallService
         // Trailing Backslash entfernen — sonst escaped er in "..." das schließende Quote
         // und SteamCMD bekommt eine kaputte Kommandozeile ("Missing configuration")
         var cleanDir = installDir.TrimEnd('\\', '/');
+        var manifestPath = Path.Combine(cleanDir, "steamapps", $"appmanifest_{AppId}.acf");
+        InstallProgress? manifestDeleteError = null;
+        try
+        {
+            if (File.Exists(manifestPath))
+            {
+                File.Delete(manifestPath);
+                _logger.LogInformation("Deleted Steam app manifest before update: {Path}", manifestPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to delete Steam app manifest before update: {Path}", manifestPath);
+            manifestDeleteError = new InstallProgress(InstallPhase.Failed,
+                $"Steam manifest konnte nicht geloescht werden: {ex.Message}", null, null);
+        }
+
+        if (manifestDeleteError is not null)
+        {
+            yield return manifestDeleteError;
+            yield break;
+        }
+
         var args = $"+force_install_dir \"{cleanDir}\" +login {login} +app_update {AppId} validate +quit";
         yield return new InstallProgress(
             InstallPhase.RunningSteamCmd,
@@ -456,13 +483,75 @@ public sealed partial class ServerInstallService : IServerInstallService
         }
     }
 
+    public async Task<bool> IsUpdateAvailableAsync(string installDir, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(installDir) || !Directory.Exists(installDir))
+            return false;
+
+        try
+        {
+            // Lese die lokale buildId aus dem manifest
+            var manifest = Path.Combine(installDir, "steamapps", $"appmanifest_{AppId}.acf");
+            if (!File.Exists(manifest))
+                return false;
+
+            string? localBuildId = null;
+            foreach (var line in File.ReadLines(manifest))
+            {
+                var m = BuildIdRegex.Match(line);
+                if (m.Success)
+                {
+                    localBuildId = m.Groups[1].Value;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(localBuildId))
+                return false;
+
+            // Frage die Steam API nach der aktuellen Version ab
+            var url = $"https://api.steampowered.com/ISteamApps/UpToDateCheck/v1/?appid={AppId}&version={localBuildId}";
+            using var http = _httpFactory.CreateClient("steam");
+            http.Timeout = TimeSpan.FromSeconds(10);
+
+            _logger.LogInformation("Checking server update availability: {Url}", url);
+            using var response = await http.GetAsync(url, ct).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Steam API returned status {Status}", response.StatusCode);
+                return false;
+            }
+
+            await using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct).ConfigureAwait(false);
+
+            // Steam API returns:
+            // { "response": { "success": true, "up_to_date": true/false, ... } }
+            if (doc.RootElement.TryGetProperty("response", out var responseElem) &&
+                responseElem.TryGetProperty("up_to_date", out var upToDateElem) &&
+                upToDateElem.GetBoolean() == false)
+            {
+                _logger.LogInformation("Server update available for {AppId} (local: {Local})", AppId, localBuildId);
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to check server update availability for {Dir}", installDir);
+            return false;
+        }
+    }
+
     [GeneratedRegex(@"progress:\s*([\d.]+)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 5000)]
     private static partial Regex ProgressRegexBuilder();
 
     [GeneratedRegex(@"""buildid""\s*""(\d+)""", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
     private static partial Regex BuildIdRegexBuilder();
 
-    [GeneratedRegex(@"\b(ERROR!|FAILED|Login Failure|Invalid Password|Missing configuration|Invalid AppID)",
+    [GeneratedRegex(@"^\s*Error!|Login Failure|Invalid Password|Missing configuration|Invalid AppID",
         RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
     private static partial Regex ErrorRegexBuilder();
 }

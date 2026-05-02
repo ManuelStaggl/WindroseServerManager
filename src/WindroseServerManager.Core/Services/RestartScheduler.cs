@@ -190,7 +190,8 @@ public sealed class RestartScheduler : BackgroundService
             RestartTrigger.MaxUptime => ServerEventType.AutoRestartMaxUptime,
             _ => ServerEventType.ScheduledRestart,
         };
-        await _events.AppendAsync(new ServerEvent(DateTime.UtcNow, eventType, reason), ct).ConfigureAwait(false);
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+        await _events.AppendAsync(new ServerEvent(DateTime.UtcNow, eventType, reason, ServerName: serverName), ct).ConfigureAwait(false);
 
         try { await _server.StopAsync(ct).ConfigureAwait(false); }
         catch (Exception ex) { _logger.LogError(ex, "Scheduled restart: stop failed"); }
@@ -205,16 +206,13 @@ public sealed class RestartScheduler : BackgroundService
                 await _backupService.CreateBackupAsync(isAutomatic: true, ct).ConfigureAwait(false);
                 _logger.LogInformation("Backup completed successfully");
                 _notification.NotifySuccess("Backup completed successfully before restart");
-                await _events.AppendAsync(
-                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartSuccess, "Backup created before restart"),
-                    ct).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Backup on restart failed, but proceeding with restart");
                 _notification.NotifyError($"Backup failed: {ex.Message}. Restart will proceed anyway.");
                 await _events.AppendAsync(
-                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartFailed, $"Backup failed: {ex.Message}"),
+                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartFailed, $"Échec du backup avant restart : {ex.Message}", ServerName: serverName),
                     ct).ConfigureAwait(false);
             }
         }

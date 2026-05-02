@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 
 namespace WindroseServerManager.App.Services;
 
+#pragma warning disable CA1416
+
 public sealed class FirewallService : IFirewallService
 {
     private const string RuleName = "Windrose Server";

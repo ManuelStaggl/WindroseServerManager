@@ -106,7 +106,7 @@ public sealed class AppUpdateService : IAppUpdateService
         if (!string.IsNullOrWhiteSpace(info) && TryParseVersion(info, out var parsed))
             return parsed;
 
-        return asm.GetName().Version ?? new Version(1, 0, 0, 0);
+        return asm.GetName().Version ?? new Version(1, 2, 5, 0);
     }
 
     private static bool TryParseVersion(string raw, out Version version)

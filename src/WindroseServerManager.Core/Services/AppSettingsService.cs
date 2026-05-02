@@ -63,14 +63,19 @@ public sealed class AppSettingsService : IAppSettingsService
 
     public async Task SelectServerAsync(string serverId)
     {
+        AppSettings changed;
         await _lock.WaitAsync().ConfigureAwait(false);
         try
         {
-            _current.ActiveServerId = serverId;
+            var next = CloneSettings(_current);
+            next.ActiveServerId = serverId;
+            await SaveCoreAsync(next).ConfigureAwait(false);
+            _current = next;
+            changed = CloneSettings(next);
         }
         finally { _lock.Release(); }
-        await SaveAsync().ConfigureAwait(false);
-        Changed?.Invoke(_current);
+
+        Changed?.Invoke(changed);
     }
 
     public async Task LoadAsync(CancellationToken ct = default)
@@ -132,14 +137,7 @@ public sealed class AppSettingsService : IAppSettingsService
         {
             // Atomic write: erst in .tmp schreiben, dann per Move ersetzen.
             // Verhindert korrupte Settings bei Crash während des Schreibens.
-            var tmpPath = _settingsPath + ".tmp";
-            await using (var stream = File.Create(tmpPath))
-            {
-                await JsonSerializer.SerializeAsync(stream, _current, JsonOptions, ct).ConfigureAwait(false);
-                await stream.FlushAsync(ct).ConfigureAwait(false);
-            }
-            File.Move(tmpPath, _settingsPath, overwrite: true);
-            _logger.LogDebug("Settings saved to {Path}", _settingsPath);
+            await SaveCoreAsync(_current, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -155,9 +153,41 @@ public sealed class AppSettingsService : IAppSettingsService
     public async Task UpdateAsync(Action<AppSettings> mutate, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(mutate);
-        mutate(_current);
-        await SaveAsync(ct).ConfigureAwait(false);
-        Changed?.Invoke(_current);
+
+        AppSettings changed;
+        await _lock.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            var next = CloneSettings(_current);
+            mutate(next);
+            await SaveCoreAsync(next, ct).ConfigureAwait(false);
+            _current = next;
+            changed = CloneSettings(next);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+
+        Changed?.Invoke(changed);
+    }
+
+    private async Task SaveCoreAsync(AppSettings settings, CancellationToken ct = default)
+    {
+        var tmpPath = _settingsPath + ".tmp";
+        await using (var stream = File.Create(tmpPath))
+        {
+            await JsonSerializer.SerializeAsync(stream, settings, JsonOptions, ct).ConfigureAwait(false);
+            await stream.FlushAsync(ct).ConfigureAwait(false);
+        }
+        File.Move(tmpPath, _settingsPath, overwrite: true);
+        _logger.LogDebug("Settings saved to {Path}", _settingsPath);
+    }
+
+    private static AppSettings CloneSettings(AppSettings settings)
+    {
+        var json = JsonSerializer.Serialize(settings, JsonOptions);
+        return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
     }
 
     /// <summary>

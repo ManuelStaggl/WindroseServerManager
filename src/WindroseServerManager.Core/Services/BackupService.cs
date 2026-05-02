@@ -12,11 +12,13 @@ public sealed class BackupService : IBackupService
 
     private readonly ILogger<BackupService> _logger;
     private readonly IAppSettingsService _settings;
+    private readonly IServerEventLog _eventLog;
 
-    public BackupService(ILogger<BackupService> logger, IAppSettingsService settings)
+    public BackupService(ILogger<BackupService> logger, IAppSettingsService settings, IServerEventLog eventLog)
     {
         _logger = logger;
         _settings = settings;
+        _eventLog = eventLog;
     }
 
     public string GetBackupDir()
@@ -50,6 +52,8 @@ public sealed class BackupService : IBackupService
         }
 
         var backupDir = GetBackupDir();
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+
         var ts = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         var fileName = $"{(isAutomatic ? AutoPrefix : ManualPrefix)}{ts}.zip";
         var fullPath = Path.Combine(backupDir, fileName);
@@ -70,6 +74,13 @@ public sealed class BackupService : IBackupService
         }
 
         var info = new FileInfo(fullPath);
+
+        _ = _eventLog.AppendAsync(new ServerEvent(
+            DateTime.UtcNow, 
+            isAutomatic ? ServerEventType.BackupAutomatic : ServerEventType.BackupManual, 
+            $"Sauvegarde créée : {fileName}", 
+            ServerName: serverName));
+
         return new BackupInfo(fileName, fullPath, info.CreationTimeUtc, info.Length, isAutomatic);
     }
 
@@ -95,6 +106,13 @@ public sealed class BackupService : IBackupService
             return;
         }
         File.Delete(path);
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+        _ = _eventLog.AppendAsync(new ServerEvent(
+            DateTime.UtcNow, 
+            ServerEventType.BackupDeleted, 
+            $"Sauvegarde supprimée : {fileName}", 
+            ServerName: serverName));
+
         _logger.LogInformation("Deleted backup {Path}", path);
     }
 
@@ -135,6 +153,13 @@ public sealed class BackupService : IBackupService
             var extractParent = Path.GetDirectoryName(targetRoot)!;
             ZipFile.ExtractToDirectory(backupPath, extractParent, overwriteFiles: true);
         }, ct).ConfigureAwait(false);
+
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+        _ = _eventLog.AppendAsync(new ServerEvent(
+            DateTime.UtcNow, 
+            ServerEventType.BackupRestored, 
+            $"Restauration effectuée : {fileName}", 
+            ServerName: serverName));
     }
 
     public int ApplyRetention()

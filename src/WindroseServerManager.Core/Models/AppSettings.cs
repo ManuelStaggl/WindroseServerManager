@@ -82,6 +82,19 @@ public sealed class AppSettings
     /// <summary>Per-server opt-in state for WindrosePlus. Key = server InstallDir. Default: NeverAsked (seeded by migration).</summary>
     public Dictionary<string, OptInState> WindrosePlusOptInStateByServer { get; set; } = new();
 
+    // Discord Bot Integration
+    /// <summary>Enable or disable the Discord bot feature. Default: false.</summary>
+    public bool EnableDiscordBot { get; set; } = false;
+    
+    /// <summary>Discord bot token. Empty = disabled.</summary>
+    public string DiscordBotToken { get; set; } = "";
+    
+    /// <summary>Discord Guild ID (Server ID) for Slash commands. 0 = disabled.</summary>
+    public ulong DiscordGuildId { get; set; } = 0;
+    
+    /// <summary>Discord text channel ID where server logs are sent. 0 = disabled.</summary>
+    public ulong DiscordLogChannelId { get; set; } = 0;
+
     /// <summary>
     /// When true, ALL configured servers are auto-started when the app launches
     /// (including Windows autostart → app → server chain). Acts as a shortcut;

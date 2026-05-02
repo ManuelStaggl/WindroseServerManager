@@ -262,6 +262,7 @@
     <sys:String x:Key="Settings.Group.App">APP</sys:String>
     <sys:String x:Key="Settings.Group.General">GENERAL</sys:String>
     <sys:String x:Key="Settings.Group.About">ABOUT</sys:String>
+    <sys:String x:Key="Settings.Group.Discord">DISCORD</sys:String>
     <sys:String x:Key="Settings.Save.Title">Save settings</sys:String>
     <sys:String x:Key="Settings.Save.Hint">Server start and Steam settings take effect on the next launch.</sys:String>
     <sys:String x:Key="Settings.Language.Title">Language</sys:String>
@@ -280,6 +281,21 @@
     <sys:String x:Key="Settings.Steam.AppId">Steam App ID</sys:String>
     <sys:String x:Key="Settings.Steam.Login">Steam login (empty = anonymous)</sys:String>
     <sys:String x:Key="Settings.Steam.Hint">Usually not needed. Change only for beta branches or alternate Steam accounts.</sys:String>
+
+    <!-- Discord Bot Integration -->
+    <sys:String x:Key="Settings.Discord.Title">Discord Bot Integration</sys:String>
+    <sys:String x:Key="Settings.Discord.Enable">Enable Discord bot</sys:String>
+    <sys:String x:Key="Settings.Discord.Hint">Connect a Discord bot to control your server via slash commands and stream logs in real-time. The bot displays server status in its Discord activity.</sys:String>
+    <sys:String x:Key="Settings.Discord.Token.Title">Bot Token</sys:String>
+    <sys:String x:Key="Settings.Discord.Token.Placeholder">Discord bot token (keep secret)</sys:String>
+    <sys:String x:Key="Settings.Discord.Token.Hint">Generate a bot token at https://discord.com/developers/applications. The bot requires Send Messages, View Channels, and Slash Command permissions.</sys:String>
+    <sys:String x:Key="Settings.Discord.Ids.Title">Server &amp; Channel IDs</sys:String>
+    <sys:String x:Key="Settings.Discord.GuildId">Guild ID (Server ID)</sys:String>
+    <sys:String x:Key="Settings.Discord.GuildId.Placeholder">123456789</sys:String>
+    <sys:String x:Key="Settings.Discord.LogChannelId">Log Channel ID</sys:String>
+    <sys:String x:Key="Settings.Discord.LogChannelId.Placeholder">987654321</sys:String>
+    <sys:String x:Key="Settings.Discord.Ids.Hint">Enable Developer Mode in Discord (User Settings → Advanced) to copy Guild ID and Channel ID by right-clicking. The Guild ID is for registering slash commands. The Log Channel ID is where server logs are streamed (optional, leave 0 to disable log streaming).</sys:String>
+
     <sys:String x:Key="Settings.Network.Title">Network &amp; ports</sys:String>
     <sys:String x:Key="Settings.Network.Hint">Windrose ports: UDP 7777 (game) + 7778 (query). NAT punch-through preferred. Firewall exception for WindroseServer.exe recommended. External hosters must open both ports.</sys:String>
     <sys:String x:Key="Settings.Firewall.Title">Windows Firewall</sys:String>
@@ -301,6 +317,12 @@
     <sys:String x:Key="Server.Status.Running">Running</sys:String>
     <sys:String x:Key="Server.OpenFolder">Open folder</sys:String>
     <sys:String x:Key="Server.OpenLiveMap">Open live map</sys:String>
+    <sys:String x:Key="Server.UpdateBadge">Server update</sys:String>
+    <sys:String x:Key="Server.UpdateNow">Update server</sys:String>
+    <sys:String x:Key="Server.Update.Preparing">Preparing server update...</sys:String>
+    <sys:String x:Key="Server.Update.Starting">{0}: updating server...</sys:String>
+    <sys:String x:Key="Server.Update.Done">{0}: server updated.</sys:String>
+    <sys:String x:Key="Server.Update.Failed">Server update failed.</sys:String>
     <sys:String x:Key="Server.LiveMap.Unavailable">Live map not available — Windrose+ dashboard is not running for this server.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Title">Windrose+</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Hint">Windrose+ extends your server with player list, kick &amp; ban, broadcast, and more.</sys:String>
@@ -447,14 +469,18 @@
     <!-- Events (session history) -->
     <sys:String x:Key="Event.Started">Started</sys:String>
     <sys:String x:Key="Event.Stopped">Stopped</sys:String>
-    <sys:String x:Key="Event.Crashed">Crash</sys:String>
-    <sys:String x:Key="Event.ScheduledRestart">Scheduled restart</sys:String>
-    <sys:String x:Key="Event.AutoRestartRam">Auto-restart (RAM)</sys:String>
-    <sys:String x:Key="Event.AutoRestartUptime">Auto-restart (uptime)</sys:String>
-    <sys:String x:Key="Event.BackupOnRestartSuccess">Backup created</sys:String>
-    <sys:String x:Key="Event.BackupOnRestartFailed">Backup failed</sys:String>
-    <sys:String x:Key="Event.SessionDurationHm">Session duration: {0}h {1}m</sys:String>
-    <sys:String x:Key="Event.SessionDurationMs">Session duration: {0}m {1}s</sys:String>
+    <sys:String x:Key="Event.Crashed">Crashed</sys:String>
+    <sys:String x:Key="Event.ScheduledRestart">Scheduled Restart</sys:String>
+    <sys:String x:Key="Event.AutoRestartRam">Auto Restart (RAM)</sys:String>
+    <sys:String x:Key="Event.AutoRestartUptime">Auto Restart (Uptime)</sys:String>
+    <sys:String x:Key="Event.BackupOnRestartSuccess">Auto-Backup Success</sys:String>
+    <sys:String x:Key="Event.BackupOnRestartFailed">Auto-Backup Failed</sys:String>
+    <sys:String x:Key="Event.BackupManual">Manual Backup</sys:String>
+    <sys:String x:Key="Event.BackupAutomatic">Automatic Backup</sys:String>
+    <sys:String x:Key="Event.BackupRestored">Backup Restored</sys:String>
+    <sys:String x:Key="Event.BackupDeleted">Backup Deleted</sys:String>
+    <sys:String x:Key="Event.SessionDurationHm">{0}h {1}m</sys:String>
+    <sys:String x:Key="Event.SessionDurationMs">{0}m {1}s</sys:String>
 
     <!-- Mods -->
     <sys:String x:Key="Nav.Mods">Mods</sys:String>
@@ -750,4 +776,49 @@
     <sys:String x:Key="Settings.WindrosePlus.Update.IntervalHours">Every {0} hours</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Update.CheckNow">Check now</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Update.OpenReleasePage">Open release page</sys:String>
+
+    <!-- Discord Bot -->
+    <sys:String x:Key="Discord.Event.LogFormat">**[{0}]** {1} {2}**{3}** : {4}{5}</sys:String>
+    <sys:String x:Key="Discord.Status.RunningFormat">Online - Uptime: {0}h {1}m</sys:String>
+    <sys:String x:Key="Discord.Status.Starting">Server starting...</sys:String>
+    <sys:String x:Key="Discord.Status.Stopping">Server stopping...</sys:String>
+    <sys:String x:Key="Discord.Status.Stopped">Server stopped</sys:String>
+    <sys:String x:Key="Discord.Status.Unknown">Unknown state</sys:String>
+
+    <sys:String x:Key="Discord.Command.Status.Title">🖥️ Windrose Server Status</sys:String>
+    <sys:String x:Key="Discord.Command.Status.State">State</sys:String>
+    <sys:String x:Key="Discord.Command.Status.Uptime">Uptime</sys:String>
+    <sys:String x:Key="Discord.Command.Status.Pid">PID</sys:String>
+    <sys:String x:Key="Discord.Command.Status.Ram">RAM Usage</sys:String>
+    <sys:String x:Key="Discord.Command.Status.Cpu">CPU</sys:String>
+
+    <sys:String x:Key="Discord.Command.Error.General">❌ An error occurred: {0}</sys:String>
+    <sys:String x:Key="Discord.Command.Error.Internal">❌ An internal error occurred.</sys:String>
+    <sys:String x:Key="Discord.Command.Error.Status">❌ Error retrieving status</sys:String>
+
+    <sys:String x:Key="Discord.Command.Start.AlreadyRunning">⚠️ Server is already running or starting.</sys:String>
+    <sys:String x:Key="Discord.Command.Start.Success">✅ Start command sent to server.</sys:String>
+    <sys:String x:Key="Discord.Command.Start.Failed">❌ Could not start server. Check settings.</sys:String>
+    <sys:String x:Key="Discord.Command.Start.Error">❌ Error while starting server</sys:String>
+
+    <sys:String x:Key="Discord.Command.Stop.AlreadyStopped">⚠️ Server is already stopped or stopping.</sys:String>
+    <sys:String x:Key="Discord.Command.Stop.Success">✅ Stop command sent to server.</sys:String>
+    <sys:String x:Key="Discord.Command.Stop.Error">❌ Error while stopping server</sys:String>
+
+    <!-- Discord Bot — Restart / Backup / BackupRestart commands -->
+    <sys:String x:Key="DiscordBot.Cmd.RestartDesc">Restarts the game server</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupDesc">Creates a manual backup</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupRestartDesc">Stops server, creates backup, and restarts</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.Restarting">Restarting server...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.RestartDone">Restart completed.</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.RestartFailed">Restart failed: server could not start.</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupInProgress">Creating backup...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupSuccess">Backup successful: {0}</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupMissing">Saves directory not found.</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.Stopping">Stopping server...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.Starting">Starting server...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.Success">Operation completed successfully!</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.Error">Error: {0}</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupFailedRestart">Backup impossible (saves dir missing), starting server...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.BackupOkRestartFailed">Backup completed but restart failed.</sys:String>
 </ResourceDictionary>

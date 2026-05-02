@@ -22,4 +22,10 @@ public interface IServerInstallService
     /// Gibt true zurück, wenn die Datei mit einer nicht-leeren DeploymentId existiert.
     /// </summary>
     Task<bool> InitializeServerDescriptionAsync(string installDir, CancellationToken ct = default);
+
+    /// <summary>
+    /// Prüft via Steam-API ob eine neuere Build-Version des Windrose Servers verfügbar ist.
+    /// Liest den buildId aus der lokalen appmanifest Datei und fragt die Steam API ab.
+    /// </summary>
+    Task<bool> IsUpdateAvailableAsync(string installDir, CancellationToken ct = default);
 }

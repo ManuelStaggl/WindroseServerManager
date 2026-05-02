@@ -96,8 +96,19 @@ sealed class Program
 
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        LogCrash(e.Exception);
-        e.SetObserved();
+        try
+        {
+            LogCrash(e.Exception);
+            Log.Error(e.Exception, "Unobserved task exception (marked as observed)");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Failed to log unobserved task exception");
+        }
+        finally
+        {
+            e.SetObserved();
+        }
     }
 
     private static void LogCrash(Exception ex)

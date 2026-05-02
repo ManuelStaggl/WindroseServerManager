@@ -20,6 +20,11 @@ public sealed partial class ServerCardViewModel : ObservableObject
     [ObservableProperty] private string? _installedWindrosePlusTag;
     [ObservableProperty] private string? _latestWindrosePlusTag;
     [ObservableProperty] private bool _isUpdatingWindrosePlus;
+    [ObservableProperty] private bool _hasServerUpdate;
+    [ObservableProperty] private bool _isUpdatingServer;
+    [ObservableProperty] private double _serverUpdateProgress;
+    [ObservableProperty] private bool _isServerUpdateProgressIndeterminate = true;
+    [ObservableProperty] private string _serverUpdateStatus = string.Empty;
 
     public string Id { get; }
     public string Name { get; }

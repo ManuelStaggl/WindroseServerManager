@@ -41,6 +41,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="Discord.Net" Version="3.13.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -470,7 +470,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         await _settings.UpdateAsync(s =>
         {
             s.ScheduledRestartEnabled = ScheduledRestartEnabled;
-            s.DailyRestartTime = DailyRestartTime;
+            s.DailyRestartTime = DailyRestartTime ?? string.Empty;
             s.RestartWarnMinutes = Math.Max(0, RestartWarnMinutes);
             // 7 von 7 Tagen aktiv ist semantisch "täglich" → leere Liste speichern.
             s.RestartDays = days.Count == 7 ? new List<DayOfWeek>() : days;

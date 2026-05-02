@@ -4,6 +4,9 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
 using Serilog;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.ViewModels;
@@ -213,6 +216,16 @@ public partial class App : Application
         s.AddSingleton<IMetricsService, MetricsService>();
         s.AddSingleton<IServerEventLog, ServerEventLog>();
 
+        // Discord Bot Services
+        s.AddSingleton<DiscordSocketClient>(sp => {
+            return new DiscordSocketClient(new DiscordSocketConfig {
+                GatewayIntents = GatewayIntents.Guilds,
+                LogLevel = LogSeverity.Info
+            });
+        });
+        s.AddSingleton<InteractionService>(sp => new InteractionService(sp.GetRequiredService<DiscordSocketClient>()));
+        s.AddSingleton<ServerCommandModule>(); // Important: Register the module itself
+
         s.AddHostedService<BackupScheduler>();
         s.AddSingleton<RestartScheduler>();
         s.AddHostedService(sp => sp.GetRequiredService<RestartScheduler>());
@@ -228,6 +241,7 @@ public partial class App : Application
         s.AddHostedService<AppUpdateScheduler>();
         s.AddSingleton<IWindrosePlusUpdateService, WindrosePlusUpdateService>();
         s.AddHostedService<WindrosePlusUpdateScheduler>();
+        s.AddHostedService<DiscordBotService>();
 
         s.AddSingleton<MainWindowViewModel>();
 

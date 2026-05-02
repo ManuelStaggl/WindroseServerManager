@@ -173,7 +173,58 @@
             </Border>
 
             <!-- ════════════════════════════════════════════════════════════════
-                 GRUPPE 3: WINDROSEPLUS  (Verwaltung, RCON, Update-Check)
+                 GRUPPE 3: DISCORD  (Bot-Konfiguration)
+            ════════════════════════════════════════════════════════════════ -->
+            <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.Discord}" />
+
+            <!-- Discord Bot Enable/Disable -->
+            <Border Classes="card" Margin="0,0,0,12">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="section-header"
+                               Text="{DynamicResource Settings.Discord.Title}" />
+                    <CheckBox Content="{DynamicResource Settings.Discord.Enable}"
+                              IsChecked="{Binding EnableDiscordBot}" />
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.Discord.Hint}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Discord Bot Token -->
+            <Border Classes="card" Margin="0,0,0,12" IsVisible="{Binding EnableDiscordBot}">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Discord.Token.Title}" />
+                    <TextBox Text="{Binding DiscordBotToken}"
+                             PlaceholderText="{DynamicResource Settings.Discord.Token.Placeholder}"
+                             Watermark="{DynamicResource Settings.Discord.Token.Placeholder}"
+                             AcceptsReturn="False" />
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.Discord.Token.Hint}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Discord Guild & Log Channel IDs -->
+            <Border Classes="card" Margin="0,0,0,12" IsVisible="{Binding EnableDiscordBot}">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="section-header" Text="{DynamicResource Settings.Discord.Ids.Title}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.Discord.GuildId}" />
+                            <TextBox Text="{Binding DiscordGuildId}"
+                                     PlaceholderText="{DynamicResource Settings.Discord.GuildId.Placeholder}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Classes="caption" Text="{DynamicResource Settings.Discord.LogChannelId}" />
+                            <TextBox Text="{Binding DiscordLogChannelId}"
+                                     PlaceholderText="{DynamicResource Settings.Discord.LogChannelId.Placeholder}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{DynamicResource Settings.Discord.Ids.Hint}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ════════════════════════════════════════════════════════════════
+                 GROUPE 4: WINDROSEPLUS  (Verwaltung, RCON, Update-Check)
             ════════════════════════════════════════════════════════════════ -->
             <TextBlock Classes="group-label" Text="{DynamicResource Settings.Group.WindrosePlus}" />
 

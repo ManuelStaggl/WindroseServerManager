@@ -117,13 +117,17 @@
                                                         IsVisible="{Binding IsActive}">
                                                     <TextBlock Text="{DynamicResource Server.Active}" />
                                                 </Border>
-                                                <Border Classes="badge-success"
-                                                        IsVisible="{Binding IsRunning}">
-                                                    <TextBlock Text="{DynamicResource Server.Status.Running}" />
-                                                </Border>
-                                                <Border Classes="badge-warning"
-                                                        IsVisible="{Binding HasWindrosePlusUpdate}"
-                                                        ToolTip.Tip="{Binding LatestWindrosePlusTag}">
+                                                 <Border Classes="badge-success"
+                                                         IsVisible="{Binding IsRunning}">
+                                                     <TextBlock Text="{DynamicResource Server.Status.Running}" />
+                                                 </Border>
+                                                 <Border Classes="badge-warning"
+                                                         IsVisible="{Binding HasServerUpdate}">
+                                                     <TextBlock Text="{DynamicResource Server.UpdateBadge}" />
+                                                 </Border>
+                                                 <Border Classes="badge-warning"
+                                                         IsVisible="{Binding HasWindrosePlusUpdate}"
+                                                         ToolTip.Tip="{Binding LatestWindrosePlusTag}">
                                                     <TextBlock Text="{DynamicResource Server.WindrosePlus.UpdateBadge}" />
                                                 </Border>
                                             </StackPanel>
@@ -154,11 +158,11 @@
                                     <Border Classes="divider" />
 
                                     <!-- ── Per-server settings + secondary actions ── -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <!-- LEFT: settings -->
-                                        <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
-                                            <CheckBox IsChecked="{Binding AutoStartOnAppLaunch, Mode=TwoWay}"
-                                                      Content="{DynamicResource Server.AutoStart.Label}" />
+                                     <Grid ColumnDefinitions="*,Auto">
+                                         <!-- LEFT: settings -->
+                                         <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
+                                             <CheckBox IsChecked="{Binding AutoStartOnAppLaunch, Mode=TwoWay}"
+                                                       Content="{DynamicResource Server.AutoStart.Label}" />
                                             <TextBlock Classes="caption muted"
                                                        TextWrapping="Wrap"
                                                        Text="{DynamicResource Server.AutoStart.Hint}" />
@@ -173,14 +177,19 @@
                                                     Content="{DynamicResource Server.OpenFolder}"
                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).OpenFolderCommand}"
                                                     CommandParameter="{Binding Id}" />
-                                            <Button Classes="subtle"
-                                                    Content="{DynamicResource Server.OpenLiveMap}"
-                                                    IsVisible="{Binding HasLiveMap}"
-                                                    Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).OpenLiveMapCommand}"
-                                                    CommandParameter="{Binding Id}" />
-                                            <Button Classes="subtle"
-                                                    Content="{DynamicResource Server.InstallWindrosePlus}"
-                                                    IsVisible="{Binding !WindrosePlusActive}"
+                                             <Button Classes="subtle"
+                                                     Content="{DynamicResource Server.OpenLiveMap}"
+                                                     IsVisible="{Binding HasLiveMap}"
+                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).OpenLiveMapCommand}"
+                                                     CommandParameter="{Binding Id}" />
+                                             <Button Classes="primary"
+                                                     Content="{DynamicResource Server.UpdateNow}"
+                                                     IsEnabled="{Binding !IsUpdatingServer}"
+                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).UpdateServerCommand}"
+                                                     CommandParameter="{Binding Id}" />
+                                             <Button Classes="subtle"
+                                                     Content="{DynamicResource Server.InstallWindrosePlus}"
+                                                     IsVisible="{Binding !WindrosePlusActive}"
                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).InstallWindrosePlusCommand}"
                                                     CommandParameter="{Binding Id}" />
                                             <Button Classes="primary"
@@ -188,12 +197,24 @@
                                                     IsVisible="{Binding HasWindrosePlusUpdate}"
                                                     IsEnabled="{Binding !IsUpdatingWindrosePlus}"
                                                     Command="{Binding $parent[UserControl].((vm:InstallationViewModel)DataContext).UpdateWindrosePlusCommand}"
-                                                    CommandParameter="{Binding Id}" />
-                                        </StackPanel>
-                                    </Grid>
+                                                     CommandParameter="{Binding Id}" />
+                                         </StackPanel>
+                                     </Grid>
 
-                                </StackPanel>
-                            </Border>
+                                     <StackPanel Spacing="6"
+                                                 IsVisible="{Binding IsUpdatingServer}">
+                                         <ProgressBar Minimum="0"
+                                                      Maximum="100"
+                                                      Height="4"
+                                                      Value="{Binding ServerUpdateProgress}"
+                                                      IsIndeterminate="{Binding IsServerUpdateProgressIndeterminate}" />
+                                         <TextBlock Classes="caption muted"
+                                                    Text="{Binding ServerUpdateStatus}"
+                                                    TextWrapping="Wrap" />
+                                     </StackPanel>
+
+                                 </StackPanel>
+                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
