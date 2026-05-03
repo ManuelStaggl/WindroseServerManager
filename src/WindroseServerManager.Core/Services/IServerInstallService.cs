@@ -4,6 +4,12 @@ namespace WindroseServerManager.Core.Services;
 
 public interface IServerInstallService
 {
+    /// <summary>
+    /// Fired for every InstallProgress yielded during InstallOrUpdateAsync.
+    /// Subscribers must marshal to the UI thread themselves.
+    /// </summary>
+    event Action<InstallProgress>? ProgressChanged;
+
     Task<ServerInstallInfo> GetInstallInfoAsync(string installDir, CancellationToken ct = default);
 
     IAsyncEnumerable<InstallProgress> InstallOrUpdateAsync(

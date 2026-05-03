@@ -27,7 +27,8 @@ public sealed class SteamCmdService : ISteamCmdService
         _steamCmdExe = Path.Combine(_steamCmdDir, "steamcmd.exe");
     }
 
-    public async Task<string> EnsureSteamCmdAsync(IProgress<string>? log, CancellationToken ct = default)
+    public async IAsyncEnumerable<string> EnsureSteamCmdAsync(
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         await _ensureLock.WaitAsync(ct).ConfigureAwait(false);
         try
@@ -38,7 +39,8 @@ public sealed class SteamCmdService : ISteamCmdService
                 Directory.CreateDirectory(_steamCmdDir);
                 var zipPath = Path.Combine(_steamCmdDir, "steamcmd.zip");
 
-                log?.Report($"Lade SteamCMD von {SteamCmdZipUrl}...");
+                var downloadMsg = $"Lade SteamCMD von {SteamCmdZipUrl}...";
+                yield return downloadMsg;
                 _logger.LogInformation("Downloading SteamCMD from {Url} to {Path}", SteamCmdZipUrl, zipPath);
 
                 using (var http = _httpFactory.CreateClient("steam"))
@@ -51,7 +53,8 @@ public sealed class SteamCmdService : ISteamCmdService
                     await response.Content.CopyToAsync(fs, ct).ConfigureAwait(false);
                 }
 
-                log?.Report("Entpacke SteamCMD...");
+                var extractMsg = "Entpacke SteamCMD...";
+                yield return extractMsg;
                 _logger.LogInformation("Extracting SteamCMD archive");
                 ZipFile.ExtractToDirectory(zipPath, _steamCmdDir, overwriteFiles: true);
 
@@ -65,19 +68,18 @@ public sealed class SteamCmdService : ISteamCmdService
             }
             else
             {
-                log?.Report($"SteamCMD bereits installiert: {_steamCmdExe}");
+                yield return $"SteamCMD bereits installiert: {_steamCmdExe}";
             }
 
             // Always run self-update to ensure SteamCMD is current before use
-            log?.Report("Starte SteamCMD self-update (kann 1-2 Minuten dauern)...");
+            yield return "Starte SteamCMD self-update (kann 1-2 Minuten dauern)...";
             _logger.LogInformation("Running SteamCMD self-update");
             await foreach (var line in RunAsync("+quit", ct).ConfigureAwait(false))
             {
-                log?.Report(line);
+                yield return line;
             }
 
-            log?.Report($"SteamCMD bereit: {_steamCmdExe}");
-            return _steamCmdExe;
+            yield return $"SteamCMD bereit: {_steamCmdExe}";
         }
         finally
         {
@@ -160,6 +162,12 @@ public sealed class SteamCmdService : ISteamCmdService
         await completion.ConfigureAwait(false);
         _logger.LogInformation("steamcmd exited with code {Code}", process.ExitCode);
         ct.ThrowIfCancellationRequested();
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException(
+                $"SteamCMD exited with code {process.ExitCode}");
+        }
     }
 
     /// <summary>

@@ -403,7 +403,7 @@ public sealed class DiscordBotService : BackgroundService, IAsyncDisposable
             await Task.Delay(1000).ConfigureAwait(false);
             await channel.SendMessageAsync(message).ConfigureAwait(false);
         }
-        catch (Discord.Net.HttpException ex) when ((int)ex.DiscordCode == 50001 || ex.DiscordCode == DiscordErrorCode.MissingPermissions)
+        catch (Discord.Net.HttpException ex) when (ex.DiscordCode == (DiscordErrorCode)50001 || ex.DiscordCode == DiscordErrorCode.MissingPermissions)
         {
             _logger.LogWarning("Discord bot Missing Access (50001) or Permissions for channel {ChannelId}. Check Bot permissions in Discord.", channel.Id);
         }
@@ -500,17 +500,23 @@ public class ServerCommandModule : InteractionModuleBase<SocketInteractionContex
     private readonly IServerProcessService _serverProcess;
     private readonly IMetricsService _metrics;
     private readonly IBackupService _backupService;
+    private readonly IServerInstallService _installService;
+    private readonly IAppSettingsService _settings;
     private readonly ILogger<ServerCommandModule> _logger;
 
     public ServerCommandModule(
         IServerProcessService serverProcess,
         IMetricsService metrics,
         IBackupService backupService,
+        IServerInstallService installService,
+        IAppSettingsService settings,
         ILogger<ServerCommandModule> logger)
     {
         _serverProcess = serverProcess;
         _metrics = metrics;
         _backupService = backupService;
+        _installService = installService;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -704,6 +710,60 @@ public class ServerCommandModule : InteractionModuleBase<SocketInteractionContex
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in backuprestart command");
+            await ModifyOriginalResponseAsync(m => m.Content = Loc.Format("DiscordBot.Cmd.Error", ex.Message)).ConfigureAwait(false);
+        }
+    }
+
+    [SlashCommand("update", "Updates the game server via SteamCMD")]
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
+    public async Task UpdateCommand()
+    {
+        if (_serverProcess.Status is ServerStatus.Running or ServerStatus.Starting)
+        {
+            await RespondAsync(Loc.Get("DiscordBot.Cmd.UpdateServerRunning"), ephemeral: true).ConfigureAwait(false);
+            return;
+        }
+
+        await DeferAsync().ConfigureAwait(false);
+
+        try
+        {
+            _logger.LogInformation("Discord bot: Update command invoked by {User}", Context.User.Username);
+
+            await FollowupAsync(Loc.Get("DiscordBot.Cmd.UpdateStarting")).ConfigureAwait(false);
+
+            var installDir = _settings.Current.ServerInstallDir;
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(30));
+
+            await foreach (var progress in _installService.InstallOrUpdateAsync(installDir, cts.Token).ConfigureAwait(false))
+            {
+                var text = progress.Phase switch
+                {
+                    InstallPhase.Preparing or InstallPhase.DownloadingSteamCmd or InstallPhase.RunningSteamCmd
+                        => Loc.Get("DiscordBot.Cmd.UpdateBootstrap"),
+                    InstallPhase.DownloadingServer => progress.Percent.HasValue
+                        ? Loc.Format("DiscordBot.Cmd.UpdateDownloading", (int)(progress.Percent.Value * 100))
+                        : Loc.Get("DiscordBot.Cmd.UpdateBootstrap"),
+                    InstallPhase.Validating => Loc.Get("DiscordBot.Cmd.UpdateValidating"),
+                    InstallPhase.Complete => Loc.Get("DiscordBot.Cmd.UpdateSuccess"),
+                    InstallPhase.Failed => string.IsNullOrWhiteSpace(progress.Message)
+                        ? Loc.Format("DiscordBot.Cmd.UpdateFailed", "Unknown error")
+                        : Loc.Format("DiscordBot.Cmd.UpdateFailed", progress.Message),
+                    _ => null
+                };
+
+                if (text is not null)
+                {
+                    await ModifyOriginalResponseAsync(m => m.Content = text).ConfigureAwait(false);
+                }
+
+                if (progress.Phase is InstallPhase.Complete or InstallPhase.Failed)
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in update command");
             await ModifyOriginalResponseAsync(m => m.Content = Loc.Format("DiscordBot.Cmd.Error", ex.Message)).ConfigureAwait(false);
         }
     }

@@ -323,6 +323,7 @@
     <sys:String x:Key="Server.Update.Starting">{0}: Server wird aktualisiert...</sys:String>
     <sys:String x:Key="Server.Update.Done">{0}: Server aktualisiert.</sys:String>
     <sys:String x:Key="Server.Update.Failed">Server-Update fehlgeschlagen.</sys:String>
+    <sys:String x:Key="Server.Update.Cancel">Abbrechen</sys:String>
     <sys:String x:Key="Server.LiveMap.Unavailable">Live-Karte nicht verfügbar — Windrose+-Dashboard läuft für diesen Server nicht.</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Title">Windrose+</sys:String>
     <sys:String x:Key="Settings.WindrosePlus.Hint">Windrose+ erweitert deinen Server um Spielerliste, Kick &amp; Ban, Broadcast und mehr.</sys:String>
@@ -821,4 +822,14 @@
     <sys:String x:Key="DiscordBot.Cmd.Error">Fehler: {0}</sys:String>
     <sys:String x:Key="DiscordBot.Cmd.BackupFailedRestart">Sicherung nicht möglich (Speicherverzeichnis fehlt), Server wird gestartet...</sys:String>
     <sys:String x:Key="DiscordBot.Cmd.BackupOkRestartFailed">Sicherung erstellt, aber Neustart fehlgeschlagen.</sys:String>
+
+    <!-- Discord Bot — Update-Befehl -->
+    <sys:String x:Key="DiscordBot.Cmd.UpdateDesc">Aktualisiert den Spielserver via SteamCMD</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateServerRunning">Stoppe den Server vor dem Update.</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateStarting">Serveraktualisierung wird gestartet...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateBootstrap">SteamCMD wird vorbereitet...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateDownloading">Update wird heruntergeladen... {0}%</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateValidating">Dateien werden überprüft...</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateSuccess">Server erfolgreich aktualisiert!</sys:String>
+    <sys:String x:Key="DiscordBot.Cmd.UpdateFailed">Update fehlgeschlagen: {0}</sys:String>
 </ResourceDictionary>

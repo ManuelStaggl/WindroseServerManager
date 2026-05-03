@@ -195,7 +195,6 @@
                     <TextBlock Classes="section-header" Text="{DynamicResource Settings.Discord.Token.Title}" />
                     <TextBox Text="{Binding DiscordBotToken}"
                              PlaceholderText="{DynamicResource Settings.Discord.Token.Placeholder}"
-                             Watermark="{DynamicResource Settings.Discord.Token.Placeholder}"
                              AcceptsReturn="False" />
                     <TextBlock Classes="caption" TextWrapping="Wrap"
                                Text="{DynamicResource Settings.Discord.Token.Hint}" />

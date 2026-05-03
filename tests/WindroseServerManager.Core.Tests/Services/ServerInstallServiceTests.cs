@@ -139,10 +139,11 @@ public sealed class ServerInstallServiceTests
 
         public List<string> RunArguments { get; } = new();
 
-        public Task<string> EnsureSteamCmdAsync(IProgress<string>? log, CancellationToken ct = default)
+        public async IAsyncEnumerable<string> EnsureSteamCmdAsync(
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            log?.Report("SteamCMD ready");
-            return Task.FromResult(Path.Combine(Path.GetTempPath(), "steamcmd.exe"));
+            await Task.CompletedTask;
+            yield break;
         }
 
         public async IAsyncEnumerable<string> RunAsync(

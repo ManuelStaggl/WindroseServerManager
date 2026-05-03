@@ -21,6 +21,8 @@ public sealed partial class ServerInstallService : IServerInstallService
     private readonly IAppSettingsService _settings;
     private readonly IHttpClientFactory _httpFactory;
 
+    public event Action<InstallProgress>? ProgressChanged;
+
     public ServerInstallService(
         ILogger<ServerInstallService> logger,
         ISteamCmdService steamCmd,
@@ -142,47 +144,77 @@ public sealed partial class ServerInstallService : IServerInstallService
         string installDir,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
+        InstallProgress Yield(InstallProgress progress)
+        {
+            ProgressChanged?.Invoke(progress);
+            return progress;
+        }
+
         var validation = ValidateInstallDir(installDir);
         if (validation is not null)
         {
-            yield return new InstallProgress(InstallPhase.Failed, validation, null, null);
+            yield return Yield(new InstallProgress(InstallPhase.Failed, validation, null, null));
+            yield break;
+        }
+
+        if (IsServerProcessRunning(installDir, _logger))
+        {
+            yield return Yield(new InstallProgress(InstallPhase.Failed,
+                "Server läuft — bitte zuerst stoppen bevor die Installation/Update gestartet wird.", null, null));
             yield break;
         }
 
         Directory.CreateDirectory(installDir);
 
-        yield return new InstallProgress(InstallPhase.Preparing, "Bereite Installation vor...", null, null);
+        yield return Yield(new InstallProgress(InstallPhase.Preparing, "Bereite Installation vor...", null, null));
 
-        yield return new InstallProgress(
-            InstallPhase.DownloadingSteamCmd, "Stelle SteamCMD bereit...", null, null);
-
-        var logBuffer = new List<string>();
-        var progress = new Progress<string>();
-        progress.ProgressChanged += (_, line) => logBuffer.Add(line);
+        yield return Yield(new InstallProgress(
+            InstallPhase.DownloadingSteamCmd, "Stelle SteamCMD bereit...", null, null));
 
         string? steamCmdPath = null;
         InstallProgress? bootstrapError = null;
+
+        var bootstrapEnum = _steamCmd.EnsureSteamCmdAsync(ct).GetAsyncEnumerator(ct);
         try
         {
-            steamCmdPath = await _steamCmd.EnsureSteamCmdAsync(progress, ct).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            bootstrapError = new InstallProgress(InstallPhase.Failed, "Abgebrochen.", null, null);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to bootstrap SteamCMD");
-            bootstrapError = new InstallProgress(InstallPhase.Failed,
-                $"SteamCMD-Setup fehlgeschlagen: {ex.Message}", null, null);
-        }
+            while (true)
+            {
+                bool hasNext;
+                string? line = null;
+                try
+                {
+                    hasNext = await bootstrapEnum.MoveNextAsync().ConfigureAwait(false);
+                    if (hasNext) line = bootstrapEnum.Current;
+                }
+                catch (OperationCanceledException)
+                {
+                    bootstrapError = new InstallProgress(InstallPhase.Failed, "Abgebrochen.", null, null);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to bootstrap SteamCMD");
+                    bootstrapError = new InstallProgress(InstallPhase.Failed,
+                        $"SteamCMD-Setup fehlgeschlagen: {ex.Message}", null, null);
+                    break;
+                }
 
-        foreach (var line in logBuffer)
-            yield return new InstallProgress(InstallPhase.DownloadingSteamCmd, string.Empty, null, line);
+                if (!hasNext) break;
+                if (line is null) continue;
+
+                if (line.StartsWith("SteamCMD bereit:", StringComparison.OrdinalIgnoreCase))
+                    steamCmdPath = line["SteamCMD bereit:".Length..].Trim();
+                yield return Yield(new InstallProgress(InstallPhase.DownloadingSteamCmd, string.Empty, null, line));
+            }
+        }
+        finally
+        {
+            await bootstrapEnum.DisposeAsync().ConfigureAwait(false);
+        }
 
         if (bootstrapError is not null)
         {
-            yield return bootstrapError;
+            yield return Yield(bootstrapError);
             yield break;
         }
 
@@ -213,16 +245,16 @@ public sealed partial class ServerInstallService : IServerInstallService
 
         if (manifestDeleteError is not null)
         {
-            yield return manifestDeleteError;
+            yield return Yield(manifestDeleteError);
             yield break;
         }
 
         var args = $"+force_install_dir \"{cleanDir}\" +login {login} +app_update {AppId} validate +quit";
-        yield return new InstallProgress(
+        yield return Yield(new InstallProgress(
             InstallPhase.RunningSteamCmd,
             "Starte Windrose Server-Installation...",
             null,
-            $"> steamcmd {args}");
+            $"> steamcmd {args}"));
 
         double? lastPercent = null;
         var phase = InstallPhase.DownloadingServer;
@@ -241,7 +273,7 @@ public sealed partial class ServerInstallService : IServerInstallService
 
         if (startError is not null)
         {
-            yield return startError;
+            yield return Yield(startError);
             yield break;
         }
 
@@ -272,7 +304,7 @@ public sealed partial class ServerInstallService : IServerInstallService
 
                 if (loopError is not null)
                 {
-                    yield return loopError;
+                    yield return Yield(loopError);
                     yield break;
                 }
 
@@ -282,9 +314,9 @@ public sealed partial class ServerInstallService : IServerInstallService
                 if (ErrorRegex.IsMatch(line))
                 {
                     _logger.LogWarning("SteamCMD error line: {Line}", line);
-                    yield return new InstallProgress(phase, string.Empty, lastPercent, line);
-                    yield return new InstallProgress(InstallPhase.Failed,
-                        $"SteamCMD meldet Fehler: {line.Trim()}", null, null);
+                    yield return Yield(new InstallProgress(phase, string.Empty, lastPercent, line));
+                    yield return Yield(new InstallProgress(InstallPhase.Failed,
+                        $"SteamCMD meldet Fehler: {line.Trim()}", null, null));
                     yield break;
                 }
 
@@ -307,7 +339,7 @@ public sealed partial class ServerInstallService : IServerInstallService
                     phase = InstallPhase.Complete;
                 }
 
-                yield return new InstallProgress(phase, string.Empty, lastPercent, line);
+                yield return Yield(new InstallProgress(phase, string.Empty, lastPercent, line));
             }
         }
         finally
@@ -315,8 +347,8 @@ public sealed partial class ServerInstallService : IServerInstallService
             await enumerator.DisposeAsync().ConfigureAwait(false);
         }
 
-        yield return new InstallProgress(InstallPhase.Complete,
-            "Installation abgeschlossen.", 1.0, null);
+        yield return Yield(new InstallProgress(InstallPhase.Complete,
+            "Installation abgeschlossen.", 1.0, null));
     }
 
     /// <summary>
@@ -324,7 +356,7 @@ public sealed partial class ServerInstallService : IServerInstallService
     /// Wichtig vor Adoption/Re-Install: laufende Server halten DLLs (UE4SS, WindrosePlus mod.dll)
     /// offen und blockieren das Überschreiben.
     /// </summary>
-    public static bool IsServerProcessRunning(string installDir)
+    public static bool IsServerProcessRunning(string installDir, ILogger? logger = null)
     {
         if (string.IsNullOrWhiteSpace(installDir)) return false;
         var normalized = Path.GetFullPath(installDir).TrimEnd('\\', '/');
@@ -339,7 +371,14 @@ public sealed partial class ServerInstallService : IServerInstallService
                 try
                 {
                     var path = p.MainModule?.FileName;
-                    if (string.IsNullOrEmpty(path)) continue;
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        logger?.LogWarning(
+                            "Could not access MainModule for process '{Name}' (PID {Id}) — " +
+                            "server running under another user may be missed",
+                            name, p.Id);
+                        continue;
+                    }
                     var full = Path.GetFullPath(path);
                     if (full.StartsWith(normalized + Path.DirectorySeparatorChar,
                             StringComparison.OrdinalIgnoreCase))
@@ -347,10 +386,16 @@ public sealed partial class ServerInstallService : IServerInstallService
                         return true;
                     }
                 }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    logger?.LogWarning(ex,
+                        "Access denied reading MainModule for process '{Name}' (PID {Id}) — " +
+                        "server running under another user may be missed",
+                        name, p.Id);
+                }
                 catch
                 {
-                    // MainModule kann bei fremden Prozessen oder beim Race
-                    // ("Access denied" / "process exited") werfen — ignorieren.
+                    // Race: "process exited" — ignore silently.
                 }
                 finally { p.Dispose(); }
             }
@@ -551,7 +596,7 @@ public sealed partial class ServerInstallService : IServerInstallService
     [GeneratedRegex(@"""buildid""\s*""(\d+)""", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
     private static partial Regex BuildIdRegexBuilder();
 
-    [GeneratedRegex(@"^\s*Error!|Login Failure|Invalid Password|Missing configuration|Invalid AppID",
+    [GeneratedRegex(@"^\s*Error!|Login Failure|Invalid Password|Missing configuration|Invalid AppID|No subscription|Depot download failed|Connection timeout|Content server unavailable|rate limit exceeded|Invalid platform",
         RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
     private static partial Regex ErrorRegexBuilder();
 }
