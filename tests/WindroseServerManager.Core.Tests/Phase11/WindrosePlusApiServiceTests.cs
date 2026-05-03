@@ -76,6 +76,65 @@ public class WindrosePlusApiServiceTests : IDisposable
         Assert.Equal("wp.say Server restart in 5 min", svc.BuildBroadcastCommand("Server restart in 5 min"));
     }
 
+    // --- RCON injection prevention tests ---
+
+    [Fact]
+    public void SanitizeRconParameter_StripsNewlines()
+    {
+        var result = WindrosePlusApiService.SanitizeRconParameter("hello\nwp.kick AllPlayers");
+        Assert.Equal("hellowp.kick AllPlayers", result);
+    }
+
+    [Fact]
+    public void SanitizeRconParameter_StripsCarriageReturns()
+    {
+        var result = WindrosePlusApiService.SanitizeRconParameter("hello\r\nwp.ban everyone");
+        Assert.Equal("hellowp.ban everyone", result);
+    }
+
+    [Fact]
+    public void SanitizeRconParameter_StripsNullBytes()
+    {
+        var result = WindrosePlusApiService.SanitizeRconParameter("test\0injection");
+        Assert.Equal("testinjection", result);
+    }
+
+    [Fact]
+    public void SanitizeRconParameter_PreservesNormalText()
+    {
+        var result = WindrosePlusApiService.SanitizeRconParameter("Server restart in 5 min!");
+        Assert.Equal("Server restart in 5 min!", result);
+    }
+
+    [Fact]
+    public void BuildBroadcastCommand_SanitizesInjection()
+    {
+        var svc = CreateService();
+        var result = svc.BuildBroadcastCommand("hello\nwp.kick AllPlayers");
+        Assert.DoesNotContain('\n', result);
+        Assert.StartsWith("wp.say ", result);
+    }
+
+    [Fact]
+    public void BuildKickCommand_SanitizesInjection()
+    {
+        var svc = CreateService();
+        var result = svc.BuildKickCommand("player\nwp.ban all");
+        Assert.DoesNotContain('\n', result);
+    }
+
+    [Fact]
+    public void SanitizeRconParameter_EmptyString_ReturnsEmpty()
+    {
+        Assert.Equal("", WindrosePlusApiService.SanitizeRconParameter(""));
+    }
+
+    [Fact]
+    public void SanitizeRconParameter_NullString_ReturnsNull()
+    {
+        Assert.Null(WindrosePlusApiService.SanitizeRconParameter(null!));
+    }
+
     // --- Port guard tests ---
 
     [Fact]

@@ -20,6 +20,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     private readonly IWindrosePlusUpdateService _wplusUpdate;
     private readonly IServerConfigService _config;
     private readonly Dictionary<string, bool> _serverUpdateStateById = new();
+    private bool _isManualUpdateCheck;
     private System.Threading.CancellationTokenSource? _installCts;
     private System.Threading.CancellationTokenSource? _updateCts;
     private System.Threading.CancellationTokenSource? _serverUpdateCheckCts;
@@ -177,6 +178,12 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         WindrosePlusUpdatePendingCount = result.Servers.Count(x => x.HasUpdate);
         WindrosePlusLatestTag = result.LatestTag;
         WindrosePlusUpdateBannerVisible = result.AnyUpdate;
+
+        if (!result.Succeeded && _isManualUpdateCheck)
+        {
+            _isManualUpdateCheck = false;
+            _toasts.Error(result.Message ?? "WindrosePlus update check failed.");
+        }
         WindrosePlusUpdateBannerTitle = result.LatestTag is null
             ? string.Empty
             : Loc.Format("Server.WindrosePlus.Update.BannerTitleFormat", result.LatestTag);
@@ -623,6 +630,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             _toasts.Info(Loc.Format("Server.WindrosePlus.Update.Starting", entry.Name));
             await _wplus.InstallAsync(entry.InstallDir, null, CancellationToken.None);
             _toasts.Success(Loc.Format("Server.WindrosePlus.Update.Done", entry.Name));
+            _isManualUpdateCheck = true;
             await _wplusUpdate.CheckAsync();
         }
         catch (WindrosePlusOfflineException)
@@ -680,6 +688,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             }
         }
 
+        _isManualUpdateCheck = true;
         await _wplusUpdate.CheckAsync();
         _toasts.Info(Loc.Format("Server.WindrosePlus.Update.BatchSummary", ok, failed, skipped));
         RefreshServerCards();

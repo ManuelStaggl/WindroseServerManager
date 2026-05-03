@@ -16,6 +16,10 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
     private readonly Dictionary<string, (string Cookie, DateTime Expiry)> _sessionCache = new();
     private readonly SemaphoreSlim _sessionLock = new(1, 1);
 
+    // Cached HttpClient for login (needs custom handler: no redirect, no cookies).
+    // Disposing the handler is not needed for the app lifetime.
+    private readonly HttpClient _loginClient;
+
     public WindrosePlusApiService(
         IHttpClientFactory httpFactory,
         IAppSettingsService settings,
@@ -24,6 +28,10 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
         _httpFactory = httpFactory;
         _settings = settings;
         _logger = logger;
+        _loginClient = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false })
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
     }
 
     private int GetPort(string serverDir) =>
@@ -50,11 +58,8 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
         if (string.IsNullOrWhiteSpace(password)) return null;
         try
         {
-            // Use a plain handler — no auto-redirect so we can read the Set-Cookie header.
-            using var handler = new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false };
-            using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
             var form = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("password", password) });
-            using var resp = await client.PostAsync($"http://localhost:{port}/login", form, ct).ConfigureAwait(false);
+            using var resp = await _loginClient.PostAsync($"http://localhost:{port}/login", form, ct).ConfigureAwait(false);
 
             // Extract wp_session from Set-Cookie header (present on 302 redirect after successful login)
             if (resp.Headers.TryGetValues("Set-Cookie", out var cookies))
@@ -93,9 +98,9 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
     }
 
     /// <summary>Invalidates the cached session for a server so the next call re-authenticates.</summary>
-    private void InvalidateSession(string serverDir)
+    private async Task InvalidateSessionAsync(string serverDir, CancellationToken ct)
     {
-        _sessionLock.Wait(TimeSpan.FromSeconds(1));
+        await _sessionLock.WaitAsync(ct).ConfigureAwait(false);
         try { _sessionCache.Remove(serverDir); }
         finally { _sessionLock.Release(); }
     }
@@ -117,7 +122,7 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
         {
             // Session expired — re-authenticate once
             resp.Dispose();
-            InvalidateSession(serverDir);
+            await InvalidateSessionAsync(serverDir, ct).ConfigureAwait(false);
             session = await GetSessionAsync(serverDir, port, ct).ConfigureAwait(false);
             if (session is null) return null;
             using var retry = new HttpRequestMessage(HttpMethod.Get, url);
@@ -321,10 +326,27 @@ public sealed class WindrosePlusApiService : IWindrosePlusApiService
         File.Move(tmpPath, configPath, overwrite: true);
     }
 
-    public string BuildKickCommand(string identifier) => $"wp.kick {identifier}";
+    public string BuildKickCommand(string identifier) => $"wp.kick {SanitizeRconParameter(identifier)}";
 
     public string BuildBanCommand(string identifier, int? minutes) =>
-        minutes.HasValue ? $"wp.ban {identifier} {minutes.Value}" : $"wp.ban {identifier}";
+        minutes.HasValue ? $"wp.ban {SanitizeRconParameter(identifier)} {minutes.Value}" : $"wp.ban {SanitizeRconParameter(identifier)}";
 
-    public string BuildBroadcastCommand(string message) => $"wp.say {message}";
+    public string BuildBroadcastCommand(string message) => $"wp.say {SanitizeRconParameter(message)}";
+
+    /// <summary>
+    /// Strips newlines, carriage returns, and control characters to prevent RCON command injection.
+    /// An attacker could inject additional commands via newlines (e.g. "hello\nwp.kick AllPlayers").
+    /// </summary>
+    public static string SanitizeRconParameter(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        var span = input.AsSpan();
+        var sb = new System.Text.StringBuilder(span.Length);
+        foreach (var c in span)
+        {
+            if (c == '\n' || c == '\r' || c == '\0') continue;
+            sb.Append(c);
+        }
+        return sb.ToString();
+    }
 }

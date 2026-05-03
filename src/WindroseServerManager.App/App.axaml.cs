@@ -34,6 +34,10 @@ public partial class App : Application
         Services = _host.Services;
 
         var settings = Services.GetRequiredService<IAppSettingsService>();
+
+        // Load settings synchronously — safe here because the Avalonia dispatcher loop
+        // hasn't started yet, so there's no sync context to cause a deadlock.
+        // This ensures settings.Current is populated before ViewModels read it.
         settings.LoadAsync().GetAwaiter().GetResult();
 
         var localization = Services.GetRequiredService<ILocalizationService>();
@@ -56,13 +60,16 @@ public partial class App : Application
                 desktop.MainWindow = window;
             }
 
-            desktop.ShutdownRequested += (_, _) =>
+            // Async shutdown — no deadlock risk here because the dispatcher is still
+            // running but we use await (not .Result) which cooperates with it.
+            desktop.ShutdownRequested += async (_, args) =>
             {
-                try { _host?.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult(); }
+                try { if (_host is not null) await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); }
                 catch { }
             };
         }
 
+        // Start background services (RestartScheduler, DiscordBot, etc.)
         _ = _host.StartAsync();
 
         // Auto-start eligible servers. Eligibility rule:

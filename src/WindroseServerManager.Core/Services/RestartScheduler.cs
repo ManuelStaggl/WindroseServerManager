@@ -82,7 +82,7 @@ public sealed class RestartScheduler : BackgroundService
                     if (_server.Status == ServerStatus.Running
                         && (DateTime.UtcNow - _lastAutoRestartUtc).TotalMinutes >= 5)
                     {
-                        var (threshold, reason) = CheckAutoRestartThresholds();
+                        var (threshold, reason) = await CheckAutoRestartThresholdsAsync(stoppingToken).ConfigureAwait(false);
                         if (threshold is not null)
                         {
                             await TriggerRestartAsync(threshold.Value, reason, stoppingToken).ConfigureAwait(false);
@@ -145,7 +145,7 @@ public sealed class RestartScheduler : BackgroundService
         return _lastWarnDate.Date != now.Date;
     }
 
-    private (RestartTrigger? trigger, string reason) CheckAutoRestartThresholds()
+    private async Task<(RestartTrigger? trigger, string reason)> CheckAutoRestartThresholdsAsync(CancellationToken ct)
     {
         var s = _settings.Current;
 
@@ -160,7 +160,7 @@ public sealed class RestartScheduler : BackgroundService
         {
             try
             {
-                var host = _metrics.GetHostMetricsAsync().GetAwaiter().GetResult();
+                var host = await _metrics.GetHostMetricsAsync(ct: ct).ConfigureAwait(false);
                 var proc = _metrics.GetServerProcessMetrics();
                 if (proc is not null && host.RamTotalBytes > 0)
                 {
