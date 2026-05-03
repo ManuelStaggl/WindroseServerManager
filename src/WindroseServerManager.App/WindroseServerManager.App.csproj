@@ -10,10 +10,10 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>WindroseServerManager.App</RootNamespace>
     <AssemblyName>WindroseServerManager</AssemblyName>
-    <Version>1.2.3</Version>
-    <AssemblyVersion>1.2.3</AssemblyVersion>
-    <FileVersion>1.2.3</FileVersion>
-    <InformationalVersion>1.2.3</InformationalVersion>
+    <Version>1.5.0</Version>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
+    <FileVersion>1.5.0.0</FileVersion>
+    <InformationalVersion>1.5.0</InformationalVersion>
     <Product>Windrose Server Manager</Product>
     <Company>Windrose Community</Company>
     <Copyright>© 2026 Manuel Staggl — MIT License</Copyright>
@@ -41,6 +41,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="Discord.Net" Version="3.13.0" />
   </ItemGroup>
 
   <ItemGroup>

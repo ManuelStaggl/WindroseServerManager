@@ -27,54 +27,59 @@ public sealed class SteamCmdService : ISteamCmdService
         _steamCmdExe = Path.Combine(_steamCmdDir, "steamcmd.exe");
     }
 
-    public async Task<string> EnsureSteamCmdAsync(IProgress<string>? log, CancellationToken ct = default)
+    public async IAsyncEnumerable<string> EnsureSteamCmdAsync(
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         await _ensureLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            if (File.Exists(_steamCmdExe))
-            {
-                log?.Report($"SteamCMD bereits installiert: {_steamCmdExe}");
-                return _steamCmdExe;
-            }
-
-            Directory.CreateDirectory(_steamCmdDir);
-            var zipPath = Path.Combine(_steamCmdDir, "steamcmd.zip");
-
-            log?.Report($"Lade SteamCMD von {SteamCmdZipUrl}...");
-            _logger.LogInformation("Downloading SteamCMD from {Url} to {Path}", SteamCmdZipUrl, zipPath);
-
-            using (var http = _httpFactory.CreateClient("steam"))
-            {
-                http.Timeout = TimeSpan.FromMinutes(5);
-                using var response = await http.GetAsync(SteamCmdZipUrl, HttpCompletionOption.ResponseHeadersRead, ct)
-                    .ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-                await using var fs = File.Create(zipPath);
-                await response.Content.CopyToAsync(fs, ct).ConfigureAwait(false);
-            }
-
-            log?.Report("Entpacke SteamCMD...");
-            _logger.LogInformation("Extracting SteamCMD archive");
-            ZipFile.ExtractToDirectory(zipPath, _steamCmdDir, overwriteFiles: true);
-
-            try { File.Delete(zipPath); } catch (Exception ex) { _logger.LogDebug(ex, "Zip cleanup failed"); }
-
+            // Download/extract SteamCMD if not already present
             if (!File.Exists(_steamCmdExe))
             {
-                throw new InvalidOperationException(
-                    $"SteamCMD extracted but steamcmd.exe was not found in {_steamCmdDir}");
+                Directory.CreateDirectory(_steamCmdDir);
+                var zipPath = Path.Combine(_steamCmdDir, "steamcmd.zip");
+
+                var downloadMsg = $"Lade SteamCMD von {SteamCmdZipUrl}...";
+                yield return downloadMsg;
+                _logger.LogInformation("Downloading SteamCMD from {Url} to {Path}", SteamCmdZipUrl, zipPath);
+
+                using (var http = _httpFactory.CreateClient("steam"))
+                {
+                    http.Timeout = TimeSpan.FromMinutes(5);
+                    using var response = await http.GetAsync(SteamCmdZipUrl, HttpCompletionOption.ResponseHeadersRead, ct)
+                        .ConfigureAwait(false);
+                    response.EnsureSuccessStatusCode();
+                    await using var fs = File.Create(zipPath);
+                    await response.Content.CopyToAsync(fs, ct).ConfigureAwait(false);
+                }
+
+                var extractMsg = "Entpacke SteamCMD...";
+                yield return extractMsg;
+                _logger.LogInformation("Extracting SteamCMD archive");
+                ZipFile.ExtractToDirectory(zipPath, _steamCmdDir, overwriteFiles: true);
+
+                try { File.Delete(zipPath); } catch (Exception ex) { _logger.LogDebug(ex, "Zip cleanup failed"); }
+
+                if (!File.Exists(_steamCmdExe))
+                {
+                    throw new InvalidOperationException(
+                        $"SteamCMD extracted but steamcmd.exe was not found in {_steamCmdDir}");
+                }
+            }
+            else
+            {
+                yield return $"SteamCMD bereits installiert: {_steamCmdExe}";
             }
 
-            log?.Report("Running SteamCMD self-update (may take 1-2 minutes)...");
-            _logger.LogInformation("Running initial SteamCMD self-update");
+            // Always run self-update to ensure SteamCMD is current before use
+            yield return "Starte SteamCMD self-update (kann 1-2 Minuten dauern)...";
+            _logger.LogInformation("Running SteamCMD self-update");
             await foreach (var line in RunAsync("+quit", ct).ConfigureAwait(false))
             {
-                log?.Report(line);
+                yield return line;
             }
 
-            log?.Report($"SteamCMD bereit: {_steamCmdExe}");
-            return _steamCmdExe;
+            yield return $"SteamCMD bereit: {_steamCmdExe}";
         }
         finally
         {
@@ -157,6 +162,12 @@ public sealed class SteamCmdService : ISteamCmdService
         await completion.ConfigureAwait(false);
         _logger.LogInformation("steamcmd exited with code {Code}", process.ExitCode);
         ct.ThrowIfCancellationRequested();
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException(
+                $"SteamCMD exited with code {process.ExitCode}");
+        }
     }
 
     /// <summary>

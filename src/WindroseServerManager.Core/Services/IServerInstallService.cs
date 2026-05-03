@@ -4,6 +4,12 @@ namespace WindroseServerManager.Core.Services;
 
 public interface IServerInstallService
 {
+    /// <summary>
+    /// Fired for every InstallProgress yielded during InstallOrUpdateAsync.
+    /// Subscribers must marshal to the UI thread themselves.
+    /// </summary>
+    event Action<InstallProgress>? ProgressChanged;
+
     Task<ServerInstallInfo> GetInstallInfoAsync(string installDir, CancellationToken ct = default);
 
     IAsyncEnumerable<InstallProgress> InstallOrUpdateAsync(
@@ -22,4 +28,10 @@ public interface IServerInstallService
     /// Gibt true zurück, wenn die Datei mit einer nicht-leeren DeploymentId existiert.
     /// </summary>
     Task<bool> InitializeServerDescriptionAsync(string installDir, CancellationToken ct = default);
+
+    /// <summary>
+    /// Prüft via Steam-API ob eine neuere Build-Version des Windrose Servers verfügbar ist.
+    /// Liest den buildId aus der lokalen appmanifest Datei und fragt die Steam API ab.
+    /// </summary>
+    Task<bool> IsUpdateAvailableAsync(string installDir, CancellationToken ct = default);
 }

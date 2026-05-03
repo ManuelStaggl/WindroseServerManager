@@ -8,7 +8,7 @@ using WindroseServerManager.Core.Services;
 
 namespace WindroseServerManager.App.ViewModels;
 
-public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInContext
+public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInContext, IDisposable
 {
     private readonly IServerInstallService _install;
     private readonly IAppSettingsService _settings;
@@ -19,7 +19,11 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     private readonly IServerProcessService _process;
     private readonly IWindrosePlusUpdateService _wplusUpdate;
     private readonly IServerConfigService _config;
-    private System.Threading.CancellationTokenSource? _cts;
+    private readonly Dictionary<string, bool> _serverUpdateStateById = new();
+    private bool _isManualUpdateCheck;
+    private System.Threading.CancellationTokenSource? _installCts;
+    private System.Threading.CancellationTokenSource? _updateCts;
+    private System.Threading.CancellationTokenSource? _serverUpdateCheckCts;
 
     // ── Server list ───────────────────────────────────────────────────────────
     public ObservableCollection<ServerCardViewModel> ServerCards { get; } = new();
@@ -95,10 +99,54 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         _config = config;
 
         RefreshServerCards();
-        _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
+        QueueServerUpdateCheck();
+        _settings.Changed += _ => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            RefreshServerCards();
+            QueueServerUpdateCheck();
+        });
         localization.LanguageChanged += RefreshServerCards;
         _process.StatusChanged += _ => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshServerCards);
         _wplusUpdate.UpdateChecked += _ => Avalonia.Threading.Dispatcher.UIThread.Post(ApplyUpdateStatusToCards);
+        _install.ProgressChanged += OnInstallProgressChanged;
+    }
+
+    private void OnInstallProgressChanged(InstallProgress p)
+    {
+        // Match the server card by checking which card's InstallDir matches the active server.
+        var activeId = _settings.Current.ActiveServerId;
+        var card = ServerCards.FirstOrDefault(c =>
+            string.Equals(c.Id, activeId, StringComparison.OrdinalIgnoreCase));
+        if (card is null) return;
+
+        // If the UI isn't already driving the update (e.g. triggered from Discord),
+        // set the visual state so the progress bar appears.
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            if (!card.IsUpdatingServer)
+            {
+                if (p.Phase is InstallPhase.Complete or InstallPhase.Failed)
+                    return; // Too late — the update already finished before we saw it.
+                card.IsUpdatingServer = true;
+                card.ServerUpdateProgress = 0;
+                card.IsServerUpdateProgressIndeterminate = true;
+            }
+
+            UpdateServerCardProgress(card, p);
+
+            if (p.Phase is InstallPhase.Complete or InstallPhase.Failed)
+            {
+                card.IsUpdatingServer = false;
+                card.ServerUpdateProgress = 0;
+                card.IsServerUpdateProgressIndeterminate = true;
+                card.ServerUpdateStatus = string.Empty;
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    RefreshServerCards();
+                    QueueServerUpdateCheck();
+                });
+            }
+        });
     }
 
     private void ApplyUpdateStatusToCards()
@@ -130,19 +178,77 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         WindrosePlusUpdatePendingCount = result.Servers.Count(x => x.HasUpdate);
         WindrosePlusLatestTag = result.LatestTag;
         WindrosePlusUpdateBannerVisible = result.AnyUpdate;
+
+        if (!result.Succeeded && _isManualUpdateCheck)
+        {
+            _isManualUpdateCheck = false;
+            _toasts.Error(result.Message ?? "WindrosePlus update check failed.");
+        }
         WindrosePlusUpdateBannerTitle = result.LatestTag is null
             ? string.Empty
             : Loc.Format("Server.WindrosePlus.Update.BannerTitleFormat", result.LatestTag);
         WindrosePlusUpdateBannerBody = Loc.Format("Server.WindrosePlus.Update.BannerBodyFormat", WindrosePlusUpdatePendingCount);
     }
 
+    private void QueueServerUpdateCheck()
+    {
+        _serverUpdateCheckCts?.Cancel();
+
+        var cts = new System.Threading.CancellationTokenSource();
+        _serverUpdateCheckCts = cts;
+
+        var servers = _settings.Current.Servers
+            .Where(s => !string.IsNullOrWhiteSpace(s.InstallDir))
+            .Select(s => (s.Id, s.InstallDir))
+            .ToList();
+
+        _ = CheckServerUpdatesAsync(servers, cts.Token);
+    }
+
+    private async Task CheckServerUpdatesAsync(
+        IReadOnlyList<(string Id, string InstallDir)> servers,
+        CancellationToken ct)
+    {
+        foreach (var (id, installDir) in servers)
+        {
+            bool hasUpdate;
+            try
+            {
+                hasUpdate = await _install.IsUpdateAvailableAsync(installDir, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                return;
+            }
+            catch
+            {
+                hasUpdate = false;
+            }
+
+            if (ct.IsCancellationRequested) return;
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => SetServerUpdateState(id, hasUpdate));
+        }
+    }
+
+    private void SetServerUpdateState(string id, bool hasUpdate)
+    {
+        _serverUpdateStateById[id] = hasUpdate;
+        var card = ServerCards.FirstOrDefault(c => c.Id == id);
+        if (card is not null) card.HasServerUpdate = hasUpdate;
+    }
+
     private void RefreshServerCards()
     {
         // Unsubscribe from the previous cards to avoid duplicate handlers across refreshes.
-        foreach (var existing in ServerCards)
+        // ToList() creates a static copy to safely iterate even if the collection is modified.
+        foreach (var existing in ServerCards.ToList())
             existing.AutoStartChanged -= OnCardAutoStartChanged;
 
         ServerCards.Clear();
+        var knownServerIds = _settings.Current.Servers.Select(s => s.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var staleId in _serverUpdateStateById.Keys.Where(id => !knownServerIds.Contains(id)).ToList())
+            _serverUpdateStateById.Remove(staleId);
+
         var activeId = _settings.Current.ActiveServerId;
         foreach (var s in _settings.Current.Servers)
         {
@@ -166,6 +272,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 s.AutoStartOnAppLaunch,
                 isRunning,
                 liveMapUrl);
+            card.HasServerUpdate = _serverUpdateStateById.GetValueOrDefault(s.Id, false);
             card.AutoStartChanged += OnCardAutoStartChanged;
             ServerCards.Add(card);
         }
@@ -253,8 +360,14 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     [RelayCommand]
     private void CancelAdd()
     {
-        _cts?.Cancel();
+        _installCts?.Cancel();
         IsAddingServer = false;
+    }
+
+    [RelayCommand]
+    private void CancelUpdateServer()
+    {
+        _updateCts?.Cancel();
     }
 
     [RelayCommand]
@@ -319,7 +432,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
 
         IsInstalling = true;
         InstallCompleted = false;
-        _cts = new System.Threading.CancellationTokenSource();
+        _installCts = new System.Threading.CancellationTokenSource();
         try
         {
             // 1) SteamCMD install — bei adoptierter Installation überspringen, sonst würde
@@ -330,7 +443,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             }
             else
             {
-                await foreach (var p in _install.InstallOrUpdateAsync(NewInstallDir, _cts.Token))
+                await foreach (var p in _install.InstallOrUpdateAsync(NewInstallDir, _installCts.Token))
                 {
                     CurrentPhase = string.IsNullOrWhiteSpace(p.Message)
                         ? Loc.Get($"InstallPhase.{p.Phase}")
@@ -359,13 +472,13 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                         _ => string.IsNullOrWhiteSpace(p.Message) ? Loc.Get($"InstallPhase.{p.Phase}") : p.Message,
                     };
                 });
-                await _wplus.InstallAsync(NewInstallDir, progress, _cts.Token);
+                await _wplus.InstallAsync(NewInstallDir, progress, _installCts.Token);
 
                 var cfg = _wplusApi.ReadConfig(NewInstallDir) ?? new WindrosePlusConfig();
                 cfg.Server["http_port"] = DashboardPort;
                 cfg.Rcon["enabled"] = true;
                 cfg.Rcon["password"] = RconPassword;
-                await _wplusApi.WriteConfigAsync(NewInstallDir, cfg, _cts.Token);
+                await _wplusApi.WriteConfigAsync(NewInstallDir, cfg, _installCts.Token);
             }
 
             // 3) ServerName + Invite-Code anwenden.
@@ -384,12 +497,12 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 if (!IsExistingInstall)
                 {
                     CurrentPhase = Loc.Get("Installation.InitializingServerConfig");
-                    var initialized = await _install.InitializeServerDescriptionAsync(NewInstallDir, _cts.Token);
+                    var initialized = await _install.InitializeServerDescriptionAsync(NewInstallDir, _installCts.Token);
                     if (!initialized)
                         Serilog.Log.Warning("Server-Init-Run lieferte keine gültige ServerDescription.json — ServerName wird trotzdem versucht zu schreiben");
                 }
 
-                var existing = await _config.LoadServerDescriptionFromAsync(NewInstallDir, _cts.Token)
+                var existing = await _config.LoadServerDescriptionFromAsync(NewInstallDir, _installCts.Token)
                                ?? new ServerDescription();
                 existing.ServerName = NewServerName;
                 if (string.IsNullOrWhiteSpace(existing.InviteCode))
@@ -401,7 +514,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                 // wenn leer, damit der Loopback-Bind in jedem Fall funktioniert.
                 if (string.IsNullOrWhiteSpace(existing.P2pProxyAddress))
                     existing.P2pProxyAddress = "127.0.0.1";
-                await _config.SaveServerDescriptionToAsync(NewInstallDir, existing, _cts.Token);
+                await _config.SaveServerDescriptionToAsync(NewInstallDir, existing, _installCts.Token);
             }
             catch (Exception ex)
             {
@@ -437,7 +550,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
                     if (steamId is not null)
                         s.WindrosePlusAdminSteamIdByServer[installDir] = steamId;
                 }
-            }, _cts.Token);
+            }, _installCts.Token);
 
             InstallCompleted = true;
             _toasts.Success(Loc.Get("Installation.Complete"));
@@ -461,8 +574,8 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         finally
         {
             IsInstalling = false;
-            _cts?.Dispose();
-            _cts = null;
+            _installCts?.Dispose();
+            _installCts = null;
         }
     }
 
@@ -471,6 +584,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
     {
         IsAddingServer = false;
         RefreshServerCards();
+        QueueServerUpdateCheck();
         // Ensure sidebar selection matches this page
         _nav.NavigateTo(this);
     }
@@ -500,6 +614,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
         var entry = _settings.Current.Servers.FirstOrDefault(s => s.Id == id);
         if (entry is null) return;
         var card = ServerCards.FirstOrDefault(c => c.Id == id);
+        if (card?.IsUpdatingServer == true) return;
 
         // Safety: server must be stopped — we're overwriting DLLs.
         if (entry.Id == _settings.Current.ActiveServerId &&
@@ -515,6 +630,7 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             _toasts.Info(Loc.Format("Server.WindrosePlus.Update.Starting", entry.Name));
             await _wplus.InstallAsync(entry.InstallDir, null, CancellationToken.None);
             _toasts.Success(Loc.Format("Server.WindrosePlus.Update.Done", entry.Name));
+            _isManualUpdateCheck = true;
             await _wplusUpdate.CheckAsync();
         }
         catch (WindrosePlusOfflineException)
@@ -572,9 +688,91 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
             }
         }
 
+        _isManualUpdateCheck = true;
         await _wplusUpdate.CheckAsync();
         _toasts.Info(Loc.Format("Server.WindrosePlus.Update.BatchSummary", ok, failed, skipped));
         RefreshServerCards();
+    }
+
+    [RelayCommand]
+    private async Task UpdateServerAsync(string id)
+    {
+        var entry = _settings.Current.Servers.FirstOrDefault(s => s.Id == id);
+        if (entry is null) return;
+        var card = ServerCards.FirstOrDefault(c => c.Id == id);
+
+        // Safety: server must be stopped — we're overwriting binaries.
+        if (ServerInstallService.IsServerProcessRunning(entry.InstallDir))
+        {
+            _toasts.Error(Loc.Get("Toast.ServerRunningStopFirst"));
+            return;
+        }
+
+        if (card is not null)
+        {
+            card.IsUpdatingServer = true;
+            card.ServerUpdateProgress = 0;
+            card.IsServerUpdateProgressIndeterminate = true;
+            card.ServerUpdateStatus = Loc.Get("Server.Update.Preparing");
+        }
+        _updateCts = new System.Threading.CancellationTokenSource();
+        try
+        {
+            _toasts.Info(Loc.Format("Server.Update.Starting", entry.Name));
+            await foreach (var p in _install.InstallOrUpdateAsync(entry.InstallDir, _updateCts.Token))
+            {
+                UpdateServerCardProgress(card, p);
+                if (p.Phase == InstallPhase.Failed)
+                {
+                    _toasts.Error(p.Message ?? Loc.Get("Server.Update.Failed"));
+                    return;
+                }
+            }
+            SetServerUpdateState(id, false);
+            _toasts.Success(Loc.Format("Server.Update.Done", entry.Name));
+        }
+        catch (System.OperationCanceledException)
+        {
+            _toasts.Warning(Loc.Get("Installation.Cancelled"));
+        }
+        catch (Exception ex)
+        {
+            _toasts.Error(ErrorMessageHelper.FriendlyMessage(ex));
+        }
+        finally
+        {
+            if (card is not null)
+            {
+                card.IsUpdatingServer = false;
+                card.ServerUpdateProgress = 0;
+                card.IsServerUpdateProgressIndeterminate = true;
+                card.ServerUpdateStatus = string.Empty;
+            }
+            _updateCts?.Dispose();
+            _updateCts = null;
+            RefreshServerCards();
+            QueueServerUpdateCheck();
+        }
+    }
+
+    private static void UpdateServerCardProgress(ServerCardViewModel? card, InstallProgress progress)
+    {
+        if (card is null) return;
+
+        if (progress.Percent is { } percent)
+        {
+            card.ServerUpdateProgress = Math.Clamp(percent * 100.0, 0, 100);
+            card.IsServerUpdateProgressIndeterminate = false;
+        }
+        else
+        {
+            card.IsServerUpdateProgressIndeterminate = true;
+        }
+
+        var phase = Loc.Get($"InstallPhase.{progress.Phase}");
+        card.ServerUpdateStatus = string.IsNullOrWhiteSpace(progress.Message)
+            ? phase
+            : $"{phase}: {progress.Message}";
     }
 
     [RelayCommand]
@@ -656,5 +854,10 @@ public partial class InstallationViewModel : ViewModelBase, IWindrosePlusOptInCo
 
         _toasts.Info(deleteFiles ? Loc.Get("Server.DeletedWithFiles") : Loc.Get("Server.Deleted"));
         RefreshServerCards();
+    }
+
+    public void Dispose()
+    {
+        _install.ProgressChanged -= OnInstallProgressChanged;
     }
 }

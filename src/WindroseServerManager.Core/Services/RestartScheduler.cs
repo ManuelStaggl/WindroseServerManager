@@ -24,6 +24,8 @@ public sealed class RestartScheduler : BackgroundService
     private readonly IServerProcessService _server;
     private readonly IMetricsService _metrics;
     private readonly IServerEventLog _events;
+    private readonly IBackupService _backupService;
+    private readonly INotificationService _notification;
 
     private DateTime _lastTriggerDate = DateTime.MinValue;
     private DateTime _lastWarnDate = DateTime.MinValue;
@@ -36,13 +38,17 @@ public sealed class RestartScheduler : BackgroundService
         IAppSettingsService settings,
         IServerProcessService server,
         IMetricsService metrics,
-        IServerEventLog events)
+        IServerEventLog events,
+        IBackupService backupService,
+        INotificationService notification)
     {
         _logger = logger;
         _settings = settings;
         _server = server;
         _metrics = metrics;
         _events = events;
+        _backupService = backupService;
+        _notification = notification;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -76,7 +82,7 @@ public sealed class RestartScheduler : BackgroundService
                     if (_server.Status == ServerStatus.Running
                         && (DateTime.UtcNow - _lastAutoRestartUtc).TotalMinutes >= 5)
                     {
-                        var (threshold, reason) = CheckAutoRestartThresholds();
+                        var (threshold, reason) = await CheckAutoRestartThresholdsAsync(stoppingToken).ConfigureAwait(false);
                         if (threshold is not null)
                         {
                             await TriggerRestartAsync(threshold.Value, reason, stoppingToken).ConfigureAwait(false);
@@ -139,7 +145,7 @@ public sealed class RestartScheduler : BackgroundService
         return _lastWarnDate.Date != now.Date;
     }
 
-    private (RestartTrigger? trigger, string reason) CheckAutoRestartThresholds()
+    private async Task<(RestartTrigger? trigger, string reason)> CheckAutoRestartThresholdsAsync(CancellationToken ct)
     {
         var s = _settings.Current;
 
@@ -154,7 +160,7 @@ public sealed class RestartScheduler : BackgroundService
         {
             try
             {
-                var host = _metrics.GetHostMetricsAsync().GetAwaiter().GetResult();
+                var host = await _metrics.GetHostMetricsAsync(ct: ct).ConfigureAwait(false);
                 var proc = _metrics.GetServerProcessMetrics();
                 if (proc is not null && host.RamTotalBytes > 0)
                 {
@@ -184,22 +190,47 @@ public sealed class RestartScheduler : BackgroundService
             RestartTrigger.MaxUptime => ServerEventType.AutoRestartMaxUptime,
             _ => ServerEventType.ScheduledRestart,
         };
-        await _events.AppendAsync(new ServerEvent(DateTime.UtcNow, eventType, reason), ct).ConfigureAwait(false);
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+        await _events.AppendAsync(new ServerEvent(DateTime.UtcNow, eventType, reason, ServerName: serverName), ct).ConfigureAwait(false);
 
         try { await _server.StopAsync(ct).ConfigureAwait(false); }
         catch (Exception ex) { _logger.LogError(ex, "Scheduled restart: stop failed"); }
+
+        // Backup on restart if enabled.
+        if (_settings.Current.BackupOnRestartEnabled)
+        {
+            try
+            {
+                _logger.LogInformation("Creating backup before restart");
+                _notification.NotifyInfo("Creating backup...");
+                await _backupService.CreateBackupAsync(isAutomatic: true, ct).ConfigureAwait(false);
+                _logger.LogInformation("Backup completed successfully");
+                _notification.NotifySuccess("Backup completed successfully before restart");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Backup on restart failed, but proceeding with restart");
+                _notification.NotifyError($"Backup failed: {ex.Message}. Restart will proceed anyway.");
+                await _events.AppendAsync(
+                    new ServerEvent(DateTime.UtcNow, ServerEventType.BackupOnRestartFailed, $"Échec du backup avant restart : {ex.Message}", ServerName: serverName),
+                    ct).ConfigureAwait(false);
+            }
+        }
 
         try { await Task.Delay(TimeSpan.FromSeconds(10), ct).ConfigureAwait(false); }
         catch (OperationCanceledException) { return; }
 
         try
         {
+            _notification.NotifyInfo("Starting server...");
             await _server.StartAsync(ct).ConfigureAwait(false);
             _logger.LogInformation("Scheduled restart complete");
+            _notification.NotifySuccess("Server restarted successfully");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Scheduled restart: start failed");
+            _notification.NotifyError($"Server restart failed: {ex.Message}");
         }
     }
 }

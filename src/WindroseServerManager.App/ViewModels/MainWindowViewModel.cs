@@ -161,7 +161,9 @@ public partial class MainWindowViewModel : ViewModelBase
         // Aktiven Server setzen ohne OnActiveServerChanged auszulösen (kein SelectServerAsync-Call nötig)
         var activeId = current.ActiveServerId;
         var active = Servers.FirstOrDefault(s => s.Id == activeId) ?? Servers.FirstOrDefault();
+#pragma warning disable MVVMTK0034
         _activeServer = active;
+#pragma warning restore MVVMTK0034
         OnPropertyChanged(nameof(ActiveServer));
     }
 

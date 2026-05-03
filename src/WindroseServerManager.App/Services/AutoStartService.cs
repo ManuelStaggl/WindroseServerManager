@@ -3,6 +3,8 @@ using Microsoft.Win32;
 
 namespace WindroseServerManager.App.Services;
 
+#pragma warning disable CA1416
+
 public sealed class AutoStartService : IAutoStartService
 {
     private const string RunKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";

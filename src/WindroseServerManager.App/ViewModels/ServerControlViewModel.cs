@@ -38,6 +38,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private bool _scheduledRestartEnabled;
     [ObservableProperty] private string _dailyRestartTime = "04:00";
     [ObservableProperty] private int _restartWarnMinutes = 5;
+    [ObservableProperty] private bool _backupOnRestartEnabled;
     [ObservableProperty] private bool _restartMon, _restartTue, _restartWed, _restartThu, _restartFri, _restartSat, _restartSun;
 
     [ObservableProperty] private bool _autoRestartOnHighRamEnabled;
@@ -129,6 +130,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         ScheduledRestartEnabled = settings.Current.ScheduledRestartEnabled;
         DailyRestartTime = settings.Current.DailyRestartTime;
         RestartWarnMinutes = settings.Current.RestartWarnMinutes;
+        BackupOnRestartEnabled = settings.Current.BackupOnRestartEnabled;
         LogBufferSize = settings.Current.LogBufferSize > 0 ? settings.Current.LogBufferSize : 2000;
 
         var days = settings.Current.RestartDays ?? new List<DayOfWeek>();
@@ -468,7 +470,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
         await _settings.UpdateAsync(s =>
         {
             s.ScheduledRestartEnabled = ScheduledRestartEnabled;
-            s.DailyRestartTime = DailyRestartTime;
+            s.DailyRestartTime = DailyRestartTime ?? string.Empty;
             s.RestartWarnMinutes = Math.Max(0, RestartWarnMinutes);
             // 7 von 7 Tagen aktiv ist semantisch "täglich" → leere Liste speichern.
             s.RestartDays = days.Count == 7 ? new List<DayOfWeek>() : days;
@@ -476,6 +478,7 @@ public partial class ServerControlViewModel : ViewModelBase, IDisposable
             s.AutoRestartRamThresholdPercent = Math.Clamp(AutoRestartRamThresholdPercent, 10, 100);
             s.AutoRestartOnMaxUptimeEnabled = AutoRestartOnMaxUptimeEnabled;
             s.AutoRestartMaxUptimeHours = Math.Max(1, AutoRestartMaxUptimeHours);
+            s.BackupOnRestartEnabled = BackupOnRestartEnabled;
         });
         _toasts.Success(Loc.Get("Toast.AutomationSaved"));
     }

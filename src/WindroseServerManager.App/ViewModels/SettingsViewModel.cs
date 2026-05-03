@@ -4,6 +4,7 @@ using System.Reflection;
 using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.Views.Dialogs;
 using WindroseServerManager.Core.Models;
@@ -57,6 +58,12 @@ public partial class SettingsViewModel : ViewModelBase
     // Autostart
     [ObservableProperty] private bool _autoStartEnabled;
     [ObservableProperty] private bool _autoStartServerOnAppLaunch;
+
+    // Discord Bot Integration
+    [ObservableProperty] private bool _enableDiscordBot;
+    [ObservableProperty] private string _discordBotToken = string.Empty;
+    [ObservableProperty] private string _discordGuildId = "0";
+    [ObservableProperty] private string _discordLogChannelId = "0";
 
     // App-Update-Check
     [ObservableProperty] private bool _isUpdateCheckBusy;
@@ -115,6 +122,13 @@ public partial class SettingsViewModel : ViewModelBase
 
         _steamAppId = c.SteamAppId;
         _steamLogin = c.SteamLogin;
+
+        // Discord Bot Integration
+        _enableDiscordBot = c.EnableDiscordBot;
+        _discordBotToken = c.DiscordBotToken ?? string.Empty;
+        _discordGuildId = c.DiscordGuildId > 0 ? c.DiscordGuildId.ToString() : string.Empty;
+        _discordLogChannelId = c.DiscordLogChannelId > 0 ? c.DiscordLogChannelId.ToString() : string.Empty;
+
         _suppressPersist = false;
 
         _suppressAutoStartWrite = true;
@@ -130,7 +144,23 @@ public partial class SettingsViewModel : ViewModelBase
         ApplyLastWindrosePlusResult();
 
         _settings.Changed += OnSettingsChanged;
-        _ = CheckFirewallCoreAsync(showToast: false);
+        SafeFireAndForget(CheckFirewallCoreAsync(showToast: false), "CheckFirewall");
+    }
+
+    /// <summary>
+    /// Safely fires off an async task without awaiting it.
+    /// Catches any exceptions to prevent unobserved task exceptions.
+    /// </summary>
+    private void SafeFireAndForget(Task task, string taskName = "unknown")
+    {
+        if (task is null) return;
+        _ = task.ContinueWith(t =>
+        {
+            if (t.IsFaulted && t.Exception is not null)
+            {
+                Log.Warning(t.Exception, "Fire-and-forget task '{TaskName}' failed", taskName);
+            }
+        }, TaskScheduler.Default);
     }
 
     private void RebuildIntervalOptions()
@@ -157,7 +187,9 @@ public partial class SettingsViewModel : ViewModelBase
     {
         if (_suppressIntervalWrite || value is null) return;
         if (_settings.Current.WindrosePlusUpdateCheckIntervalHours == value.Hours) return;
-        _ = _settings.UpdateAsync(s => s.WindrosePlusUpdateCheckIntervalHours = value.Hours);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.WindrosePlusUpdateCheckIntervalHours = value.Hours),
+            "WindrosePlusUpdateCheckInterval");
     }
 
     private void OnWindrosePlusUpdateChecked(WindrosePlusUpdateResult r)
@@ -208,7 +240,7 @@ public partial class SettingsViewModel : ViewModelBase
 
     public string AppVersionDisplay =>
         Loc.Format("Settings.About.VersionFormat",
-            Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0");
+            Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.2.5");
 
     private void OnLanguageChanged()
     {
@@ -241,7 +273,9 @@ public partial class SettingsViewModel : ViewModelBase
         if (string.Equals(value.Key, _localization.CurrentSetting, StringComparison.OrdinalIgnoreCase)) return;
 
         _localization.SetLanguage(value.Key);
-        _ = _settings.UpdateAsync(s => s.Language = value.Key);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.Language = value.Key),
+            "Language");
     }
 
     [RelayCommand]
@@ -318,7 +352,7 @@ public partial class SettingsViewModel : ViewModelBase
 
     private void OnSettingsChanged(WindroseServerManager.Core.Models.AppSettings settings)
     {
-        _ = CheckFirewallCoreAsync(showToast: false);
+        SafeFireAndForget(CheckFirewallCoreAsync(showToast: false), "CheckFirewall");
     }
 
     private string? ResolveServerBinary()
@@ -327,7 +361,9 @@ public partial class SettingsViewModel : ViewModelBase
     partial void OnAutoStartServerOnAppLaunchChanged(bool value)
     {
         if (_suppressAutoStartWrite) return;
-        _ = _settings.UpdateAsync(s => s.AutoStartServerOnAppLaunch = value);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.AutoStartServerOnAppLaunch = value),
+            "AutoStartServerOnAppLaunch");
     }
 
     partial void OnAutoStartEnabledChanged(bool value)
@@ -363,25 +399,33 @@ public partial class SettingsViewModel : ViewModelBase
     partial void OnAutoRestartOnCrashChanged(bool value)
     {
         if (_suppressPersist) return;
-        _ = _settings.UpdateAsync(s => s.AutoRestartOnCrash = value);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.AutoRestartOnCrash = value),
+            "AutoRestartOnCrash");
     }
 
     partial void OnGracefulShutdownSecondsChanged(int value)
     {
         if (_suppressPersist) return;
-        _ = _settings.UpdateAsync(s => s.GracefulShutdownSeconds = Math.Max(5, value));
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.GracefulShutdownSeconds = Math.Max(5, value)),
+            "GracefulShutdownSeconds");
     }
 
     partial void OnLogEnabledChanged(bool value)
     {
         if (_suppressPersist) return;
-        _ = _settings.UpdateAsync(s => s.LogEnabled = value);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.LogEnabled = value),
+            "LogEnabled");
     }
 
     partial void OnExtraLaunchArgsChanged(string value)
     {
         if (_suppressPersist) return;
-        _ = _settings.UpdateAsync(s => s.ExtraLaunchArgs = value?.Trim() ?? string.Empty);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.ExtraLaunchArgs = value?.Trim() ?? string.Empty),
+            "ExtraLaunchArgs");
     }
 
     partial void OnSteamAppIdChanged(string value)
@@ -389,17 +433,55 @@ public partial class SettingsViewModel : ViewModelBase
         if (_suppressPersist) return;
         // Leer bleibt leer während Tippens — Fallback auf 4129620 nur wenn der User das Feld leer lässt.
         var v = value?.Trim();
-        _ = _settings.UpdateAsync(s => s.SteamAppId = string.IsNullOrEmpty(v) ? "4129620" : v);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.SteamAppId = string.IsNullOrEmpty(v) ? "4129620" : v),
+            "SteamAppId");
     }
 
     partial void OnSteamLoginChanged(string value)
     {
         if (_suppressPersist) return;
-        _ = _settings.UpdateAsync(s => s.SteamLogin = value?.Trim() ?? string.Empty);
+        SafeFireAndForget(
+            _settings.UpdateAsync(s => s.SteamLogin = value?.Trim() ?? string.Empty),
+            "SteamLogin");
+    }
+
+    partial void OnEnableDiscordBotChanged(bool value)
+    {
+        if (_suppressPersist) return;
+        try { _ = _settings.UpdateAsync(s => s.EnableDiscordBot = value); }
+        catch (Exception ex) { Log.Warning(ex, "Failed to update EnableDiscordBot setting"); }
+    }
+
+    partial void OnDiscordBotTokenChanged(string value)
+    {
+        if (_suppressPersist) return;
+        try { _ = _settings.UpdateAsync(s => s.DiscordBotToken = value?.Trim() ?? string.Empty); }
+        catch (Exception ex) { Log.Warning(ex, "Failed to update DiscordBotToken setting"); }
+    }
+
+    partial void OnDiscordGuildIdChanged(string value)
+    {
+        if (_suppressPersist) return;
+        if (ulong.TryParse(value?.Trim() ?? "0", out var id))
+        {
+            try { _ = _settings.UpdateAsync(s => s.DiscordGuildId = id); }
+            catch (Exception ex) { Log.Warning(ex, "Failed to update DiscordGuildId setting"); }
+        }
+    }
+
+    partial void OnDiscordLogChannelIdChanged(string value)
+    {
+        if (_suppressPersist) return;
+        if (ulong.TryParse(value?.Trim() ?? "0", out var id))
+        {
+            try { _ = _settings.UpdateAsync(s => s.DiscordLogChannelId = id); }
+            catch (Exception ex) { Log.Warning(ex, "Failed to update DiscordLogChannelId setting"); }
+        }
     }
 
     public string AppVersion =>
-        Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
+        Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.2.5";
 
     [RelayCommand]
     private async Task CheckAppUpdateAsync()

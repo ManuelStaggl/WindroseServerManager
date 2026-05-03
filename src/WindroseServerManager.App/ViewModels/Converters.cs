@@ -404,6 +404,8 @@ public sealed class ServerEventTypeToIconConverter : IValueConverter
             ServerEventType.ScheduledRestart => "⟳",
             ServerEventType.AutoRestartHighRam => "⟳",
             ServerEventType.AutoRestartMaxUptime => "⟳",
+            ServerEventType.BackupOnRestartSuccess => "✓",
+            ServerEventType.BackupOnRestartFailed => "✗",
             _ => "·",
         } : "·";
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -422,6 +424,8 @@ public sealed class ServerEventTypeToBrushConverter : IValueConverter
             ServerEventType.Crashed => "BrandErrorBrush",
             ServerEventType.ScheduledRestart => "BrandInfoBrush",
             ServerEventType.AutoRestartHighRam or ServerEventType.AutoRestartMaxUptime => "BrandWarningBrush",
+            ServerEventType.BackupOnRestartSuccess => "BrandSuccessBrush",
+            ServerEventType.BackupOnRestartFailed => "BrandErrorBrush",
             _ => "BrandTextMutedBrush",
         } : "BrandTextMutedBrush";
 
@@ -452,6 +456,8 @@ public sealed class ServerEventToTitleConverter : IValueConverter
             ServerEventType.ScheduledRestart => Loc.Get("Event.ScheduledRestart"),
             ServerEventType.AutoRestartHighRam => Loc.Get("Event.AutoRestartRam"),
             ServerEventType.AutoRestartMaxUptime => Loc.Get("Event.AutoRestartUptime"),
+            ServerEventType.BackupOnRestartSuccess => Loc.Get("Event.BackupOnRestartSuccess"),
+            ServerEventType.BackupOnRestartFailed => Loc.Get("Event.BackupOnRestartFailed"),
             _ => e.Type.ToString(),
         };
         var ts = e.TimestampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", culture);

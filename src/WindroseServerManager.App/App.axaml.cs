@@ -4,6 +4,9 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
 using Serilog;
 using WindroseServerManager.App.Services;
 using WindroseServerManager.App.ViewModels;
@@ -31,6 +34,10 @@ public partial class App : Application
         Services = _host.Services;
 
         var settings = Services.GetRequiredService<IAppSettingsService>();
+
+        // Load settings synchronously — safe here because the Avalonia dispatcher loop
+        // hasn't started yet, so there's no sync context to cause a deadlock.
+        // This ensures settings.Current is populated before ViewModels read it.
         settings.LoadAsync().GetAwaiter().GetResult();
 
         var localization = Services.GetRequiredService<ILocalizationService>();
@@ -53,13 +60,16 @@ public partial class App : Application
                 desktop.MainWindow = window;
             }
 
-            desktop.ShutdownRequested += (_, _) =>
+            // Async shutdown — no deadlock risk here because the dispatcher is still
+            // running but we use await (not .Result) which cooperates with it.
+            desktop.ShutdownRequested += async (_, args) =>
             {
-                try { _host?.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult(); }
+                try { if (_host is not null) await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); }
                 catch { }
             };
         }
 
+        // Start background services (RestartScheduler, DiscordBot, etc.)
         _ = _host.StartAsync();
 
         // Auto-start eligible servers. Eligibility rule:
@@ -213,12 +223,24 @@ public partial class App : Application
         s.AddSingleton<IMetricsService, MetricsService>();
         s.AddSingleton<IServerEventLog, ServerEventLog>();
 
+        // Discord Bot Services
+        s.AddSingleton<DiscordSocketClient>(sp => {
+            return new DiscordSocketClient(new DiscordSocketConfig {
+                GatewayIntents = GatewayIntents.Guilds,
+                LogLevel = LogSeverity.Info
+            });
+        });
+        s.AddSingleton<InteractionService>(sp => new InteractionService(sp.GetRequiredService<DiscordSocketClient>()));
+        s.AddSingleton<ServerCommandModule>(); // Important: Register the module itself
+
         s.AddHostedService<BackupScheduler>();
         s.AddSingleton<RestartScheduler>();
         s.AddHostedService(sp => sp.GetRequiredService<RestartScheduler>());
 
         s.AddSingleton<INavigationService, NavigationService>();
         s.AddSingleton<IToastService, ToastService>();
+        s.AddSingleton<INotificationService>(sp => 
+            new NotificationServiceAdapter(sp.GetRequiredService<IToastService>()));
         s.AddSingleton<IFirewallService, FirewallService>();
         s.AddSingleton<IUpdateCheckService, UpdateCheckService>();
         s.AddSingleton<IAutoStartService, AutoStartService>();
@@ -226,6 +248,7 @@ public partial class App : Application
         s.AddHostedService<AppUpdateScheduler>();
         s.AddSingleton<IWindrosePlusUpdateService, WindrosePlusUpdateService>();
         s.AddHostedService<WindrosePlusUpdateScheduler>();
+        s.AddHostedService<DiscordBotService>();
 
         s.AddSingleton<MainWindowViewModel>();
 
