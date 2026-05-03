@@ -26,7 +26,7 @@ public sealed class LocalizationService : ILocalizationService
         {
             var app = Application.Current;
             if (app is null) return key;
-            if (app.Resources.TryGetResource(key, app.ActualThemeVariant, out var val) && val is string s)
+            if (app.Resources.TryGetResource(key, null, out var val) && val is string s)
                 return s;
             return key;
         }
@@ -97,11 +97,17 @@ public static class Loc
 {
     public static string Get(string key)
     {
+        if (Dispatcher.UIThread.CheckAccess())
+            return GetInternal(key);
+
+        return Dispatcher.UIThread.Invoke(() => GetInternal(key));
+    }
+
+    private static string GetInternal(string key)
+    {
         var app = Application.Current;
         if (app is null) return key;
-        if (app.Resources.TryGetResource(key, app.ActualThemeVariant, out var val) && val is string s)
-            return s;
-        return key;
+        return app.Resources.TryGetResource(key, null, out var val) && val is string s ? s : key;
     }
 
     /// <summary>Lookup + string.Format für Werte mit Platzhaltern ({0}, {1}, …).</summary>

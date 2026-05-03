@@ -200,7 +200,8 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
 
             _logger.LogInformation("Started Windrose server pid={Pid} exe={Exe}", ProcessId, exe);
 
-            _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, ServerEventType.Started, $"Start via App (pid={ProcessId})"));
+            var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+            _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, ServerEventType.Started, $"Démarrage via l'application (PID={ProcessId})", ServerName: serverName));
 
             // Start WindrosePlus dashboard server after game server starts (fire-and-forget, 2s delay)
             _ = Task.Run(async () =>
@@ -441,7 +442,8 @@ public sealed class ServerProcessService : IServerProcessService, IAsyncDisposab
         var reason = crashed
             ? $"Crash (ExitCode={code?.ToString() ?? "?"})"
             : $"Stop (ExitCode={code?.ToString() ?? "?"})";
-        _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, evtType, reason, code, sessionDuration));
+        var serverName = _settings.Current.Servers.FirstOrDefault(s => s.Id == _settings.Current.ActiveServerId)?.Name ?? "Serveur";
+        _ = _events.AppendAsync(new ServerEvent(DateTime.UtcNow, evtType, reason, code, sessionDuration, ServerName: serverName));
 
         // Auto-restart on crash if enabled and we weren't the one who stopped it
         if (previous != ServerStatus.Stopping && _settings.Current.AutoRestartOnCrash)

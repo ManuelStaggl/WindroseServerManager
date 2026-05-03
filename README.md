@@ -4,9 +4,9 @@
 
 A Windows desktop app (Avalonia / .NET 9) that bundles SteamCMD setup, server control, configuration editing, mod management, backups, firewall rules, and app-update checks into one clean UI — and adds the full Windrose+ feature stack on top: player list with kick/ban, events log, live map, health checks and Windrose+ update notifications.
 
-**Status: Stable · v1.2.0**
+**Status: Stable · v1.3.0**
 
-![Version](https://img.shields.io/badge/version-1.2.0-success)
+![Version](https://img.shields.io/badge/version-1.3.0-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
 ![.NET](https://img.shields.io/badge/.NET-9-512BD4)
@@ -14,6 +14,36 @@ A Windows desktop app (Avalonia / .NET 9) that bundles SteamCMD setup, server co
 ![Language](https://img.shields.io/badge/UI-English%20%7C%20German-blueviolet)
 
 > The UI ships in **English and German** with auto-detection from the Windows language setting (screenshots happen to show the German UI).
+
+---
+
+## What's new in v1.3.0
+
+### 🤖 Integrated Discord Bot
+A fully integrated Discord bot running as a background service alongside the Avalonia UI.
+
+- Bot comes **online automatically** when the application starts and goes offline on close
+- **Live server status** displayed as the bot's Discord Activity (e.g. "🟢 Server online (uptime: 2h 30m)")
+- **Session history events** forwarded in real-time to a configurable Discord channel
+- **Slash commands** (all restricted to Discord Server Administrators):
+  - `/status` — Shows server status, uptime and RAM usage via a styled Embed
+  - `/start` / `/stop` / `/restart` — Remote server control
+  - `/backup` — Creates a manual backup
+  - `/backuprestart` — Stops the server, creates a clean backup, then restarts
+  - `/update` — Updates the server via SteamCMD with live progress editing
+- Configure the bot directly from the **Settings** page (Token, Guild ID, Log Channel ID)
+
+### 💾 Backup on Restart
+- New option in **Server Control** to automatically create a backup before every scheduled or threshold-based restart
+- Backup is created after the server stops and before it starts again, guaranteeing files are never locked during archiving
+- A backup failure never blocks the server restart
+
+### 🔧 Server Update Reliability
+- Fixed critical bug: SteamCMD non-zero exit code is now correctly reported as a failure
+- Added Cancel button for in-progress updates
+- Extended SteamCMD error detection patterns
+- Real-time bootstrap logs during SteamCMD self-update phase
+- UI progress now syncs correctly whether the update is triggered from the UI or from Discord
 
 ---
 
@@ -30,6 +60,14 @@ A huge thank-you to **HumanGenome** for building Windrose+, keeping the API stab
 ---
 
 ## Features
+
+### 🤖 Discord Bot Integration *(new in v1.3.0)*
+- Bot runs as a background service — starts and stops with the app
+- Live server status as Discord Activity
+- Session history events forwarded to a configurable Discord channel
+- Slash commands: `/status`, `/start`, `/stop`, `/restart`, `/backup`, `/backuprestart`, `/update`
+- All critical commands restricted to Discord Server Administrators
+- Configure Token, Guild ID and Log Channel ID directly from Settings
 
 ### Player management (with Windrose+)
 - **Player list** — see who's online, with one-click **kick**, **ban** and **broadcast**.
@@ -56,6 +94,7 @@ A huge thank-you to **HumanGenome** for building Windrose+, keeping the API stab
 - **Auto-restart on crash** (opt-in)
 - **Scheduled restarts** per weekday with configurable warning toast
 - **Threshold-based restarts** — high RAM usage or max uptime
+- **Backup on restart** *(new in v1.3.0)* — automatic backup before every restart
 - **Session history** of all starts / stops / crashes with duration
 - **Live log** with colour coding (errors red, warnings orange)
 
@@ -75,6 +114,7 @@ A huge thank-you to **HumanGenome** for building Windrose+, keeping the API stab
 ### Backups
 - One-click backup of `ServerDescription.json` + worlds + mods
 - Scheduled backups (daily / weekly)
+- **Backup on restart** — automatic backup triggered before every scheduled or threshold-based restart
 - Safe-restore preview before overwriting
 - Configurable retention
 
@@ -102,7 +142,7 @@ A huge thank-you to **HumanGenome** for building Windrose+, keeping the API stab
 ![Installation](Screenshots/02-installation.png)
 
 ### Log & Automation — scheduled restarts and live log
-![Log & Automation](Screenshots/03-log.png)
+![Log & Automation](Screenshots/03-server-control.png)
 
 ### Configuration — server and world parameters
 ![Configuration](Screenshots/04-configuration.png)
@@ -113,10 +153,8 @@ A huge thank-you to **HumanGenome** for building Windrose+, keeping the API stab
 ### Backups — scheduled + safe restore
 ![Backups](Screenshots/06-backups.png)
 
-### Settings — language, firewall, autostart, app-update, Windrose+
+### Settings — language, firewall, autostart, Discord bot, Windrose+
 ![Settings](Screenshots/07-settings.png)
-
-> Screenshots reflect v1.1.0 — some Windrose+ panels (player list, events, live map, health banner) added in v1.2.0 will be refreshed shortly.
 
 ---
 
@@ -132,23 +170,40 @@ No separate .NET install required — the self-contained build ships everything.
 ## Install
 
 ### Option A: Installer (recommended)
-1. Download `WindroseServerManager-Setup-1.2.0.exe` from the [Releases page](https://github.com/ManuelStaggl/WindroseServerManager/releases)
+1. Download `WindroseServerManager-Setup-1.3.0.exe` from the [Releases page](https://github.com/Numa26210/WindroseServerManager/releases)
 2. Run the installer, follow the prompts
 3. Launch from the Start Menu
 
 ### Option B: Portable ZIP
-1. Download `WindroseServerManager-1.2.0-portable.zip`
+1. Download `WindroseServerManager-1.3.0-portable.zip` from the [Releases page](https://github.com/Numa26210/WindroseServerManager/releases)
 2. Extract anywhere
 3. Run `WindroseServerManager.exe`
 
 ### Option C: Build from source
 ```powershell
-git clone https://github.com/ManuelStaggl/WindroseServerManager
+git clone https://github.com/Numa26210/WindroseServerManager
 cd WindroseServerManager
 dotnet build src/WindroseServerManager.App
 # or a release build:
 .\scripts\build-release.ps1
 ```
+
+## Discord Bot Setup
+
+To enable the integrated Discord bot:
+
+1. **Create a bot** on the [Discord Developer Portal](https://discord.com/developers/applications)
+   - New Application → Bot tab → Create Bot → Copy Token
+2. **Invite the bot** to your server
+   - OAuth2 → URL Generator → Scopes: `bot` + `applications.commands`
+   - Permissions: `Send Messages`, `View Channels`, `Read Message History`
+3. **Enable Developer Mode** in Discord (Settings → Advanced)
+   - Right-click your server → Copy Server ID (Guild ID)
+   - Right-click your log channel → Copy Channel ID
+4. **Configure in the app**
+   - Settings → DISCORD section
+   - Enable the bot, paste Token, Guild ID and Log Channel ID
+   - Restart the application
 
 ## First Run
 
@@ -160,6 +215,7 @@ dotnet build src/WindroseServerManager.App
 4. **Server Control** → "Start".
 5. **Settings** → add firewall rule (accept admin prompt).
 6. Optional: **Mods** → drop `.pak` / `.zip` / `.7z` files onto the page.
+7. Optional: **Settings → DISCORD** → configure your Discord bot.
 
 ## Paths
 
@@ -208,6 +264,7 @@ WindroseServerManager/
 
 - **.NET 9** · **Avalonia 12** · Semi.Avalonia (with custom Navy/Amber brand layer)
 - **CommunityToolkit.Mvvm** · Microsoft.Extensions.Hosting / DI
+- **Discord.Net 3.13.0** *(new in v1.3.0)*
 - **Serilog** (file sink, daily rolling)
 - **SharpCompress** (7z support)
 - Windows-specific: tray icon, HKCU Run-Key, Netsh firewall, DwmSetWindowAttribute
@@ -225,6 +282,7 @@ Covers: mod install/uninstall/enable/disable, side-car metadata I/O, Nexus URL p
 ## Credits
 
 - **[Windrose+](https://github.com/HumanGenome/WindrosePlus)** by **HumanGenome** — MIT-licensed mod that powers all player-management features in this app. Bundled at install time via fresh download from GitHub when you opt in; LICENSE preserved next to the mod, attribution in the About dialog. Coordination with HumanGenome confirmed Windrose+ is OK to bundle this way and the API surfaces (HTTP endpoints, RCON, events log, `windrose_plus.json`) are stable across point releases.
+- **[ManuelStaggl](https://github.com/ManuelStaggl/WindroseServerManager)** — original author of WindroseServerManager. This fork builds on their work.
 - The Windrose admin community on Reddit — every "is there a way to kick a player?" thread shaped what this app became.
 
 ## License

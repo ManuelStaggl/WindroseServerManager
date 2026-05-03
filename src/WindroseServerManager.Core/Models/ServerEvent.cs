@@ -8,6 +8,12 @@ public enum ServerEventType
     ScheduledRestart,
     AutoRestartHighRam,
     AutoRestartMaxUptime,
+    BackupOnRestartSuccess,
+    BackupOnRestartFailed,
+    BackupManual,
+    BackupAutomatic,
+    BackupRestored,
+    BackupDeleted,
 }
 
 /// <summary>
@@ -18,4 +24,5 @@ public sealed record ServerEvent(
     ServerEventType Type,
     string Reason,
     int? ExitCode = null,
-    TimeSpan? SessionDuration = null);
+    TimeSpan? SessionDuration = null,
+    string? ServerName = null);

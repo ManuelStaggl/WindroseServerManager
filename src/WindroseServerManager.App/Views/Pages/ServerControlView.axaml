@@ -54,6 +54,12 @@
                     </StackPanel>
                 </StackPanel>
 
+                <Border Classes="divider" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <CheckBox Content="{DynamicResource ServerControl.BackupOnRestart}" IsChecked="{Binding BackupOnRestartEnabled}" VerticalAlignment="Center" />
+                </StackPanel>
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Classes="primary" Content="{DynamicResource Action.Save}" Command="{Binding SaveRestartScheduleCommand}" />
                 </StackPanel>

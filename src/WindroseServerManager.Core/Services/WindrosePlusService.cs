@@ -61,7 +61,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
             using var http = _httpFactory.CreateClient(HttpClientName);
             http.Timeout = TimeSpan.FromSeconds(10);
             http.DefaultRequestHeaders.UserAgent.Clear();
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(UserAgent, "1.0"));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(UserAgent, "1.2.5"));
             http.DefaultRequestHeaders.Accept.Clear();
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
 
@@ -273,7 +273,7 @@ public sealed class WindrosePlusService : IWindrosePlusService
             using var http = _httpFactory.CreateClient(HttpClientName);
             http.Timeout = TimeSpan.FromMinutes(5);
             http.DefaultRequestHeaders.UserAgent.Clear();
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(UserAgent, "1.0"));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(UserAgent, "1.2.5"));
 
             using var resp = await http.GetAsync(release.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct)
                 .ConfigureAwait(false);
